@@ -1,0 +1,13 @@
+<dedication xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+    <para>
+
+    </para>
+<blockquote>
+    <attribution>Gregory Chaitin, <citetitle>META MATH! The Quest for Omega</citetitle>, <citation>METAMATH</citation></attribution>
+    <para>
+        &#x201E;To me, you understand something only if you can program it.  
+        (You, not someone else!)  Otherwise you don’t really understand it, 
+        you only think you understand it.&#x201D;
+    </para>
+</blockquote>
+</dedication>

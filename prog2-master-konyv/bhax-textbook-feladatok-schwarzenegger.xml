@@ -1,0 +1,362 @@
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+    <info>
+        <title>Helló, Schwarzenegger!</title>
+        <keywordset>
+            <keyword/>
+        </keywordset>
+    </info>
+    <section>
+        <title>Szoftmax Py MNIST</title>
+        <para>
+            Python
+        </para>
+        <para>
+            Megoldás videó: <link xlink:href="https://youtu.be/j7f9SkJR3oc">
+             https://youtu.be/j7f9SkJR3oc</link> linken elérhető, Bátfai Norbert megoldása.
+        </para>
+        <para>
+            Megoldás forrása: 
+            <link xlink:href="https://github.com/tensorflow/tensorflow/releases/tag/v0.9.0">
+            https://github.com/tensorflow/tensorflow/releases/tag/v0.9.0</link>            
+        </para>
+
+        <para>
+            A Python nyelv egy magas színtű programozási nyelv melyet 1989-ben Guido van Rossum holland származású programozó kezdett kifejleszteni,
+            majd 1991-ben kiadta művét. A python nyelv dinamikus tipusokat használ, a típusoknak két fajtája létezik, úgymond a mutálható és a mutálhatatlan, 
+            ebből érthetjük hogy tömören csak a megváltoztathatóságról van szó.
+            Ez egy kicsit hasonlíthat már az előbbi feladatokban a C++ nyelvben -ami a python után alakult ki- a globális és nem globális OPP részekhez.
+            Valmint a már számunka ismert OPP (objektumorientált) programozást is támogatja.
+        </para>
+
+        <para> Az eredeti forráskód: </para>
+        <programlisting language="python"><![CDATA[
+
+            # Copyright 2015 The TensorFlow Authors. All Rights Reserved.
+            #
+            # Licensed under the Apache License, Version 2.0 (the "License");
+            # you may not use this file except in compliance with the License.
+            # You may obtain a copy of the License at
+            #
+            #     http://www.apache.org/licenses/LICENSE-2.0
+            #
+            # Unless required by applicable law or agreed to in writing, software
+            # distributed under the License is distributed on an "AS IS" BASIS,
+            # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+            # See the License for the specific language governing permissions and
+            # limitations under the License.
+            # ==============================================================================
+
+            """A very simple MNIST classifier.
+
+            See extensive documentation at
+            http://tensorflow.org/tutorials/mnist/beginners/index.md
+            """
+            from __future__ import absolute_import
+            from __future__ import division
+            from __future__ import print_function
+
+            # Import data
+            from tensorflow.examples.tutorials.mnist import input_data
+
+            import tensorflow as tf
+
+            flags = tf.app.flags
+            FLAGS = flags.FLAGS
+            flags.DEFINE_string('data_dir', '/tmp/data/', 'Directory for storing data')
+
+            mnist = input_data.read_data_sets(FLAGS.data_dir, one_hot=True)
+
+            sess = tf.InteractiveSession()
+
+            # Create the model
+            x = tf.placeholder(tf.float32, [None, 784])
+            W = tf.Variable(tf.zeros([784, 10]))
+            b = tf.Variable(tf.zeros([10]))
+            y = tf.nn.softmax(tf.matmul(x, W) + b)
+
+            # Define loss and optimizer
+            y_ = tf.placeholder(tf.float32, [None, 10])
+            cross_entropy = tf.reduce_mean(-tf.reduce_sum(y_ * tf.log(y), reduction_indices=[1]))
+            train_step = tf.train.GradientDescentOptimizer(0.5).minimize(cross_entropy)
+
+            # Train
+            tf.initialize_all_variables().run()
+            for i in range(1000):
+            batch_xs, batch_ys = mnist.train.next_batch(100)
+            train_step.run({x: batch_xs, y_: batch_ys})
+
+            # Test trained model
+            correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(y_, 1))
+            accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+            print(accuracy.eval({x: mnist.test.images, y_: mnist.test.labels}))
+
+        ]]></programlisting>
+
+        <para> 
+        A fenti forráskód szabadon terjeszthető és felhasználható a TensorFlow Authors fejlesztőinek feltüntetésével.
+        így ebben a kódban kedvünkre dolgozhatunk, az alábbiakban egy átdolgozott megvalósítását láthatjuk a TensorFlow 
+        programnak.
+        </para>
+
+        <para>
+            Az átdolgozott progi és magyarázata:
+        </para>
+        <para>
+            A Minst kézzel írott számok adatbázisa, amely 6000 képet tartalmaz. Ez az alapja azoknak a programoknak ami 
+            képről ismeri fel a tárgyakat. 
+            A Minst program a kézel írt számokról el fogja dönteni hogy milyen szám, de a kézírás mindenkinek más, viszont 
+            a programnak mindig tudnia kell, hogy melyik számot kell felismernie, ez az igazán izgalmas dolog ebben a programban.
+        </para>
+        <para>
+            A programhoz a TensorFlowot használjuk. A TensorFlow egy a Google által alkotott gépi tanulási rendszer, melyet
+            sok helyen használnak, az egyik az a Google Mapsben található utcakép. A TensorFlow nyílt forráskódu, ezért bárki 
+            letöltheti, felhasználhatja, bővítheti és új 5leteit valósíthatja meg egy már megírt kód segitségével.
+        </para>
+
+        <para>
+            A forráskódot részekre bontva magyarázom:
+            
+        </para>
+
+        <programlisting language="python"><![CDATA[
+            from __future__ import absolute_import
+            from __future__ import division
+            from __future__ import print_function
+
+            import argparse
+
+            # Import data
+            from tensorflow.examples.tutorials.mnist import input_data
+
+            import tensorflow as tf
+            old_v = tf.logging.get_verbosity()
+            tf.logging.set_verbosity(tf.logging.ERROR)
+
+            import matplotlib.pyplot
+
+
+            FLAGS = None
+
+            ]]></programlisting>
+
+            <para>
+            Azokat a könyvtárakat amelyek szükségesek a <command>from</command> kulcsszóval adjuk a programunkhoz, hogy 
+            dolgozni tudjunk velük. Majd importáljuk a "TensorFlow" könyvtárt az <command>import</command> kulcsszóval és
+            elnevezzük tf-nek, hogy később könnyebben hivatkozhassunk a rövid névre. Majd importáljuk a "matplotlib.pyplot" 
+            könyvtárat ami majd a kép kirajzolásához lesz szükséges.
+            </para>
+
+            <programlisting language="python"><![CDATA[
+                def readimg():
+                file = tf.read_file("sajat.png")
+                img = tf.image.decode_png(file,1)
+                return img
+            ]]></programlisting>
+
+            <para>
+            Ezután következik readimg() függvény, ami a képeinket olvassa be és dekódolja, majd lent a main() függvény, amiben 
+            a kiíratás felépítése van, hogy hogyan küldjük ki az eredményeket, a függvények definiálásához 
+            <command>def</command> kulcsszót használjuk. 
+            </para>
+
+            <programlisting language="python"><![CDATA[
+
+            def main(_):
+            mnist = input_data.read_data_sets(FLAGS.data_dir, one_hot=True)
+            
+            # Create the model
+            x = tf.placeholder(tf.float32, [None, 784])
+            W = tf.Variable(tf.zeros([784, 10]))
+            b = tf.Variable(tf.zeros([10]))
+            y = tf.matmul(x, W) + b
+            mylist=[]
+            ilist=[]
+            # Define loss and optimizer
+            y_ = tf.placeholder(tf.float32, [None, 10])
+
+            # The raw formulation of cross-entropy,
+            #
+            #   tf.reduce_mean(-tf.reduce_sum(y_ * tf.log(tf.nn.softmax(y)),
+            #                                 reduction_indices=[1]))
+            #
+            # can be numerically unstable.
+            #
+            # So here we use tf.nn.softmax_cross_entropy_with_logits on the raw
+            # outputs of 'y', and then average across the batch.
+            cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels = y_, logits = y))
+            train_step = tf.train.GradientDescentOptimizer(0.5).minimize(cross_entropy)
+
+            sess = tf.InteractiveSession()
+            # Train
+            tf.initialize_all_variables().run(session=sess)
+            print("-- A halozat tanitasa")  
+            for i in range(1000):
+                batch = mnist.train.next_batch(50)
+                batch_xs, batch_ys = mnist.train.next_batch(100)
+                correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(y_, 1))
+                accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))  
+                train_accuracy = accuracy.eval(feed_dict={
+                x: batch[0], y_: batch[1]})
+                sess.run(train_step, feed_dict={x: batch_xs, y_: batch_ys})
+                mylist.append(train_accuracy)
+                ilist.append(i)
+                
+                if i % 100 == 0:
+                print(i/10, "%")
+            ]]></programlisting>
+
+            <para>
+                A sess azaz egy session segítségével fogjuk a tanítást végezni, hasonlóan mint a neurális hálózatnál.
+                A session objektum lehetővé teszi, hogy egy kérés folytatódjon egy bizonyos paraméteren keresztül.
+                Ez a Train program rész azaz a vonat rész, a session tulajdonságából kiindúlva, hogy hosszú időn keresztül
+                folytatódik a folyamat. A pontosság miatt a ciklust ezerszer fogjuk futtatni eyg for ciklusban, 
+                hogy az eredmény tökéletest megkoözelítse. Aztán kííratjuk mennyire lett pontos az eredmény százalékban, 
+                a print() függyvény segitségével. 
+            </para>
+                
+            <programlisting language="python"><![CDATA[
+            # Test trained model
+            print("-- A halozat tesztelese") 
+            
+            print("-- A MNIST 42. tesztkepenek felismerese, mutatom a szamot, a tovabblepeshez csukd be az ablakat")
+            
+            img = mnist.test.images[42]
+            image = img
+
+            matplotlib.pyplot.imshow(image.reshape(28, 28), cmap=matplotlib.pyplot.cm.binary)
+            matplotlib.pyplot.savefig("4.png")  
+            matplotlib.pyplot.show()
+
+            classification = sess.run(tf.argmax(y, 1), feed_dict={x: [image]})
+
+            print("-- Ezt a halozat ennek ismeri fel: ", classification[0])
+            print("----------------------------------------------------------")
+
+            print("-- A sajat kezi -asom felismerese, mutatom a szamot, a tovabblepeshez csukd be az ablakat")
+            img = readimg()
+            image = img.eval()
+            image = image.reshape(28*28)
+            matplotlib.pyplot.imshow(image.reshape(28,28), cmap=matplotlib.pyplot.cm.binary)
+            matplotlib.pyplot.savefig("8.png")  
+            matplotlib.pyplot.show()
+
+            classification = sess.run(tf.argmax(y, 1), feed_dict={x: [image]})
+
+            print("-- Ezt a halozat ennek ismeri fel: ", classification[0])
+            print("----------------------------------------------------------")
+            matplotlib.pyplot.plot(ilist,mylist, color='red', linestyle='solid', linewidth = 1,marker='o', 
+                                    markerfacecolor='blue', markersize=3)
+                    
+            matplotlib.pyplot.show()
+
+
+        ]]></programlisting>
+
+        <para>
+            Elérkeztünk a képzett modell tesztelés (Test trained modell) kódrészhez. A programcsipetben előszőr megjelenik 
+            egy a mnist 42. tesztkép, a rajzoláshoz a <command>matplotlib.pyplot</command>-t használjuk. Majd megjelenik 
+            a saját képünk és a session tovább futtat. Végül megjelenik a saját képünk értékelése, hogy mennyire volt 
+            felismerhető a kézírásunk.
+        </para>
+
+        <programlisting language="python"><![CDATA[
+            if __name__ == '__main__':
+            parser = argparse.ArgumentParser()
+            parser.add_argument('--data_dir', type=str, default='/tmp/tensorflow/mnist/input_data',
+                                help='Directory for storing input data')
+            FLAGS = parser.parse_args()
+            tf.app.run()
+        ]]></programlisting>
+
+        <para>
+            Ha egy képet bezárunk akkor jön a következő kép és így tovább. Legvégül program a kapott eredményeket egy 
+            tömben tárolja el.
+        </para>
+        <para>
+            A program viszonylag nagy pontossággal fogja felismerni a képeken lévő számokat, ezt a többszöri futtatásnak,
+            jelen esetben már említett 1000 futtatásnak köszönhetünk.
+        </para>
+
+    </section>        
+
+
+
+
+
+    <section>
+        <title>Mély MNIST</title>
+        <para>
+            Python            
+        </para>
+        <para>
+            Passz.
+        </para>
+    </section>      
+
+
+
+
+    <section>
+        <title>Minecraft-MALMÖ</title>
+
+        <para>
+            Információkat a Malmö projekttel kapcsolatban bevezetésképpen a Turing fejezetben még az első 
+            ilyen feladat előtt írtam tájékoztatást, hogy érthető legyen ezen projekt célja. Itt már egy 
+            picit komolyabb kifejtésre kerül sor, de a számos feladatnak a külön-külön magyarázatának az 
+            olvasásával mélyebb betekintést nyerhet az olvasó. 
+        </para> 
+        
+        <para>
+            Megoldás videó: initial hack: <link xlink:href="https://youtu.be/bAPSu3Rndi8">https://youtu.be/bAPSu3Rndi8</link>.
+            Red Flower Hell: <link xlink:href="https://github.com/nbatfai/RedFlowerHell">https://github.com/nbatfai/RedFlowerHell</link>.      
+        </para>   
+        <para>
+            A projektben számtalan kreatív lehetőséggel rendelkezünk ahogyan ezt a projekt vezetői is említik. A lehetőségünk az ágens irányításával kezdve a 
+            különböző blockok azonosításával és a környezet felismerésével a blockok mozagtásán át, a különböző sziutációkban, az npc és mob közelség
+            reakcióáig és még tovább egy kreatív programozó és fan számára kimeríthetetlen lehet.      
+        </para>
+        <para>
+            Ezen RFH vagy Vörös Pipacs Pokol projektnek lényege, hogy egy aréna jellegű map-al rendelkezünk, mely egy tölcsérhez hasonló. 
+            A láva folyik az aréna peremétől egészen az aréna közepéig, pontosan 300 másodperc alatt ér le a közepére, és feladatunk, 
+            hogy a lehető legtöbb Pipacsot szedjünk össze ez idő alatt, melyek minden szinten el vannak helyezve, random koordinátákkal.       
+        </para>
+        <para>  
+            Van lehetőség előre és hátra menni a <command>move</command>, fordulni a <command>turn</command>, 
+            a nézés irányát változtatni a <command>look</command>, ütni a <command>attack</command> parancsok 
+            segítségével és még több másra is képesek vagyunk.
+            A 2020-as tavaszi félév során a kezdetben még csak a csigavonalban haladó Steve intelligenciája a program megírása alapján 
+            már eljutott addig, hogy a piros virágokat érzékelje és kiüsse majd felszedje és tovább menjen, természetesen 
+            ezt mind időre a láva leérkezése előtt.
+        </para>
+        <para>
+            Az ágensprogramozás nem olyan egyszerű mint ahogyan azt gondolnánk, de a végeredmény mosolyt tud csalni az racunkra.
+            Ellentétben azzal, hogy számtalanszor lehet nemvárt hibákba futni, amlyeket nem a legkönnyebb kijavítani 
+            és tökéletessé csiszolni. Viszont a cél az ágens megismerése és minden paramétert megfelelően beállítani 
+            annak érdekében, hogy a megfelelő eredményt érjük el.
+        </para>
+        <para>
+            A <link xlink:href="https://github.com/nbatfai/RedFlowerHell">Red Flower Hell</link> repóban különböző érdekes programkódok elérhetők. 
+        </para>
+        <para>
+        	A mesterséges inteligencia fejlesztői is azon dolgoznak, hogy ezt ne csak egy ilyen MALMÖ projektben ahol különböző blockok 
+            felismerésével érünk el eredményt hanem már pixelek alapján is értelmezhetővé váljon a vizuális térben való elhelyzkedés és 
+            különböző feladatok elvégzése. 
+        </para>
+
+    </section>    
+
+
+
+    
+        
+    <section>
+        <title>Vörös Pipacs Pokol/javíts a 19 RF-en</title>
+        <para>
+            Megoldás forrása: <link xlink:href="https://github.com/nbatfai/RedFlowerHell">https://github.com/nbatfai/RedFlowerHell</link>               
+        </para>
+        <para>
+            Második passz.
+        </para>            
+    </section>       
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
+</chapter>                

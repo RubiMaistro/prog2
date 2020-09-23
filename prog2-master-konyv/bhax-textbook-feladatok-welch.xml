@@ -1,0 +1,1503 @@
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+    <info>
+        <title>Helló, Welch!</title>
+        <keywordset>
+            <keyword/>
+        </keywordset>
+    </info>
+    <section>
+        <title>Első osztályom</title>
+        <para>
+            Valósítsd meg C++-ban és Java-ban az módosított polártranszformációs algoritmust! A matek háttér 
+            teljesen irreleváns, csak annyiban érdekes, hogy az algoritmus egy számítása során két normálist
+            számol ki, az egyiket elspájzolod és egy további logikai taggal az osztályban jelzed, hogy van vagy
+            nincs eltéve kiszámolt szám.
+        </para>
+        <para>
+            Megoldás videó:
+        </para>
+        <para>
+            Az Objektum Orientált Programozás (OOP) alapja az osztályozás (class), vagyis minden egyes osztály egy-egy objektum.
+        </para>
+        <para>
+            Akkor nevezünk egy nyelvet objektum orientáltnak, ha egymással kommunikáló és műveleteket végző objektumokból áll egy program.
+            Az OOP egyszerűsit a programon, növeli a hatékonyságot és átláthatóbb.
+            A C++ és a Java egyaránt OOP nyelvek.
+            </para>
+            <para>
+            AZ első program az OOP bevezetéshez a polargen. 
+            Fontos lépés a feladatban, hogy egy számitási lépés két normális eloszlású számot állit elő, és minden második meghiváskor fel fogja 
+            használni az előzőleg tároltban elhelyezett számot, tehát nem fog mindig számolni.
+        </para>
+        <para>
+            Először a C++ nyelven fogunk végignézni a programot. A program 3 részből fog állni.
+        </para>
+        <para>
+            Megoldás forrása: 
+
+        <link xlink:href="https://sourceforge.net/p/udprog/code/ci/master/tree/source/labor/polargen/">
+                            https://sourceforge.net/p/udprog/code/ci/master/tree/source/labor/polargen/</link>    
+        </para>           
+        
+        <para> Bátfai Norbert forrását felhasználva.</para>
+        <para>Az első program C++ nyelven lesz látható, amely képes objektumokkal is dolgozni ezért OOP nyelv.</para>
+
+        <programlisting language="c++"><![CDATA[
+
+            #ifndef POLARGEN__H
+            #define POLARGEN__H
+
+            #include <cstdlib>
+            #include <cmath>
+            #include <ctime>
+
+            class PolarGen
+            {
+            public:
+            PolarGen ()
+            {
+                nincsTarolt = true;
+                std::srand (std::time (NULL));
+            }
+            ~PolarGen ()
+            {
+            }
+            double kovetkezo ();
+
+            private:
+            bool nincsTarolt;
+            double tarolt;
+
+            };
+
+            #endif
+        ]]></programlisting>
+
+        <para> 
+            Az első kódrészlet a header fájl. Itt definiáljuk a polargen headert és includeoljuk a szükséges headereket. A cmath header a matematikai számításokat 
+            tartalmazza, a ctime header a nekünk szükséges srand() időmérő függvényt tartalmazza.
+        </para>
+        <para>
+            Létrehozzuk a PolarGen osztályt (class), amelynek a publikus részében egy konstruktort majd egy destruktort hozunk létre.
+            A private részben deklarálunk két változót, egy logikai (bool) nincsTarolt ami a tárolásról ad majd információt, és egy double tarolt változót, 
+            ezek azért kerültek a privát részbe, hogy az értékükön ne legyen módunk változtatni.
+            Viszzatérve a publikus részhez, a konstruktorban kezdőértéket adunk a logikai változónak, ami jelen esetben igaz, vagyis hogy üres a változó.
+            Az srand() függvény csak az időt méri, felhasználva a számitógép idő bitjét.
+            A destruktor a programunk végén fog lefutni, amely a memóriaszivárgást akadályozza meg.
+        </para>
+
+
+        <programlisting language="c++"><![CDATA[
+            #include "polargen.h"
+
+            double
+            PolarGen::kovetkezo ()
+            {
+            if (nincsTarolt)
+                {
+                double u1, u2, v1, v2, w;
+                do
+                {
+                u1 = std::rand () / (RAND_MAX + 1.0);
+                u2 = std::rand () / (RAND_MAX + 1.0);
+                v1 = 2 * u1 - 1;
+                v2 = 2 * u2 - 1;
+                w = v1 * v1 + v2 * v2;
+                }
+                while (w > 1);
+
+                double r = std::sqrt ((-2 * std::log (w)) / w);
+
+                tarolt = r * v2;
+                nincsTarolt = !nincsTarolt;
+
+                return r * v1;
+                }
+            else
+                {
+                nincsTarolt = !nincsTarolt;
+                return tarolt;
+                }
+            }
+        ]]></programlisting>
+
+        <para>
+            A második kódrészlet a számításokat végzi, itt valósítjuk meg a polártranszformációt. 
+            Includeoljuk a már megbeszélt polargen.h headert.
+        </para>
+        <para>
+            A lényeg, hogy az if fogja vizsgálni a nincsTarolt logikai értékét, azaz hogy van-e számunk a változóban, ha van akkor elvégzi 
+            a matematikai számításokat (ezek most nem fontosak).
+            Ha nincs benne szám akkor új számot fogunk készíteni.
+        </para>
+
+        <programlisting language="c++"><![CDATA[
+            #include <iostream>
+            #include "polargen.h"
+
+            using namespace std;
+
+            int
+            main (int argc, char **argv)
+            {
+            PolarGen pg;
+
+            cout<<endl;
+            for (int i = 0; i < 10; ++i)
+                cout <<"\t"<< pg.kovetkezo () << endl;
+
+            return 0;
+            }
+        ]]></programlisting>
+
+        <para>
+        Végül a harmadik kódrészlet maga a fő függvényünk amelyben kidomborodik a program, 
+        itt futtatja le a program a for ciklusban a számításokat végző függvéyünket.
+        Jelen esetben 10x fog lefutni.
+        </para>
+
+        <figure>
+                <title>Polargenteszt.cpp futtatása</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="img/PolarGenKimenet.png" format="PNG" scale="60" />
+                    </imageobject>
+                    <textobject>
+                        <phrase>Polargenteszt.cpp futtatása</phrase>
+                    </textobject>
+                </mediaobject>
+            </figure>
+
+            <para>
+            A következő program ugyan az mint az előző csak Java nyelven, ez a programozási nyelv amit már az előző fejezetekben tárgyaltunk, egy 
+            OOP nyelv amely csak objektumokkal dolgozik, a C++-al szemben.
+            </para>
+            <programlisting language="c++"><![CDATA[
+                public class PolarGen{
+                
+                    boolean nincsTarolt = true;
+                    double tarolt;
+                    
+                    public PolarGen() {
+                        
+                        nincsTarolt = true;
+                        
+                    }
+                    
+                    public double kovetkezo() {
+                        
+                        if(nincsTarolt) {
+                            
+                            double u1, u2, v1, v2, w;
+                            do {
+                                u1 = Math.random();
+                                u2 = Math.random();
+                                
+                                v1 = 2*u1 - 1;
+                                v2 = 2*u2 - 1;
+                                
+                                w = v1*v1 + v2*v2;
+                                
+                            } while(w > 1);
+                            
+                            double r = Math.sqrt((-2*Math.log(w))/w);
+                            
+                            tarolt = r*v2;
+                            nincsTarolt = !nincsTarolt;
+                            
+                            return r*v1;watch?v=9_ylSciSjBw&feature=youtu.be
+                            
+                        } else {
+                            nincsTarolt = !nincsTarolt;
+                            return tarolt;
+                        }
+                    }
+                    
+                    public static void main(String[] args) {
+                        
+                        PolarGen g = new PolarGen();
+                        
+                        for(int i=0; i<10; ++i)
+                            System.out.println(g.kovetkezo());
+                        
+                    }
+                
+                }
+
+            ]]></programlisting>
+
+            <para>
+                Különösen nincs mit magyarázni, mert a program ugyan úgy működik mint az előző. A különbség annyi, hogy ebben a nyelvben 
+                csak objektumokat/függvényeket tudunk lértrehozni, így már a program csipetben látható is, hogy a program kód egyben van 
+                és nincs részekre bontva.
+            </para>
+
+    </section>        
+
+
+
+
+
+
+    <section>
+        <title>LZW</title>
+        <para>
+            Valósítsd meg C-ben az LZW algoritmus fa-építését!
+        </para>
+        <para>
+            A program egy bináris fát fog felépíteni bemeneti adatokból. Az LZW binfa minden csomópontjának (elágazás) két gyermeke (további ága) lehet. 
+            A csomópontok gyermekei vagy 0-ás vagy 1-es lehet. Az 1-es a jobb oldali, a 0-ás a bal oldali. 
+        </para>
+        <para>
+            A binfa lényege hogy a gyökérből (kitüntetett elem) elérhetünk minden elemet.
+        </para>
+        <para>
+            Megoldás forrása Bátfai Norbert Tanárúrtól: <link xlink:href ="https://progpater.blog.hu/2011/03/05/labormeres_otthon_avagy_hogyan_dolgozok_fel_egy_pedat?fbclid=IwAR0R_H4ol5laHPvyjt-p5MQomtcQIdfTeZvPInhgRxu-CCsxGOx453MSrGk">
+            https://progpater.blog.hu/2011/03/05/labormeres_otthon_avagy_hogyan_dolgozok_fel_egy_pedat?fbclid=IwAR0R_H4ol5laHPvyjt-p5MQomtcQIdfTeZvPInhgRxu-CCsxGOx453MSrGk</link>                
+        </para>
+
+        <programlisting language="c++"><![CDATA[
+        BINFA_PTR gyoker = uj_elem ();
+          gyoker->ertek = '/';
+          gyoker->bal_nulla = gyoker->jobb_egy = NULL;
+          BINFA_PTR fa = gyoker;
+          long max=0;
+            while (read (0, (void *) &b, sizeof(unsigned char)))
+            {
+                for(i=0;i<8; ++i)
+                {
+                    egy_e= b& 0x80;
+                    if ((egy_e >>7)==0)
+                        c='1';
+                    else
+                        c='0';
+                }
+                if (c == '0')
+                {
+                    if (fa->bal_nulla == NULL)
+                    {
+                    fa->bal_nulla = uj_elem ();
+                    fa->bal_nulla->ertek = 0;
+                    fa->bal_nulla->bal_nulla = fa->bal_nulla->jobb_egy = NULL;
+                    fa = gyoker;
+                    }
+                    else
+                    {
+                    fa = fa->bal_nulla;
+                    }
+                }
+              else
+                {
+                    if (fa->jobb_egy == NULL)
+                    {
+                     fa->jobb_egy = uj_elem ();
+                     fa->jobb_egy->ertek = 1;
+                     fa->jobb_egy->bal_nulla = fa->jobb_egy->jobb_egy = NULL;
+                     fa = gyoker;
+                     }
+                else
+                    {
+                  fa = fa->jobb_egy;
+                    }
+                }
+            }
+        ]]></programlisting>
+
+        <para>
+           A fa építésében két esetünk van. A 0-ás és az 1-es beépítése a megfelelő helyre.
+        </para>
+        <para>
+            Ha 0-ás a bemenet akkor a gyökértől kezdve megnézzük, hogy van egy 0-ás (bal oldali) gyermeke, ha van akkor rálépünk, 
+            ha viszont nincs akkor létre kell hozni, majd miután létrehoztuk, vissza lépünk a gyökérre és olvassuk tovább a bemenetet.
+        </para>
+        <para>
+            Az 1-es bemenet esetén hasonlóan járunk el mint a 0-ásnál. A gyökértől kezdve megnézzük, hogy van egy 1-es (jobb oldali) gyermeke, ha van akkor rálépünk, 
+            ha viszont nincs akkor létre kell hozni, majd miután létrehoztuk, vissza lépünk a gyökérre és olvassuk tovább a bemenetet.
+        </para>
+        <para>
+            Végül az LZWBinfa ezen algoritmus alapján fog felépülni, és beépülni minden egyes csomópont (1-es vagy 0-ás) a fába.  
+        </para>
+        <para>
+            Ebben a programrészletben a fát inorder bejárással dolgozzuk fel, ami azt jelenti hogy elsőre a bal oldallal, aztán 
+            a gyökérrel és végül a jobb oldallal foglalkozunk.
+        </para>
+
+    </section>        
+        
+
+
+
+
+
+    <section>
+        <title>Fabejárás</title>
+        <para>
+            Járd be az előző (inorder bejárású) fát pre- és posztorder is!
+        </para>
+        <para>
+            Az előző feladatban létrehozott fát több féleképpen be lehet járni: inorder, preorder és postorder. 
+        </para>
+        <para>
+            Lent e három fabejárás kódját lehet látni.
+        </para>
+        <para>Az első az inorder:</para>
+
+        <programlisting language="c++"><![CDATA[
+            void kiir (Csomopont * elem, std::ostream & os)
+            {
+                if (elem != NULL)
+                {
+                    ++melyseg;
+                    kiir (elem->egyesGyermek (), os); //egyes gyermek feldolgozása
+                    
+                    
+                    for (int i = 0; i < melyseg; ++i)
+                        os << "---";
+                    os << elem->getBetu () << "(" << melyseg - 1 << ")" << std::endl; //csomópont feldolgozása
+
+                    kiir (elem->nullasGyermek (), os); //nullás gyermek feldolgozása
+                    --melyseg;
+                }
+            }
+
+        ]]></programlisting>
+        <para>
+            Ez már az előző feladatban tárgyalva volt. Tehát az inorder bejárással a fát úgy dolgozzuk fel, 
+            hogy egy adott csomópontnak mindig a bal gyerekét dolgozzuk fel először, azután az aktuális csomópontot, azután pedig a jobb gyermekét.
+            A kitüntetett elem feldolgozása a bejárás közepén kerül sorra.
+        </para>
+
+        <figure>
+            <title>Inorder fa bejárás</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="img/inorder.png" format="PNG" scale="60" />
+                    </imageobject>
+                    <textobject>
+                        <phrase>Inorder fa bejárás</phrase>
+                    </textobject>
+                </mediaobject>
+        </figure>
+        <para>
+            Kép forrása: <link xlink:href="https://medium.com/@andrewmf/iterative-in-order-tree-traversal-using-dynamic-programming-508f189eb494"
+            >https://medium.com/@andrewmf/iterative-in-order-tree-traversal-using-dynamic-programming-508f189eb494</link>
+        </para>
+
+        <para>
+            Az fenti programrészletben a void tipusú kiir() függvény inorder módon fogja az elemeket kiíratni.
+        </para>
+
+        <para>A második a preorder:</para>
+
+        <programlisting language="c++"><![CDATA[
+            void kiir (Csomopont * elem, std::ostream & os)
+            {
+                // Nem létező csomóponttal nem foglalkozunk... azaz ez a rekurzió leállítása
+                if (elem != NULL)
+                {
+                    ++melyseg;
+
+                    for (int i = 0; i < melyseg; ++i)
+                        os << "---";
+                    os << elem->getBetu () << "(" << melyseg - 1 << ")" << std::endl;
+
+
+                    kiir (elem->egyesGyermek (), os); //egyes gyermek feldolgozása
+                    
+                    kiir (elem->nullasGyermek (), os); //nullás gyermek feldolgozása
+                    --melyseg;
+                }
+            }
+
+        ]]></programlisting>
+    
+        <para> 
+            A preorder bejárással elsőre a csomópontot, majd a bal, aztán a jobb gyermeket dolgozzuk fel. Ez azt jelenti hogy a fát a gyökérből indulva,
+            haladva a fa bal oldalán végig feldogozzuk az össze csomópont bal oldali gyemekét, majd a jobb oldalit, amíg vissza nem érünk a gyökérhez,
+            és akkor a feldologzás ugyanúgy folytatódik, tovább a fa jobb oldalát is bejárjuk. A kitüntetett elem lesz feldolgozva elsőre.
+        </para>
+
+        <figure>
+            <title>Preorder fa bejárás</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="img/preorder.png" format="PNG" scale="60" />
+                    </imageobject>
+                    <textobject>
+                        <phrase>Preorder fa bejárás</phrase>
+                    </textobject>
+                </mediaobject>
+        </figure>
+
+        <para>
+            Kép forrása: <link xlink:href="https://algorithms.tutorialhorizon.com/binary-tree-preorder-traversal-non-recursive-approach/"
+            >https://algorithms.tutorialhorizon.com/binary-tree-preorder-traversal-non-recursive-approach/</link>
+        </para>
+
+        <para>
+            Az fenti programrészletben a void tipusú kiir() függvény preorder módon fogja az elemeket kiíratni.
+        </para>
+
+        <para>A harmadik a postorder:</para>
+
+        <programlisting language="c++"><![CDATA[
+            void kiir (Csomopont * elem, std::ostream & os)
+            {
+                if (elem != NULL)
+                {
+                    ++melyseg;
+
+                    kiir (elem->egyesGyermek (), os);
+
+                    kiir (elem->nullasGyermek (), os);
+
+                    for (int i = 0; i < melyseg; ++i)
+                        os << "---";
+                    os << elem->getBetu () << "(" << melyseg - 1 << ")" << std::endl;
+
+                    --melyseg;
+                }
+            }
+
+        ]]></programlisting>
+
+        <para>
+            A postorder bejárással elsőre a bal oldali gyermeket, majd a jobb oldali gyermeket és végül az adott csomópontot dolgozzuk fel, 
+            elérve egészen a gyökérig. Itt a kitüntetett elem kerül utoljára feldolgozásra.
+        </para>
+
+        <figure>
+            <title>Postorder fa bejárás</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="img/postorder.png" format="PNG" scale="60" />
+                    </imageobject>
+                    <textobject>
+                        <phrase>Postorder fa bejárás</phrase>
+                    </textobject>
+                </mediaobject>
+        </figure>
+       
+       <para>
+            Kép forrása: <link xlink:href="https://www.wikitechy.com/technology/java-algorithm-iterative-postorder-traversal-set-2-using-one-stack/"
+            >https://www.wikitechy.com/technology/java-algorithm-iterative-postorder-traversal-set-2-using-one-stack/</link>
+        </para>
+
+        <para>
+            Az fenti programrészletben a void tipusú kiir() függvény postorder módon fogja az elemeket kiíratni.
+        </para>
+
+    </section>     
+
+
+
+
+                        
+    <section>
+        <title>Tag a gyökér</title>
+        <para>
+            Az LZW algoritmust ültesd át egy C++ osztályba, legyen egy Tree és egy beágyazott Node
+            osztálya. A gyökér csomópont legyen kompozícióban a fával!
+        </para>
+        <para>
+            A Csomopont osztályban létrehozzuk a '/' betűt tartalmazó objektumot, ami része a fának, vagyis tagként veszi a gyökeret is.
+        </para>
+        <para>
+            Megoldás forrása: <link xlink:href="https://github.com/RubiMaistro/Bevprog/blob/master/Binfa/z3a7.cpp">
+                                https://github.com/RubiMaistro/Bevprog/blob/master/Binfa/z3a7.cpp
+            </link>             
+        </para>
+        <para>A forrás Báfai Norbert Tanárúrtól származik, a repó pedig saját.</para>
+
+        <programlisting language="c++"><![CDATA[
+
+        #include <iostream> 
+        #include <cmath>        
+        #include <fstream>      
+
+        class LZWBinFa
+        {
+        public:
+
+            LZWBinFa ():fa (&gyoker)
+            {
+            }
+            ~LZWBinFa ()
+            {
+                szabadit (gyoker.egyesGyermek ());
+                szabadit (gyoker.nullasGyermek ());
+            }
+
+            void operator<< (char b)
+            {
+                
+                if (b == '0')
+                {
+                  
+                    if (!fa->nullasGyermek ())  
+                    {
+                       
+                        Csomopont *uj = new Csomopont ('0');
+                        
+                        fa->ujNullasGyermek (uj);
+                    
+                        fa = &gyoker;
+                    }
+                    else        
+                    {
+                        fa = fa->nullasGyermek ();
+                    }
+                }
+                else
+                {
+                    if (!fa->egyesGyermek ())
+                    {
+                        Csomopont *uj = new Csomopont ('1');
+                        fa->ujEgyesGyermek (uj);
+                        fa = &gyoker;
+                    }
+                    else
+                    {
+                        fa = fa->egyesGyermek ();
+                    }
+                }
+            }
+
+            void kiir (void)
+            {
+
+                melyseg = 0;
+
+                kiir (&gyoker, std::cout);
+            }
+
+            int getMelyseg (void);
+            double getAtlag (void);
+            double getSzoras (void);
+
+            friend std::ostream & operator<< (std::ostream & os, LZWBinFa & bf)
+            {
+                bf.kiir (os);
+                return os;
+            }
+            void kiir (std::ostream & os)
+            {
+                melyseg = 0;
+                kiir (&gyoker, os);
+            }
+
+        ]]></programlisting>
+        
+        <para>
+            A program magyarázata:
+        </para>
+        <para>
+            Az LZWBinfa osztályban van privát és publikus rész. 
+         </para>
+         <para>
+            Az osztály konstruktora és destruktora a publikus részében szerepel. 
+            A public részben szerepel az algoritmus, azaz a 0-ás és 1-es csomópontok beágyazása. Itt van a még kiir() függvény amely a kimenetre irat. 
+        </para>
+        <programlisting language="c++"><![CDATA[
+        private:
+            class Csomopont
+            {
+            public:
+
+                Csomopont (char b = '/'):betu (b), balNulla (0), jobbEgy (0)
+                {
+                };
+                ~Csomopont ()
+                {
+                };
+
+                Csomopont *nullasGyermek () const
+                {
+                    return balNulla;
+                }
+
+                Csomopont *egyesGyermek () const
+                {
+                    return jobbEgy;
+                }
+
+                void ujNullasGyermek (Csomopont * gy)
+                {
+                    balNulla = gy;
+                }
+
+                void ujEgyesGyermek (Csomopont * gy)
+                {
+                    jobbEgy = gy;
+                }
+
+                char getBetu () const
+                {
+                    return betu;
+                }
+        ]]></programlisting>
+        <para>
+            A private részben van az LZWBinfa osztálynak a Csomopont osztálya. Ennek van konstruktora, destruktora (memóriaszivárgás elkerülés végett), 
+            nullás és egyes gyermeket lekérdező függvények (a vizsgáló függvények) és új nullás és új egyes gyermek létrehozásáért felelős függvények, 
+            valamint a lekérdező függvény, hogy mi található a csomópontban. 
+        </para>
+
+
+        <programlisting language="c++"><![CDATA[
+        private:
+
+                char betu;
+
+                Csomopont *balNulla;
+                Csomopont *jobbEgy;
+                
+                Csomopont (const Csomopont &); 
+                Csomopont & operator= (const Csomopont &);
+            };
+        ]]></programlisting>
+        <para>
+            A Csomopont osztály private részben van deklarálva a betű változó, ami megmondja, hogy milyen betű van a csomópontban, majd
+            a jobb és bal gyermeket is deklaráljuk. Ez alatt található a Csomopont osztály másoló konstruktora.
+        </para>
+
+
+        <programlisting language="c++"><![CDATA[
+            Csomopont *fa;
+
+            int melyseg, atlagosszeg, atlagdb;
+            double szorasosszeg;
+          
+            LZWBinFa (const LZWBinFa &);
+            LZWBinFa & operator= (const LZWBinFa &);
+
+             
+            void kiir (Csomopont * elem, std::ostream & os) //PREORDER
+            {
+                if (elem != NULL)
+                {
+                    ++melyseg; 
+
+                    for (int i = 0; i < melyseg; ++i) 
+                        os << "---";
+                    os << elem->getBetu () << "(" << melyseg - 1 << ")" << std::endl;
+
+                    kiir (elem->egyesGyermek (), os); 
+                    
+                    kiir (elem->nullasGyermek (), os);
+
+                    
+
+                    --melyseg;
+                }
+            }
+            void szabadit (Csomopont * elem)
+            {
+                if (elem != NULL)
+                {
+                    szabadit (elem->egyesGyermek ());
+                    szabadit (elem->nullasGyermek ());
+
+                    delete elem;
+                }
+            }           
+        ]]></programlisting>
+        <para>
+            Tovább haladva, az LZWBinfa másoló konstruktora, a kiir függvényben kiirjuk a függvényt az os csatornára, itt tudjuk megadni, 
+            hogy milyen bejárással irja ki a fát, a fa bejárások feladatban volt róla szó. Ezt követi egy szabadit függvény, mely felszabaditja a szabad 
+            tárból az egyes gyermeket, a nullásat rekurzivan és végül az elemet is. 
+        </para>
+
+
+        <programlisting language="c++"><![CDATA[
+        protected:  
+            
+            Csomopont gyoker;
+            int maxMelyseg;
+            double atlag, szoras;
+
+            void rmelyseg (Csomopont * elem);
+            void ratlag (Csomopont * elem);
+            void rszoras (Csomopont * elem);
+
+        };
+
+        int
+        LZWBinFa::getMelyseg (void)
+        {
+            melyseg = maxMelyseg = 0;
+            rmelyseg (&gyoker);
+            return maxMelyseg - 1;
+        }
+
+        double
+        LZWBinFa::getAtlag (void)
+        {
+            melyseg = atlagosszeg = atlagdb = 0;
+            ratlag (&gyoker);
+            atlag = ((double) atlagosszeg) / atlagdb;
+            return atlag;
+        }
+
+        double
+        LZWBinFa::getSzoras (void)
+        {
+            atlag = getAtlag ();
+            szorasosszeg = 0.0;
+            melyseg = atlagdb = 0;
+
+            rszoras (&gyoker);
+
+            if (atlagdb - 1 > 0)
+                szoras = std::sqrt (szorasosszeg / (atlagdb - 1));
+            else
+                szoras = std::sqrt (szorasosszeg);
+
+            return szoras;
+        }
+
+        void
+        LZWBinFa::rmelyseg (Csomopont * elem)
+        {
+            if (elem != NULL)
+            {
+                ++melyseg;
+                if (melyseg > maxMelyseg)
+                    maxMelyseg = melyseg;
+                rmelyseg (elem->egyesGyermek ());
+
+                rmelyseg (elem->nullasGyermek ());
+                --melyseg;
+            }
+        }
+
+        void
+        LZWBinFa::ratlag (Csomopont * elem)
+        {
+            if (elem != NULL)
+            {
+                ++melyseg;
+                ratlag (elem->egyesGyermek ());
+                ratlag (elem->nullasGyermek ());
+                --melyseg;
+                if (elem->egyesGyermek () == NULL && elem->nullasGyermek () == NULL)
+                {
+                    ++atlagdb;
+                    atlagosszeg += melyseg;
+                }
+            }
+        }
+
+        void
+        LZWBinFa::rszoras (Csomopont * elem)
+        {
+            if (elem != NULL)
+            {
+                ++melyseg;
+                rszoras (elem->egyesGyermek ());
+                rszoras (elem->nullasGyermek ());
+                --melyseg;
+                if (elem->egyesGyermek () == NULL && elem->nullasGyermek () == NULL)
+                {
+                    ++atlagdb;
+                    szorasosszeg += ((melyseg - atlag) * (melyseg - atlag));
+                }
+            }
+        }
+
+        ]]></programlisting>
+        <para>
+            A protected rész arra szolgál, hogy a jövőbeni változtatások látszódjanak majd a gyermek osztályban is. Itt jelenik meg a Csomopont gyoker is, 
+            valamint az rmelyseg, ratlag, rszoras függvények is. A protected rész tulajdonképpen öröklődésre, friend függvényekre használatos.
+        </para>
+
+
+        <programlisting language="c++"><![CDATA[
+            void
+        usage (void)
+        {
+            std::cout << "Usage: lzwtree in_file -o out_file" << std::endl;
+        }
+
+        int
+        main (int argc, char *argv[])
+        {
+
+            if (argc != 4)
+            {
+                usage ();
+
+                return -1;
+            }
+
+            char *inFile = *++argv;
+
+            if (*((*++argv) + 1) != 'o')
+            {
+                usage ();
+                return -2;
+            }
+
+            std::fstream beFile (inFile, std::ios_base::in);
+
+            if (!beFile)
+            {
+                std::cout << inFile << " nem letezik..." << std::endl;
+                usage ();
+                return -3;
+            }
+
+            std::fstream kiFile (*++argv, std::ios_base::out);
+
+            unsigned char b;        
+            LZWBinFa binFa;     
+
+            while (beFile.read ((char *) &b, sizeof (unsigned char)))
+                if (b == 0x0a)
+                    break;
+
+            bool kommentben = false;
+
+            while (beFile.read ((char *) &b, sizeof (unsigned char)))
+            {
+
+                if (b == 0x3e)
+                {       
+                    kommentben = true;
+                    continue;
+                }
+
+                if (b == 0x0a)
+                {   
+                    kommentben = false;
+                    continue;
+                }
+
+                if (kommentben)
+                    continue;
+
+                if (b == 0x4e)
+                    continue;
+
+                for (int i = 0; i < 8; ++i)
+                {
+                    if (b & 0x80)
+                        binFa << '1';
+                    else
+                        binFa << '0';
+                    b <<= 1;
+                }
+
+            }
+
+            kiFile << binFa;
+
+            kiFile << "depth = " << binFa.getMelyseg () << std::endl;
+            kiFile << "mean = " << binFa.getAtlag () << std::endl;
+            kiFile << "var = " << binFa.getSzoras () << std::endl;
+
+            kiFile.close ();
+            beFile.close ();
+
+            return 0;
+        }
+        ]]></programlisting>
+        <para>
+            A main függvényben láthatjuk az egyszerű hibakezeléseket: az argumentumszám, a kapcsoló. Majd olvassuk a bemeneti fájlból a 
+            karaktereket az fstream segitségével, ezeket átalakitjuk 0-vá vagy 1-sé, ezt logikai és használatával valósítjuk meg. 
+            A kifile-ba irányitjuk a binfát, és kiirunk még róla néhány információt ezt követően (mélység, átlag, szórás). Majd bezárjuk az fstream fájlokat.
+        </para>
+
+    </section>        
+                
+
+
+
+
+
+    <section>
+        <title>Mutató a gyökér</title>
+        <para>
+            Írd át az előző forrást, hogy a gyökér csomópont ne kompozícióban, csak aggregációban legyen a 
+            fával!
+        </para>
+        <para>
+            Az LZWBinfa programot vesszük alapul és a gyökér elemet átalakítjuk mutatóvá. A gyökér elem az osztály protected részében van.
+        </para>
+        <programlisting language="c++"><![CDATA[
+            protected: 
+            Csomopont *gyoker; 
+            int maxMelyseg; 
+            double atlag, szoras;
+        ]]></programlisting>
+        <para>
+            A Csomopont osztályban a gyoker elemet át is írtuk mutatóvá. De ennyivel még nem vagyunk készen, mert ahogyan most egyszerűen átírtuk a kódban
+            az osztály elemet mutatóra, minden helyen ahol használtuk az elemet, mutatóként kell használnunk. 
+        </para>
+        <programlisting language="c++"><![CDATA[
+            //előtte: 
+            fa=&gyoker;
+
+            //utánna: 
+            fa=gyoker;
+
+            //előtte: 
+            szabadit (gyoker.egyesGyermek ()); 
+            szabadit (gyoker.nullasGyermek ()); 
+
+            //utánna: 
+            szabadit (gyoker->egyesGyermek ()); 
+            szabadit (gyoker->nullasGyermek ());
+        ]]></programlisting>
+
+        <para>
+            A fenti kódcsipetben hoztam példákat. Először is nem a mutató memóriacímét akarjuk már átadni hanem az értékét, ezért töröltük a &amp; jeleket.
+            Továbbá nem elemként (.) hivatkozunk a gyokerre hanem mutatóként (->).
+        </para>
+        <para>
+            A gyökér mutatónak foglalni kell memóriát is, a következőképpen.
+        </para>
+        <programlisting language="c++"><![CDATA[
+            LZWBinFa () 
+            { 
+                gyoker= new Csomopont(’/’); 
+                fa = gyoker; 
+            } 
+            ~LZWBinFa () 
+            { 
+                szabadit (gyoker->egyesGyermek ()); 
+                szabadit (gyoker->nullasGyermek ()); 
+                delete(gyoker); 
+            }
+        ]]></programlisting>
+        <para>
+            A konstruktorban megy végbe a memóriafoglalás, így a gyökér is egy csomópont lesz. A destruktorban a felszabadítást (a szabadit() függvényünkkel) 
+            és a törlést (a delete() függvénnyel) láthatjuk.
+        </para>
+
+    </section>  
+
+
+
+
+
+
+    <section>
+        <title>Mozgató szemantika</title>
+    
+        <para>
+            Írj az előző programhoz mozgató konstruktort és értékadást, a mozgató konstruktor legyen a mozgató
+            értékadásra alapozva!
+        </para>
+        <para>
+            A feladat annyiból áll, hogy mozgató konstruktort adunk hozzá a programunkhoz, hogya fában az elemeket mozgatni/másolni tudjuk.
+        </para>
+        <para>
+            Ez a feladat a védés második feladata. A program már előre megírt, Bátfai Norbert Tanárúr 
+            felhasználásra bocsátása jóvoltából használom fel ehez a feladathoz.
+        </para>
+        <para>
+            Saját megoldás videó: (videó link) (készül)
+        </para>
+        <para>
+            Megoldás forrása: 
+            <link xlink:href="https://gitlab.com/nbatfai/bhax/-/blob/master/distance_learning/ziv_lempel_welch/z3a18qa5_from_scratch.cpp">
+                https://gitlab.com/nbatfai/bhax/-/blob/master/distance_learning/ziv_lempel_welch/z3a18qa5_from_scratch.cpp</link>  
+        </para>
+
+        <programlisting language="c++"><![CDATA[[
+            #include <iostream>
+            #include <random>
+            #include <functional>
+            #include <chrono>
+
+            class Unirand {
+
+                private:
+                    std::function <int()> random;
+
+                public:
+                    Unirand(long seed, int min, int max): random(
+                        std::bind(
+                            std::uniform_int_distribution<>(min, max),
+                            std::default_random_engine(seed) 
+                        )
+                    ){}    
+
+            int operator()(){return random();}
+                    
+            };
+
+            template <typename ValueType>
+            class BinRandTree {
+
+            protected:
+                class Node {
+                    
+                private:
+                    ValueType value;
+                    Node *left;
+                    Node *right;
+                    int count{0};
+                    
+                    // TODO rule of five
+                    Node(const Node &);
+                    Node & operator=(const Node &);
+                    Node(Node &&);
+                    Node & operator=(Node &&);
+                    
+                public:
+                    Node(ValueType value, int count=0): value(value), count(count), left(nullptr), right(nullptr) {}
+                    ValueType getValue() const {return value;}
+                    Node * leftChild() const {return left;}
+                    Node * rightChild() const {return right;}
+                    void leftChild(Node * node){left = node;}
+                    void rightChild(Node * node){right = node;}
+                    int getCount() const {return count;}
+                    void incCount(){++count;}        
+                };
+
+                Node *root;
+                Node *treep;    
+                int depth{0};
+                
+            private:     
+                // TODO rule of five
+                
+            public:
+                BinRandTree(Node *root = nullptr, Node *treep = nullptr): root(root), treep(treep) {
+                    std::cout << "BT ctor" << std::endl;        
+                }
+                
+                BinRandTree(const BinRandTree & old) {
+                    std::cout << "BT copy ctor" << std::endl;
+                    
+                    root = cp(old.root, old.treep);
+                    
+                }
+                
+                Node * cp(Node *node, Node *treep) 
+                {
+                    Node * newNode = nullptr;
+                    
+                    if(node)
+                    {
+                        newNode = new Node(node->getValue(), 42 /*node->getCount()*/);
+                        
+                        newNode->leftChild(cp(node->leftChild(), treep));            
+                        newNode->rightChild(cp(node->rightChild(), treep));
+                        
+                        if(node == treep)
+                            this->treep = newNode;
+                    }
+                    
+                    return newNode;
+                }
+                
+                
+                BinRandTree & operator=(const BinRandTree & old) {
+                    std::cout << "BT copy assign" << std::endl;
+                    
+                    BinRandTree tmp{old};
+                    std::swap(*this, tmp);
+                    return *this;
+                }
+                
+                BinRandTree(BinRandTree && old) {
+                    std::cout << "BT move ctor" << std::endl;
+                    
+                    root = nullptr;
+                    *this = std::move(old);
+                }
+                
+                BinRandTree & operator=(BinRandTree && old) {
+                    std::cout << "BT move assign" << std::endl;
+                    
+                    std::swap(old.root, root);
+                    std::swap(old.treep, treep);
+                    
+                    return *this;
+                }
+                
+                ~BinRandTree(){
+                    std::cout << "BT dtor" << std::endl;
+                    deltree(root);
+                }
+                BinRandTree & operator<<(ValueType value);
+                void print(){print(root, std::cout);}
+                void printr(){print(*root, std::cout);}
+                void print(Node *node, std::ostream & os);
+                void print(const Node &cnode, std::ostream & os);
+                void deltree(Node *node); 
+
+                Unirand ur{std::chrono::system_clock::now().time_since_epoch().count(), 0, 2};
+
+                int whereToPut() {
+                    
+                        return ur();
+                }
+                
+                
+            };
+
+
+            template <typename ValueType>
+            class BinSearchTree : public BinRandTree<ValueType> {
+
+            public:
+                BinSearchTree() {}
+                BinSearchTree & operator<<(ValueType value);
+                
+                
+            };
+
+            template <typename ValueType, ValueType vr, ValueType v0>
+            class ZLWTree : public BinRandTree<ValueType> {
+
+            public:
+                ZLWTree(): BinRandTree<ValueType>(new typename BinRandTree<ValueType>::Node(vr)) {
+                    this->treep = this->root;
+                }
+                ZLWTree & operator<<(ValueType value);
+                
+                
+            };
+
+            template <typename ValueType>
+            BinRandTree<ValueType> & BinRandTree<ValueType>::operator<<(ValueType value)
+            {
+                
+                int rnd = whereToPut();
+                
+                if(!treep) {
+                
+                    root = treep = new Node(value);
+                    
+                } else if (treep->getValue() == value) {
+                    
+                    treep->incCount();
+                    
+                } else if (!rnd) {
+            
+                    treep = root;
+                    *this << value;
+                    
+                } else if (rnd == 1) {
+                    
+                    if(!treep->leftChild()) {
+                        
+                        treep->leftChild(new Node(value));
+                        
+                    } else {
+                        
+                        treep = treep->leftChild();
+                        *this << value;
+                    }
+                    
+                } else if (rnd == 2) {
+                    
+                    if(!treep->rightChild()) {
+                        
+                        treep->rightChild(new Node(value));
+                        
+                    } else {
+                        
+                        treep = treep->rightChild();
+                        *this << value;
+                    }
+                    
+                }
+                    
+                return *this;
+            }
+
+
+            template <typename ValueType>
+            BinSearchTree<ValueType> & BinSearchTree<ValueType>::operator<<(ValueType value)
+            {
+                if(!this->treep) {
+                
+                    this->root = this->treep = new typename BinRandTree<ValueType>::Node(value);
+                    
+                } else if (this->treep->getValue() == value) {
+                    
+                    this->treep->incCount();
+                    
+                } else if (this->treep->getValue() > value) {
+                    
+                    if(!this->treep->leftChild()) {
+                        
+                        this->treep->leftChild(new typename BinRandTree<ValueType>::Node(value));
+                        
+                    } else {
+                        
+                        this->treep = this->treep->leftChild();
+                        *this << value;
+                    }
+                    
+                } else if (this->treep->getValue() < value) {
+                    
+                    if(!this->treep->rightChild()) {
+                        
+                        this->treep->rightChild(new typename BinRandTree<ValueType>::Node(value));
+                        
+                    } else {
+                        
+                        this->treep = this->treep->rightChild();
+                        *this << value;
+                    }
+                    
+                }
+                
+                this->treep = this->root;
+                
+                return *this;
+            }
+
+
+            template <typename ValueType, ValueType vr, ValueType v0>
+            ZLWTree<ValueType, vr, v0> & ZLWTree<ValueType, vr, v0>::operator<<(ValueType value)
+            {
+                
+                if(value == v0) {
+                    
+                    if(!this->treep->leftChild()) {
+                        
+                        typename BinRandTree<ValueType>::Node * node = new typename BinRandTree<ValueType>::Node(value);
+                        this->treep->leftChild(node);
+                        this->treep = this->root;
+                        
+                    } else {
+                        
+                        this->treep = this->treep->leftChild(); 
+                    }
+                    
+                } else {
+
+                    if(!this->treep->rightChild()) {
+                        
+                        typename BinRandTree<ValueType>::Node * node = new typename BinRandTree<ValueType>::Node(value);
+                        this->treep->rightChild(node);
+                        this->treep = this->root;
+                        
+                    } else {
+                        
+                        this->treep = this->treep->rightChild(); 
+                    }
+                    
+                }
+                
+                return *this;
+            }
+
+            template <typename ValueType>
+            void BinRandTree<ValueType>::print(Node *node, std::ostream & os) 
+            {
+                if(node)
+                {
+                    ++depth;
+                    print(node->leftChild(), os);
+                    
+                    for(int i{0}; i<depth; ++i)
+                        os << "---";            
+                    os << node->getValue() << " " << depth << " " << node->getCount() << std::endl;     
+                    
+                    print(node->rightChild(), os);
+                    --depth;
+                }
+                
+            }
+
+            template <typename ValueType>
+            void BinRandTree<ValueType>::print(const Node &node, std::ostream & os) 
+            {
+
+                    ++depth;
+                    
+                    if(node.leftChild())
+                        print(*node.leftChild(), os);
+                    
+                    for(int i{0}; i<depth; ++i)
+                        os << "---";            
+                    os << node.getValue() << " " << depth << " " << node.getCount() << std::endl;     
+                    
+                    if(node.rightChild())
+                        print(*node.rightChild(), os);
+                    
+                    --depth;
+                
+            }
+
+            template <typename ValueType>
+            void BinRandTree<ValueType>::deltree(Node *node) 
+            {
+                if(node)
+                {
+                    deltree(node->leftChild());
+                    deltree(node->rightChild());
+                    
+                    delete node;
+                }
+                
+            }
+
+            BinRandTree<int> bar()
+            {    
+                BinRandTree<int> bt;
+                BinRandTree<int> bt2;
+
+                Unirand r(0, 0, 1);
+                
+                bt << 0 << 0 << 0;
+                bt2 << 1 << 1 << 1;
+                bt.print();
+                std::cout << " --- " << std::endl;
+                bt2.print();
+                
+                
+                return r()?bt:bt2;
+            }
+
+            BinRandTree<int> foo()
+            {    
+                return BinRandTree<int>();
+            }
+
+
+            int main(int argc, char** argv, char ** env)
+            {
+                
+                std::cout << " *** " << std::endl;
+                BinRandTree<int> bt2{bar()};
+                std::cout << " *** " << std::endl;
+                bt2.print(); 
+                    
+            }
+
+        ]]></programlisting>
+        
+        <para>
+        Az alábbi program fogja használni a mozgató szemantikát.
+        </para>
+
+        <programlisting language="c++"><![CDATA[
+            #include "vedes_Binfa.h"
+
+            int main()
+            {
+                ZLWTree<char, '/', '0'> tree1;
+                ZLWTree<char, '/', '0'> tree2;
+
+                    tree1 = tree2;
+
+                return 0;
+            }
+        ]]></programlisting>
+
+        <para>
+            Ha lefuttattuk a programot akkor láthatjuk a kimeneten, hogy milyen részek futottak le a programban, mert az egyszerűség kedvéért
+            a feladatban tárgyalt kódrészletek lefutására bizonyítékként kiírattuk, hogy az adott rész lefutott. 
+        </para>
+        <para>
+            Az első két sor a kimeneten a BT ctor, ez annyit jelent hogy a Binfa konstruktora lefutott. Tehát a tree1 és tree2 fákat létrehozta a program.
+        </para>
+        <programlisting language="c++"><![CDATA[
+            ZLWTree<char, '/', '0'> tree1;
+            ZLWTree<char, '/', '0'> tree2;
+        ]]></programlisting>
+        <para>
+            Aztán a BT copy assign sor azt jelenti, hogy amikor a tree1-et egyenlővé tesszük a tree2-vel,
+        </para>
+
+            <programlisting language="c++"><![CDATA[ tree1 = tree2; ]]></programlisting> 
+            
+        <para>
+            akkor lefut a másoló értékadás és létrehoz egy átmeneti fát amibe lementi a tree2-t majd később abból rakja a tree1-be.
+            A feladat arra öszpontosít hogy a mozgatást az értékadásra alapozzuk, vagyis meghívjuk 
+            a függyvényben a másoló konstruktort.
+        </para>
+        <programlisting language="c++"><![CDATA[
+            BinRandTree & operator=(const BinRandTree & old) {
+                    std::cout << "BT copy assign" << std::endl;
+                    
+                    BinRandTree tmp{old};
+                    std::swap(*this, tmp);
+                    return *this;
+                }
+        ]]></programlisting>
+        <para>
+        Majd a BT copy ctor sor, a másoló konstruktor lefutását mutatja.
+        </para>
+        <programlisting language="c++"><![CDATA[
+        BinRandTree(const BinRandTree & old) {
+                std::cout << "BT copy ctor" << std::endl;
+                        
+                root = cp(old.root, old.treep);
+                    
+            }
+        ]]></programlisting>
+        <para>
+        Miután lemásolta, haladunk tovább és a mozgató konstruktor is meghívódik, és a mozgató konstruktor a mozgató értékadásra van alapozva, 
+        látszik lent hogy két objektum van egyenlővé téve.
+        </para>
+        <programlisting language="c++"><![CDATA[
+        BinRandTree(BinRandTree && old) {
+                std::cout << "BT move ctor" << std::endl;
+                
+                root = nullptr;
+                *this = std::move(old);
+            }
+        ]]></programlisting>
+
+        <para>
+            A BT move assign, azaz a mozgató értékadás meghívódik, mivel van két értékadás és még egy az átmeneti, így fut le háromszor.
+        </para>
+
+        <programlisting language="c++"><![CDATA[
+            BinRandTree & operator=(BinRandTree && old) {
+                    std::cout << "BT move assign" << std::endl;
+                    
+                    std::swap(old.root, root);
+                    std::swap(old.treep, treep);
+                    
+                    return *this;
+                }
+        ]]></programlisting>
+
+        <para>
+            És végül a BT dtor sorok, azt mutatják hogy a destruktor is lefutott, vagyis töröltünk a memóriából mindent, így megakadályozva 
+            a memóriafolyást vagy memóriaszivárgást.
+        </para>
+        <programlisting language="c++"><![CDATA[
+            ~BinRandTree(){
+                    std::cout << "BT dtor" << std::endl;
+                    deltree(root);
+                }
+        ]]></programlisting>
+        
+    </section>       
+
+
+
+
+
+    <section>
+        <title>Vörös Pipacs Pokol/5x5x5 ObservationFromGrid</title>
+        <para>
+            Megoldás forrása: <link xlink:href="https://github.com/nbatfai/RedFlowerHell">https://github.com/nbatfai/RedFlowerHell</link>               
+        </para>
+
+        <para>
+            Ebben a feladatban kiszélesítjük egy kicsit Steve látóterét, azaz már nem 3x3x3-mas hanem 5x5x5-ös tömbbe helyezzük Stevet amelyben 
+            mindent érzékelni fog. A programkódban megírt 3x3x3-mas helyére 5x5x5-öst írjunk, majd az xml fájlban a szélső értékeket állísuk át a 
+            következőképpen:
+        </para>
+        <para>- minimumok: x = -2, y = -2, z = -2,</para>
+        <para>- maximumok: x =  2, y =  2, z =  2.</para>
+
+        <para>
+            A programkód megtalálható a repómban a következő linken:
+            <link xlink:href="https://github.com/RubiMaistro/MALMO-Agens-Teaching/blob/master/lava.py">erzekelni_5x5x5_ben</link>
+        </para>            
+    </section>               
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+</chapter>                

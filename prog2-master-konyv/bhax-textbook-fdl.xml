@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<book xmlns="http://docbook.org/ns/docbook" 
+      xmlns:xlink="http://www.w3.org/1999/xlink" 
+      xmlns:xi="http://www.w3.org/2001/XInclude" 
+      version="5.0" xml:lang="hu">    
+    
+    <xi:include href="bhax-textbook-fdlinfo.xml">
+        <xi:fallback>
+            <para>
+                <emphasis>XInclude: bhax-textbook-fdlinfo.xml file not found</emphasis>
+            </para>
+        </xi:fallback>
+    </xi:include>     
+        
+    <xi:include href="bhax-textbook-motto.xml">
+        <xi:fallback>
+            <para>
+                <emphasis>XInclude: bhax-textbook-motto.xml file not found</emphasis>
+            </para>
+        </xi:fallback>
+    </xi:include>     
+    
+    <xi:include href="bhax-textbook-pre.xml">
+        <xi:fallback>
+            <para>
+                <emphasis>XInclude: bhax-textbook-pre.xml file not found</emphasis>
+            </para>
+        </xi:fallback>
+    </xi:include> 
+
+    <!-- 
+        <xi:include href="bhax-textbook-glossary.xml">
+            <xi:fallback>
+                <para>
+                    <emphasis>XInclude: bhax-textbook-glossary.xml file not found</emphasis>
+                </para>
+            </xi:fallback>
+        </xi:include> 
+    -->
+
+    <xi:include href="bhax-textbook-intro.xml">
+        <xi:fallback>
+            <para>
+                <emphasis>XInclude: bhax-textbook-glossary.xml file not found</emphasis>
+            </para>
+        </xi:fallback>
+    </xi:include> 
+
+    <xi:include href="bhax-textbook-feladatok.xml">
+        <xi:fallback>
+            <para>
+                <emphasis>XInclude: bhax-textbook-motto.xml file not found</emphasis>
+            </para>
+        </xi:fallback>
+    </xi:include>                                                              
+
+    <xi:include href="bhax-textbook-feladatok2.xml">
+        <xi:fallback>
+            <para>
+                <emphasis>XInclude: bhax-textbook-motto.xml file not found</emphasis>
+            </para>
+        </xi:fallback>
+    </xi:include>                                                              
+
+
+    <xi:include href="bhax-textbook-bib.xml">
+        <xi:fallback>
+            <para>
+                <emphasis>XInclude: bhax-textbook-bib.xml file not found</emphasis>
+            </para>
+        </xi:fallback>
+    </xi:include>     
+          
+            <xi:include href="bhax-textbook-ack.xml">
+            <xi:fallback>
+                <para>
+                    <emphasis>XInclude: bhax-textbook-ack.xml file not found</emphasis>
+                </para>
+            </xi:fallback>
+        </xi:include>     
+
+</book>

@@ -1,0 +1,481 @@
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+    <info>
+        <title>Helló, Arroway!</title>
+        <keywordset>
+            <keyword/>
+        </keywordset>
+    </info>
+
+    <section>
+        <title>OO szemlélet</title>
+        <para>
+            A következő program objectum orientált ahogyan ezt a címben rövidítve (OO) is láthatjuk.
+            Az OO programozás osztályokkal és objektumokkal fog dolgozni, jelen esetben létrehoz 10 
+            véletlenszerű számot.
+        </para>
+        <para>
+            Megoldás forrása:                
+        </para>
+        <para>
+            A programot három fő részre lehet osztani, a főosztály azaz a main, a kisegítő mellék osztály és 
+            ebben a generálást végző függvény.
+        </para>
+        <para>
+            A programkód részekre bontva a következő:
+        </para>
+
+        <programlisting language="java"><![CDATA[
+            class PolarGen {
+
+                boolean nincsTarolt = true;
+                double tarolt;
+                
+                /// Constructor .
+                public PolarGen() {
+                    nincsTarolt = true;
+                }
+            ]]></programlisting>
+
+            <para>
+                A PolarGen mellékosztály amelyben egy Constructort láthatunk, ez a függvény minden
+                osztályban létrehozható és inicializálásokat lehet végrehajtani benne. Mivel ez a függvény 
+                akkor fut le ha példányosítunk, azaz létrehozunk egy osztály objectumot, ezt majd a main részben, tesszük meg.
+            </para>
+            <para>
+                A Constructor egy logikai változónak alapértéket definiál, jelen esetben igaz értéket.
+                Az osztályban még létrehozunk egy double tipusú változót ami majd a generált számot fogja tartalmazni.
+            </para>
+
+            <programlisting language="java"><![CDATA[
+                /// Generator .
+                public double kovetkezo() {
+                    
+                    if(nincsTarolt) {
+                        double n1, n2, v1, v2, s;
+                        
+                        do {
+                            n1 = Math.random();			// nextDouble() /// .
+                            n2 = Math.random();			// nextDouble()
+                            
+                            /// . from nextGaussian
+                            
+                            v1 = 2 * n1 - 1;			// v1 = 2 * nextDouble() - 1; 
+                            v2 = 2 * n2 - 1;			// v2 = 2 * nextDouble() - 1; 
+                            
+                            s = n1 * n2 + v1 * v2;
+                            
+                        } while ( s > 1 );
+                        
+                        double r = Math.sqrt(( -2 * Math.log(s)) / s);
+                        tarolt = r * v2;
+                        nincsTarolt = !nincsTarolt;
+                        return r * v1;
+                    } else {
+                    
+                        nincsTarolt = !nincsTarolt;
+                        return tarolt;
+                    }
+                }
+                
+            }
+        ]]></programlisting>
+
+        <para>
+            A kovetkezo() nevű metódus matematikai számítás alapján hoz létre számokat. Az if elágazás eldönti, hogy
+            van-e már legenerált szám, ha nincs akkor belép a ciklusba és létrehoz 2 változót aminek a random() függvénnyel 
+            generál számot, majd jön a matematikai számítás a while() ciklusban hogy ha a szám nagyobb mint 1 akkor
+            elvégez egy műveletet, majd értéket ad a tarolt nevű változónak. Majd a nincsTarolt valtozó logikai értékét megváltoztatja,
+            aztán vissza ad egy számot a return kulcsszóval.
+        </para>
+        <para>
+            Ha már volt generált szám akkor az else ágra lép, ahol a nincsTarolt valtozó logikai értékét megváltoztatja és
+            vissza adja a tarolt valtozo értékét a return kulcsszóval.
+        </para>
+
+
+        <programlisting language="java"><![CDATA[
+            public class PolarGenerator {
+                
+                public static void main(String[] args) {
+                    
+                    /// Instance .
+                    PolarGen g = new PolarGen();
+                    
+                    for(int i=0; i<10; ++i)
+                        System.out.println(g.kovetkezo());
+                }
+                
+            }
+        ]]></programlisting>
+
+        <para>
+            A PolarGenerator osztály, a főosztály, ahol a main() függvényben létrehoz egy a PolarGen osztályhoz tartozó példányt,
+            a g nevű objektumot, majd egy for() ciklust indít, amely addig fut amíg 10 számot nem generált a kovetkezo() nevű metódussal, 
+            s ezeket a számokat kiírja.
+        </para>
+
+        <para>
+            A következő programcsipet a JDK beéített metódusa amely megtalálható 
+            a java.util.Random forrásban a nextGaussian néven.
+        </para>
+
+        <programlisting language="java"><![CDATA[
+            public class NextGuassian {
+		
+                private double nextNextGaussian;
+                private boolean haveNextNextGaussian = false;
+
+                public double nextGaussian() {
+                if (haveNextNextGaussian) {
+                    haveNextNextGaussian = false;
+                    return nextNextGaussian;
+                } else {
+                    double n1, n2, v1, v2, s;
+                    do {
+                        n1 = Math.random();	/// nextDouble()
+                        n2 = Math.random();
+                        
+                        v1 = 2 * n1 - 1;   // between -1.0 and 1.0
+                        v2 = 2 * n2 - 1;   // between -1.0 and 1.0
+                        s = v1 * v1 + v2 * v2;
+                    } while (s >= 1 || s == 0);
+                    double multiplier = StrictMath.sqrt(-2 * StrictMath.log(s)/s);
+                    nextNextGaussian = v2 * multiplier;
+                    haveNextNextGaussian = true;
+                    return v1 * multiplier;
+                    }
+                }
+            }
+        ]]></programlisting>
+
+        <para>
+            Ebben a forrásban egy hasonló generálást láthatunk mint a kovetkezo() metódusban amit fent láthattunk, 
+            de ez valamennyivel pontosabb számítást végez.
+        </para>
+        <para>
+            (Console futási kép)
+        </para>
+
+        <para>
+            A követzkező program pedig ugyan az mint amit láthattunk feljebb csak C++ nyelven:
+        </para>
+        <para>
+            (link)
+        </para>
+
+
+
+    </section>        
+
+
+    <section>
+        <title>Gagyi</title>
+    
+        <para>
+            Megoldás forrása:                
+        </para>
+
+        <para>
+            Javaban az Integer tipusú számokat a java -128 és 127 között eltárolja a poolba. (Feltételezi a java, hogy a
+            program sokat fog kissebb számokkal dolgozni, és ha Intiger típusú szám kell, akkor a poolbol kivesz.) Ha
+            a -128 és 127 közötti intervallumból szeretnénk értéket adni egy változónak, akkor az elore eltárolt pool-ból ˝
+            fog hozzá memória címet rendelni. Ez úgy történik, hogy ebben az esetben meghívódik az Intiger.value.Of
+            függvény, ami kiosztja a címet. Ha a megadott tartományok kívül rendelünk a változóhoz értéket, például
+            -129 akkor viszont ugyan ez a függvény létrehoz egy új objektumot. Ezek alapján ha x és t változó értéke
+            egyenlő és ezen értéke az adott tartományon belül vannak, akkor azonos lesz a két változó címe. Viszont ha ˝
+            x és t értéke azonos, de nem a -128 és 127 tartományból lesz, akkor a két változó címe nem fog megegyezni,
+            mivel két külön objektum fog létrejönni ezeknek a számoknak.
+        </para>
+
+        <para>
+            Első esetben, amikor nem kerül végtelen ciklusba mert a feltétel nem teljesül.
+        </para>
+
+        <programlisting language="java"><![CDATA[
+            public class Gagyi {
+
+                public static void main(String[] args) {
+                    
+                    Integer x = -128;
+                    Integer t = -128;
+                    
+                    System.out.println (x);
+                    System.out.println (t);
+                    
+                    int a = 0;
+                    
+                    do {
+                        a = a + 1;
+                        System.out.println(a);
+                    } while(x <= t && x >= t && t != x);
+                }
+            }
+        ]]></programlisting>
+
+
+        <para>
+            (még átdolgozás)
+        </para>
+        <para>
+            Második esetben, amikor teljesül a while() feltétele és végtelen ciklusba kerül.
+        </para>
+
+        <programlisting language="java"><![CDATA[
+            public class Gagyi_out_range {
+
+                public static void main(String[] args) {
+                    
+                    Integer x = -129;
+                    Integer t = -129;
+                    
+                    System.out.println (x);
+                    System.out.println (t);
+                    
+                    int a = 0;
+                    
+                    do {
+                        a = a + 1;
+                        System.out.println(a);
+                    } while(x <= t && x >= t && t != x);
+                }
+            }
+         ]]></programlisting>
+
+         <para>
+
+         </para>
+
+    </section>   
+
+
+        <section>
+        <title>Yoda</title>
+        <para>
+            A Yoda egy programozási sítlus, pontosabban Yoda feltételeknek hívjuk. A lényege az, hogy az
+            összehasonlító kifejezésben megcseréljük a változót és a konstanst. Eredetileg a konstanshoz hasonlítjuk a
+            változót, azaz a konstans a bal míg a változó a jobb oldalon helyeszkedik el. De a Yoda feltételek szerint
+            fordítva, azaz a konstans lesz a jobb oldalon és a változó a bal oldalon. Ez a megszokott színtaxistól
+            eltérő. A nevét a Csillagok Háborújábol ismert Yoda mesterről kapta, mivel furán beszéli az angolt, vagyis szavakat
+            cserél fel és nem a szokványos angol szintaxis szerint beszél.
+        </para>
+        <para>
+            Megoldás forrása:                
+        </para>
+        <para>
+            A program ami java.lang.NullPointerEx-el leáll, ha nem követjük a Yodaconditionst:
+        </para>
+        <programlisting language="java"><![CDATA[
+            public class Yoda {
+
+                public static void main(String[] args) {
+                    
+                    String peldastring = null;
+                        
+                    if (peldastring.equals("example")){
+                        System.out.println("code example");
+                    }          
+                }          
+            }
+         ]]></programlisting>
+        <para>
+            Ha a Yoda stílusban írjuk a programot, ezt a híbát kiküszöböltük. További elonye a Yoda stílusnak, 
+            hogy el tudjuk kerülni a nem biztonságos viselkedésű null típusokat.
+        </para>
+    </section> 
+
+
+    <section>
+        <title>EPAM: Java Object metódusok</title>
+        <para>
+            A javaban találhatunk beéített Object metódusokat amelyeket szabadon használhatunk,
+            de ha számunkra egy picit mást szeretnénk hogy végezzen akkor átírhatjuk, azaz felülírhatjuk
+            a programunkban a már beéített metódust.
+        </para>
+        <para>
+            Nem minden esetben helyes számunkra az előre definiált metódus, mert nem biztos hogy optimálisan
+            fog működni a programunk. Ekkor ajánlott és kötelező is felüldefiniálni a metódust.
+        </para>
+        <para>
+            Megoldás forrása:  (repó)              
+        </para>
+        <programlisting language="java"><![CDATA[
+            public class Methods {
+        
+                public Methods() {
+                    System.out.println("Methods Constructor.");
+                }
+
+                @Override
+                public String toString() {
+                    System.out.println("Methods: " + getClass().getName() + ", toString()=" + super.toString());
+                    return "";
+                }
+
+                @Override
+                public int hashCode() {
+                    return super.hashCode();
+                }
+
+                @Override
+                public boolean equals(Object obj) {
+                    return super.equals(obj);
+                }
+
+                @Override
+                protected Object clone() throws CloneNotSupportedException {
+                    return super.clone();
+                }
+
+                @Override
+                protected void finalize() throws Throwable {
+                    
+                }
+            }
+        ]]></programlisting>
+    
+        <para>
+            (kifejtés)
+        </para>
+        <programlisting language="java"><![CDATA[
+            public class Main {
+
+                public static void main(String[] args) {
+                    
+                    Methods obj = new Methods();
+                    Methods obj1 = new Methods();
+                    
+                    obj.toString();
+                    System.out.println(obj.getClass());
+                    System.out.println(obj.equals(obj1)); // összehasonlitja a hash kódokat
+                    
+                    System.out.println(obj.hashCode());
+                    System.out.println(obj1.hashCode());
+                }
+            }
+        ]]></programlisting>
+    </section>    
+
+
+    <section>
+        <title>EPAM: Objektum példányosítás programozási mintákkal</title>
+        <para>
+            Több fajta példányosítási mintát hozhatunk létre a java programozási nyelvben. 
+            Ezek minden esetben más-más célra lesznek a legmegfelelőbbek.
+        </para>
+        <para>
+            (kidolgozás)
+        </para>
+        <para>
+            Megoldás forrása:                
+        </para>
+        <para>
+            Sinlgeton
+        </para>
+        <programlisting language="java"><![CDATA[
+
+        ]]></programlisting>
+        
+        <para>
+           Singleton Main
+        </para>
+
+        <programlisting language="java"><![CDATA[
+            public class Singleton {
+
+                public static void main(String[] args) {
+
+                    SingleObject object = SingleObject.getInstance();
+                    SingleObject obj2 = SingleObject.getInstance();
+
+                    //show the message
+                    object.showMessage();
+                    
+                    obj2.showMessage();
+                }
+            }
+        ]]></programlisting>
+
+        <para>
+            (kifejtés)
+        </para>
+        <para>
+            Factory
+        </para>
+
+            <programlisting language="java"><![CDATA[
+                import java.io.*;
+
+                abstract class Plan{  
+                    protected double rate;  
+                    abstract void getRate();  
+
+                    public void calculateBill(int units){  
+                        System.out.println(units*rate);  
+                    }  
+                }
+
+                class  DomesticPlan extends Plan{  
+                    //@override  
+                    public void getRate(){  
+                        rate=3.50;              
+                    }  
+                }
+
+                class  CommercialPlan extends Plan{  
+                    //@override   
+                        public void getRate(){   
+                            rate=7.50;  
+                    }
+                }
+
+                class GetPlanFactory{  
+                    
+                    //use getPlan method to get object of type Plan   
+                        public Plan getPlan(String planType){  
+                                if(planType == null){  
+                                return null;  
+                                }  
+                            if(planType.equalsIgnoreCase("DOMESTICPLAN")) {  
+                                    return new DomesticPlan();  
+                                }   
+                            else if(planType.equalsIgnoreCase("COMMERCIALPLAN")){  
+                                    return new CommercialPlan();  
+                                }    
+                        return null;  
+                    }  
+                    }
+
+                public class Factory {
+
+                    public static void main(String[] args) throws IOException {
+                        
+                        GetPlanFactory planFactory = new GetPlanFactory();  
+                        
+                        System.out.print("Enter the name of plan for which the bill will be generated: ");  
+                        BufferedReader br=new BufferedReader(new InputStreamReader(System.in));  
+                    
+                        String planName=br.readLine();  
+                        System.out.print("Enter the number of units for bill will be calculated: ");  
+                        int units=Integer.parseInt(br.readLine());  
+                    
+                        Plan p = planFactory.getPlan(planName);  
+                        //call getRate() method and calculateBill()method of DomesticPaln.  
+                    
+                        System.out.print("Bill amount for "+planName+" of  "+units+" units is: ");  
+                            p.getRate();  
+                            p.calculateBill(units);  
+
+                    }
+
+                }
+            ]]></programlisting>
+
+        <para>
+            (kifejtés)
+        </para>
+
+
+    </section>   
+        
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+</chapter>                

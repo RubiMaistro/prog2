@@ -1,0 +1,731 @@
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+    <info>
+        <title>Helló, Chomsky!</title>
+        <keywordset>
+            <keyword/>
+        </keywordset>
+    </info>
+
+    <section>
+        <title>Decimálisból unárisba átváltó Turing gép</title>
+
+        <para>
+            Állapotátmenet gráfjával megadva írd meg ezt a gépet!
+        </para>
+        <para>
+            A gép a nevét Alan Truring után kapta 1936-ban. A gép decimális számrendszerből 
+            unáris számrendszerbe írja át a számot. 
+            Az unáris számrendszer másnéven egyes számrendszer. A gép úgy működik, hogy csak 1-eseket ír.
+            Tehát például a 6-ost átírva 6 darab 1-est ír le unáris számrenszerbe átváltva, az 1-es helyett 
+            csak egy 1-est ír.
+        </para>
+
+        <para>
+            A Turing gép kódja c++ nyelven a következő:
+        </para>
+
+        <programlisting language="c"><![CDATA[
+        #include <iostream>
+using namespace std;
+int main() {
+    int a;
+    int tiz=0, szaz=0;
+    cout<<"Decimalis szam:\n";
+    cin>>a;
+    cout<<"A szam unarisban:\n";
+    for (int i=0; i<a; i++){
+            cout<<"1";
+            ++tiz;
+            ++szaz;
+    if (tiz==10) {
+            cout<<" "; tiz=0;
+    }
+    if (szaz==100){
+            cout<<"\n";szaz=0;
+    }
+    }
+    return 0;
+}
+        ]]></programlisting>
+
+        <para>
+            A kódban egyszerűen csak egy fő függvényt használtunk a main()-t, ebben bekértünk egy tetszőleges számot
+            és ezt alakítjuk unárisba. Egy for ciklust meghtároztuk, hogy 0-tól induljon (i=0) és egészen addig
+            fusson amíg eléri azt a számot amit megadtunk </para><programlisting language="c"><![CDATA[(i<a)]]></programlisting><para>, persze minden lefutása után eggyel (i++) növekedjen.
+            A for ciklusban mindig kiíratunk egy 1-est, a két segédváltozót csak az áttekinthetőség miatt használjuk,
+            tehát amikor már kiírattunk egymás után 10 darab 1-est iratunk egy szóközt, ha 100 darab 1-est akkor
+            egy sortörést.
+        </para>
+
+    </section>        
+
+
+    
+       
+         
+     <section>
+        <title>Az a<superscript>n</superscript>b<superscript>n</superscript>c<superscript>n</superscript> nyelv nem környezetfüggetlen</title>
+
+        <para>
+            A generatív nyelvek kidolgozása Noam Chomsky nevéhez fűződik. A nyelveket osztályokba rendezzük, 
+            vannak erősebb és gyengébb osztályok és az erősebb osztály képes létrehozni gyengébb osztályt. 
+            Négy darab alapon fekszik a generatív nyelvtan: 
+        </para>
+        <para>
+            - Terminális szombólumok, a konstansok. 
+        </para>
+        <para>
+            - Nem terminális jelek, a változók. 
+        </para>
+        <para>
+            - Kezdőszimbólum, egy kijelölt szimbólum. 
+        </para>
+        <para>
+            - Helyettesítési szabályok, ezzel a szavakat értelmezzük majd. 
+        </para>
+
+        <para>
+            Legyenek a nyelv változói:
+        </para>
+
+        <programlisting><![CDATA[
+            X Y Z
+        ]]></programlisting>
+
+        <para>
+            És legyenek a nyelv konstansai:
+        </para>
+        <programlisting><![CDATA[
+            a b c
+        ]]></programlisting>
+
+        <para>
+            A helyettesítési szabályok:
+        </para>
+
+        <programlisting><![CDATA[
+            X->abc, X->aYbc, Yb->bY, Yc->Zbcc, bZ->Zb, aZ->aaY, aZ->aa
+        ]]></programlisting>
+
+        <programlisting><![CDATA[
+            X (X->aYbc)
+            aYbc (Yb->bY)
+            abYc (Yc->Zbcc)
+            abZbcc (bZ->Zb)
+            aZbbcc (aZ->aa)
+            aabbcc
+
+            X (X->aYbc)
+            aYbc (Yb->bY)
+            abYc (Yc->Zbcc)
+            abZbcc (bZ->Zb)
+            aZbbcc (aZ->aaY)
+            aaYbbcc (Yb->bY)
+            aabYbcc (Yb->bY)
+            aabbYcc (Yc->Zbcc)
+            aabbZbccc (bZ->Zb)
+            aabZbbccc (bZ->Zb)
+            aaZbbbccc (aZ->aa)
+            aaabbbccc
+        ]]></programlisting>
+
+        <para>
+            Azt láthatjuk, hogy addig alkalmazzuk a helyetesítési szabályokat míg csak konstansaink lesznek. Azaz mindig alsóbb 
+            osztályt hozunk létre. 
+        </para>
+
+</section>
+           
+     
+
+
+
+<section>
+        <title>Hivatkozási nyelv</title>
+
+        <para>
+            Ahogy a beszélt nyelv, úgy a programozási nyelv is fejlődik. Ennek a bemutatására az alábbi programot fogjuk használni:
+        </para>
+
+        <programlisting language="c"><![CDATA[
+            #include <stdio.h>
+
+            int main()
+            { 
+                for(int i=0;i<1;i++) 
+                printf("Lefut"); 
+                
+            }
+        ]]></programlisting>
+
+        <para>
+            A program egyszerű, kiíratja a for ciklus a "Lefut" szöveget. A kódot viszon több nyelvtanban is fordíthatjuk.
+            Ha a C89-es nyelvtannal fordítjuk a kódot akkor "gcc -std=gnu89 fajnev.c -o fajlnev"-et használom.
+            Ekkor a program hibát fog kiírni a for ciklusnál, mert a C89-es nyelvtanban a for cikluson belül deklaráljuk 
+            az i változót, mert ebben a régebbi nyelvtanban még erre nincs lehetőségünk, csak cikluson kívül.
+        </para>
+
+        <para>
+            De viszont ha C99-es nyelvtannal fordíjuk "gcc -std=gnu99 fajlnev.c -o fajlnev"-et ahsználom, akkor a kód hiba nélkül lefut, 
+            mivel ebben már szerepel az a lehetőség, hogy cikluson belül deklarálhatunk változókat a C89-es nyelvtannal ellentétben.
+        </para>
+
+        <para>
+            Tehát a tanulság, hogy egy programozási nyelven belül sem mindegy milyen tipusú nyelvtannal fordítjuk a kódunkat.
+        </para>
+
+    </section>  
+
+
+
+
+
+    <section>
+        <title>Saját lexikális elemző</title>
+
+        <para>
+            A program a bemeneten megjelenő valós számokat összeszámolja. A lexikális elemző kódja: 
+        </para>
+        
+        <programlisting language="c"><![CDATA[
+            %{
+            #include <string.h> 
+            int szamok=0; 
+            %} 
+
+            %% [0-9]+ 
+            {++szamok;} %%
+
+            int main() 
+            {
+                yylex(); 
+                printf("%d szam",szamok); 
+            return 0; 
+            }
+        ]]></programlisting>
+
+        <para>
+            A szamokat változóval számoljuk, hogy hányszor fordul elő szám a bemenetben. A programot a %-jelekkel osztjuk fel részekre. 
+            a [0-9]+ {++szamok;}
+        </para>
+        <para>
+            Ez a sor adja azt, hogy 0-9 vagy nagyobb számot talál akkor növelje a "szamok" valtozót.
+            A printf el pedig csak kiíratjuk hogy hány szám volt a bemenetben (ez az elemzés). 
+        </para>
+        <para>
+            A yylex() a lexikális elemző a fordítás a következő: 
+        </para>
+
+        <programlisting language="c"><![CDATA[
+            flex program.l 
+        ]]></programlisting>
+        <para>
+            ez készít egy "lex.cc.y" fájlt. 
+        </para>
+        <para>
+            Ezt az alábbi módon futtatjuk: 
+        </para>
+
+        <programlisting language="c"><![CDATA[
+            cc lex.yy.c -o program_neve -lfl
+        ]]></programlisting>
+
+        <para>
+            A futtatáshoz pedig hozzá kell csatolni a vizsgált szöveget.
+        </para>
+
+    </section>    
+
+
+
+
+
+    <section>
+        <title>Leetspeak</title>
+
+        <para>
+        Tutor: Kikina Dominik
+        </para>
+        <para>
+            Lexelj össze egy l33t ciphert!
+        </para>
+
+        <programlisting language="c"><![CDATA[
+        % {
+
+            #include <string.h>
+            int szamok=0;
+            } %
+
+            %%
+            "0" { printf("O"); }
+            "1" { printf("I"); }
+            "2" { printf("Z"); }
+            "3" { printf("E"); }
+            "4" { printf("A"); }
+
+            "5" { printf("S"); }
+            "6" { printf("b"); }
+            "7" { printf("T"); }
+            "8" { printf("B"); }
+            "9" { printf("P"); }
+
+
+            "O" { printf("0"); }
+            "I" { printf("1"); }
+            "Z" { printf("2"); }
+            "E" { printf("3"); }
+            "A" { printf("4"); }
+
+            "S" { printf("5"); }
+            "b" { printf("6"); }
+            "T" { printf("7"); }
+            "B" { printf("8"); }
+            "P" { printf("9"); }
+
+            %%
+
+            int main()
+            {
+            yylex();
+            printf("%d szam", szamok);
+            retrun 0;
+            }
+        ]]></programlisting>
+
+        <para>
+            Ez a nyelv lefordítja a l33t nyelven írt szöveget vagy a l33t nyelvre írja át.
+            A program működése hasonló az előzőhöz, csak itt a megadott számokat keresi és helyettük a l33t nyelvben a nekik 
+            megadott megfelelő betűt írja helyette. Az ellenkező esetben pedig ha l33t nyelvre akarjuk átírni a szöveget, akkor
+            a megadott betűket keresi és alakítja át számokká.
+        </para>
+
+    </section>       
+                 
+
+
+
+
+     <section>
+        <title>A források olvasása</title>
+
+        <para>
+            Hogyan olvasod, hogyan értelmezed természetes nyelven az alábbi kódcsipeteket? Például
+            </para>
+            <programlisting><![CDATA[
+                if(signal(SIGINT, jelkezelo)==SIG_IGN)
+                signal(SIGINT, SIG_IGN);
+            ]]></programlisting>
+            <para>
+                Ha a SIGINT jel kezelése figyelmen kívül volt hagyva, akkor ezen túl is legyen
+                figyelmen kívül hagyva, ha nem volt figyelmen kívül hagyva, akkor a jelkezelo függvény
+                kezelje. (Miután a <command>man 7 signal</command> lapon megismertem a SIGINT jelet, a
+                <command>man 2 signal</command> lapon pedig a használt rendszerhívást.)
+            </para>
+
+        <caution>
+            <title>Bugok</title>
+
+            <para>
+                Vigyázz, sok csipet kerülendő, mert bugokat visz a kódba! Melyek ezek és miért? 
+                Ha nem megy ránézésre, elkapja valamelyiket esetleg a splint vagy a frama?
+            </para>
+
+        </caution>
+            
+        
+                                              
+                <programlisting><![CDATA[if(
+                    signal(SIGINT, SIG_IGN)!=SIG_IGN)
+                    signal(SIGINT, jelkezelo);
+                ]]></programlisting>
+          
+        <para>
+            A példában szereplő kód részlet ellentetje, azaz ha a SIGNT jel kezelése nem lett ﬁgyelmen kívül hagyva akkor, 
+            a jelkezelő függvény kezelje.
+        </para>
+
+                                            
+        <programlisting>
+        <![CDATA[
+        int i=0;
+
+            for(i=0; i<5;)
+                printf("(%d) ", ++i)
+                
+        ]]></programlisting>
+        <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/olvasas/elso.png" format="PNG" scale="60" />
+                </imageobject>
+        </mediaobject>            
+            
+        <para>
+            Ez egy for ciklus, a benne lévű i változó kezdőértéke 0, a ciklus addig fut le újra és újra amíg az i értéke
+            kisebb mint 5. Ebben az esetben az i értékét még a lefutás előtt mindíg növeljük 1-el, mivel "++i"-ként használjuk,
+            ebben az esetben az i=0-ra ha teljesül a feltétel akkor az i=1-el (tehát mindig a ráköveztkezőjére) fut le a ciklus.
+        </para>
+
+        <programlisting>
+        <![CDATA[
+        int i=0;
+
+            for(i=0; i<5;)
+                printf("(%d) ", i++)
+        ]]></programlisting>   
+        <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/olvasas/masodik.png" format="PNG" scale="60" />
+                </imageobject>
+        </mediaobject>          
+           
+        <para>
+            Ez a for ciklus hasonló az előzőhöz, a különbség viszont az, hogy az i értékét majd csak a ciklus lefutása után 
+            növeljük 1-el, ebben az esetben pedig i=0-ra ha teljesül a feltétel akkor szintén i=0-val fut le a ciklus.
+        </para>
+
+        <programlisting>
+        <![CDATA[
+            int i=0;
+            int tomb[6];
+
+            for(i=0; i<5; tomb[i] = i++){
+                printf("%d ", tomb[i]);
+            }
+        ]]></programlisting> 
+
+        <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/olvasas/harmadik.png" format="PNG" scale="60" />
+                </imageobject>
+        </mediaobject>          
+           
+        <para>
+            Ez a for ciklus egy tömböt feltölt az i értékével. Nagyon érdekes módon történik ez mivel a tömb első eleme memóriaszemét 
+            lesz, ez azért történik meg mert amikor i=0-tól indul a for ciklus a tomb is az első eleménél az az a 0.-nál tart. 
+
+            Bug: A for cikluson belül semmi nem történik ezért az első értékadás a tombbe úgymond nem sikerül, majd végrehajtódik 
+            a for ciklus harmadik utasítása a léptetés, ahol értéket adunk a tombbe és az i 1-el növekszik, ezért a for ciklus 
+            minden futásnál megkapja az aktuális i értékének az előző futás kezdőértéket, ezért 0-tól kezdve felvesz minden i-t 
+            0-tól indulva, de a tomb utolsó eleme 3 lesz, mert 5-ig alapból nem megy el.
+
+        </para>
+
+        <programlisting>
+        <![CDATA[
+        int i=0, n=10, a=10;
+        int *d, *s;
+        *d = a;
+        s = d;
+            for(i=0; i<n && (*d++ = *s++); ++i)
+            {
+                printf("%d  %d  %d\n",i,s,d);
+            }
+        ]]></programlisting>            
+            
+        <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/olvasas/negyedik.png" format="PNG" scale="60" />
+                </imageobject>
+        </mediaobject> 
+
+        <para>
+            Ebben az esetben a for ciklusban két feltétel van, tehát akkor fut le a for ciklus ha mind a két feltétel teljesül.
+            Az első feltétel, hogy i kisebb mint az n.
+            A második feltétel, hogy a d és az s mutató egyenlő, és minden ciklusnál növeljük a értékeket.
+            A két feltételt és operátorral füzzük össze.
+            Bug: A második feltételt célszerűbb lenne a for cikluson belül if-ekkel vizsgálni, mert nem logikai feltétel.
+        </para>
+
+                                           
+            <programlisting><![CDATA[
+                int f(int a, int b){
+                    return a+b;
+                }
+                int main(){
+
+                        int a = 0;
+                        printf("%d %d %d", f(a,++a), f(++a,a), a);
+                    return 0;
+                }
+            ]]></programlisting>    
+
+        <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/olvasas/otodik.png" format="PNG" scale="60" />
+                </imageobject>
+        </mediaobject>         
+         
+            <para>
+                A printf() függvény kiírja az összeget a képernyőre. Itt két egész típusú (%d) változót, az f() függvénnyel határozzuk
+                meg a számot, a hiba csak az, hogy nem megfelelő a sorrend.
+            </para>
+
+                                           
+            <programlisting><![CDATA[
+                int f(int a){
+                    a+=a;
+                    return a;
+                }
+                int main(){
+
+                        int a = 1;
+                        printf("%d %d", f(a), a);
+                    return 0;
+                }
+            ]]></programlisting>     
+
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/olvasas/hatodik.png" format="PNG" scale="60" />
+                </imageobject>
+        </mediaobject>        
+        
+            <para>
+                A printf() függvény kiír két egész számot, az első számot az "a"-t a f() függvény határozza meg itt 2 lesz és a második
+                pedig maga az "a" változó értéke az 1.
+            </para>
+                                 
+            <programlisting><![CDATA[
+                int f(int a){
+                    return a;
+                }
+                int main(){
+
+                        int a = 1;
+                        printf("%d %d", f(&a), a);
+                    return 0;
+                }
+            ]]></programlisting>  
+
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/olvasas/hetedik.png" format="PNG" scale="60" />
+                </imageobject>
+        </mediaobject>         
+            
+            <para>
+                A printf() függvény kiír két egész számot, amiben eltér az előző kódcsipettől, hogy itt az f() fügvény az a változó
+                memóriacímét kapja meg.
+            </para>
+    
+    </section>  
+
+
+
+
+
+    <section>
+        <title>Logikus</title>
+        
+        <para>
+            Hogyan olvasod természetes nyelven az alábbi Ar nyelvű formulákat?
+        </para>
+
+        <programlisting language="tex"><![CDATA[$(\forall x \exists y ((x<y)\wedge(y \text{ prím})))$ 
+
+        $(\forall x \exists y ((x<y)\wedge(y \text{ prím})\wedge(SSy \text{ prím})))$ 
+
+        $(\exists y \forall x (x \text{ prím}) \supset (x<y)) $ 
+
+        $(\exists y \forall x (y<x) \supset \neg (x \text{ prím}))$
+        ]]>
+        </programlisting>        
+
+        <para>
+            A természetes nyelvet mi emberek megértjük és ennek függvényében gondolkodunk és cselekszünk, viszont létre 
+        kellett hoznunk egy nyelvelt jelen esetben az Ar nyelvet amellyel a számitógépünkkel is tudunk kommunikálni.
+        Egyszerűen csak meg kell tanulnunk melyik parancs mit jelent, az Ar nyelv egy komplex nyelv.
+        Vannak benne logikai összekötőjelek (például: és = \wedge, nem = \neg, vagy = \vee, implikáció(ha A, akkor B) = \supset).
+        Vannak kvantorok (például: "létezik" = \exists és a "minden" = \forall).
+        Az "S" értéknövelés, a kiírást pedig a \text-el végezzük.
+        </para>
+
+    </section>      
+
+
+
+
+      
+
+    <section>
+        <title>Deklaráció</title>
+            
+        <para>
+            Vezesd be egy programba (forduljon le) a következőket: 
+        </para>
+
+        <itemizedlist>
+            <listitem>
+                <para>egész</para>                        
+            </listitem>
+            <listitem>
+                <para>egészre mutató mutató</para>                        
+            </listitem>
+            <listitem>
+                <para>egész referenciája</para>                        
+            </listitem>
+            <listitem>
+                <para>egészek tömbje</para>                        
+            </listitem>
+            <listitem>
+                <para>egészek tömbjének referenciája (nem az első elemé)</para>                        
+            </listitem>
+            <listitem>
+                <para>egészre mutató mutatók tömbje</para>                        
+            </listitem>
+            <listitem>
+                <para>egészre mutató mutatót visszaadó függvény</para>                        
+            </listitem>
+            <listitem>
+                <para>egészre mutató mutatót visszaadó függvényre mutató mutató</para>                        
+            </listitem>
+            <listitem>
+                <para>egészet visszaadó és két egészet kapó függvényre mutató mutatót visszaadó, egészet kapó függvény</para>                        
+            </listitem>            
+            <listitem>
+                <para>függvénymutató egy egészet visszaadó és két egészet kapó függvényre mutató mutatót visszaadó, egészet kapó függvényre</para>                        
+            </listitem>            
+        </itemizedlist> 
+
+        
+         <programlisting><![CDATA[
+            #include <iostream>
+            int main()
+            { 
+            int a; 
+            int *b=&a; 
+            int &r=a; 
+            int c[5]; 
+            int (&tr)[5]=c; 
+            int *d[5]; 
+            int *h(); 
+            int *(*l) (); 
+            int (*v(int c)) (int a, int b); 
+            int (*(*z)(int)) (int,int); 
+            }
+         ]]>
+         </programlisting>           
+
+        <para>
+            Mit vezetnek be a programba a következő nevek?
+        </para>
+
+    
+                <programlisting><![CDATA[int a;]]></programlisting>            
+      
+            <para>
+                Egy egész tipusú változót deklarál.
+            </para>
+
+      
+                <programlisting><![CDATA[int *b = &a;]]></programlisting>            
+       
+            <para>
+                Egy egész tipusú mutatót deklarál ami tárolja az a memóriacímét (azaz "b" mutat "a"-ra).
+            </para>
+
+   
+                <programlisting><![CDATA[int &r = a;]]></programlisting>            
+    
+            <para>
+                Az r egész tipusú változó már létezik és itt referenciát deklaráluk, a referencia más szóval paraméter érték átadás
+                a már meglévő változó értékét jelen esetben megválzotatjuk és értékül kapja az "a" értékét.
+            </para>
+
+       
+                <programlisting><![CDATA[int c[5];]]></programlisting>            
+            
+            <para>
+                Egy egész tipusú 5 elemű tömböt deklarál.
+            </para>
+
+           
+                <programlisting><![CDATA[int (&tr)[5] = c;]]></programlisting>            
+           
+            <para>
+                Ez egy referenciája a "c" 5 elemű tömbnek (Az összes elemnek).
+            </para>
+
+           
+                <programlisting><![CDATA[int *d[5];]]></programlisting>            
+           
+            <para>
+                Egy egész tipusú 5 elemű tömböt deklarál melynek az összes eleme egy-egy mutató.
+            </para>
+
+            
+                <programlisting><![CDATA[int *h ();]]></programlisting>            
+            
+            <para>
+                Az egész tipusú változó visszatérési értékét tartalmazó függvény;
+            </para>
+
+            
+                <programlisting><![CDATA[int *(*l) ();]]></programlisting>            
+           
+            <para>
+                Egy egész tipusra mutató visszaadó függvényre mutató mutató.
+            </para>
+
+            
+                <programlisting><![CDATA[int (*v (int c)) (int a, int b)]]></programlisting>            
+             
+            <para>
+                Egy egész tipusú változót visszaadó és két egész tipusú változót kapó függvényre mutató mutatót
+                visszaadó egész tipusú változót kapó függvény.
+            </para>
+
+            
+                <programlisting><![CDATA[int (*(*z) (int)) (int, int);]]></programlisting>            
+             
+            <para>
+                Egy függvénymutató egy egészet visszaadó és két egészet kapó függvényre mutató mitatót visszaadó
+                egészet kapó függvény.
+            </para>
+            
+    </section>    
+
+
+
+
+
+    <section>
+        <title>Vörös Pipacs Pokol/csiga diszkrét mozgási parancsokkal</title>
+        <para>
+            Megoldás videó: <link xlink:href="https://youtu.be/Fc33ByQ6mh8">https://youtu.be/Fc33ByQ6mh8</link>      
+        </para>
+        <para>
+            Megoldás forrása: <link xlink:href="https://github.com/nbatfai/RedFlowerHell">https://github.com/nbatfai/RedFlowerHell</link>               
+        </para>
+
+        <para>
+            Ez a feladat az előző Malmős feladathoz hasonló, mivel itt is az a cél hogy Steve csiga vonalban haladjon egyre feljebb
+            az arénában, amíg eléri a lávát. Amiben változik itt a feladat az csak annyi, hogy diszkrét mozgást végezzen, tehát 
+            előre meghatározott lépést haladjon és meghatározott időben és mennyiségben ugorjon és fordúljon.
+        </para>
+        <para>
+            Amit meg kell adnunk az, hogy egy bizonyos gyűrűn való csiga járást négy részre bontjuk és csak egy résszel foglalkozunk 
+            mert az arána szimmetrikus, és ezeket az előre haladásokat fordulásokkal és esetleges ugrásokkal kötünk össze. 
+        </para> 
+        <para>
+            A diszkrét parancsok a következők:
+        </para>
+
+        <para>- egy kockányi ugrás: <command> move 1 </command></para>
+        <para>- ugrás közbeni mozgás: <command> turn 1 </command></para>
+        <para>- egy fordulat jobbra: <command> jumpmove 1 </command></para>
+        
+        <para>
+            A <command> time.sleep() </command> parancs a mozgás időtartamát befolyásolja, viszont a kiadott parancs mennyisége nem fog
+            változni.
+        </para>
+
+        <para>
+            A program kód elérhető a következő linek:
+            <link xlink:href="https://github.com/RubiMaistro/MALMO-Agens-Teaching/blob/master/csigakordiszkr.py"> csiga_diszkreten </link>
+        </para>
+           
+    </section>  
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+</chapter>                

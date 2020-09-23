@@ -1,0 +1,95 @@
+<authorgroup xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+    <author>
+        <personname>
+            <honorific>Dr</honorific>
+            <surname>Bátfai</surname>
+            <firstname>Norbert</firstname>        
+        </personname>    
+        <affiliation>
+            <shortaffil>E. adjunktus, DE.</shortaffil>
+            <jobtitle>Egyetemi adjunktus</jobtitle>
+            <orgname>Debreceni Egyetem</orgname>
+            <orgdiv>Információtechnológiai Tanszék</orgdiv>
+            <address>
+                <email>batfai.norbert@inf.unideb.hu</email>
+                <email>nbatfai@gmail.com</email>
+            </address>
+        </affiliation>
+        <address>
+            <street>Kassai út 26.</street>
+            <city>Debrecen</city>
+            <postcode>4028</postcode>
+            <country>Magyarország</country>
+            <email>batfai.norbert@inf.unideb.hu</email>
+            <otheraddr>
+                <link xlink:href="https://arato.inf.unideb.hu/batfai.norbert/">https://arato.inf.unideb.hu/batfai.norbert/</link>
+            </otheraddr>
+            </address>
+    </author> 
+
+    <author>
+        <personname>       
+            <surname>Bátfai</surname>
+            <firstname>Mátyás</firstname>        
+        </personname>    
+        <affiliation>
+            <shortaffil>tanuló</shortaffil>
+            <jobtitle>tanuló</jobtitle>
+            <orgname>Debreceni Hunyadi János Általános Iskola</orgname>
+            <orgdiv>6/c</orgdiv>
+            <address>
+                <email>batfai.matyi@gmail.com</email>               
+            </address>
+        </affiliation>               
+    </author>  
+    
+    <author>
+        <personname>       
+            <surname>Bátfai</surname>
+            <firstname>Nándor</firstname>        
+        </personname>    
+        <affiliation>
+            <shortaffil>tanuló</shortaffil>
+            <jobtitle>tanuló</jobtitle>
+            <orgname>Debreceni Hunyadi János Általános Iskola</orgname>
+            <orgdiv>4/c</orgdiv>
+            <address>
+                <email>batfai.nandi@gmail.com</email>               
+            </address>
+        </affiliation>               
+    </author>  
+    
+    <author>
+        <personname>       
+            <surname>Bátfai</surname>
+            <firstname>Margaréta</firstname>        
+        </personname>    
+        <affiliation>
+            <shortaffil>tanuló</shortaffil>
+            <jobtitle>tanuló</jobtitle>
+            <orgname>Debreceni Hunyadi János Általános Iskola</orgname>
+            <orgdiv>4/c</orgdiv>
+            <address>
+                <email>batfai.greta@gmail.com</email>               
+            </address>
+        </affiliation>               
+    </author>  
+    
+    <author>
+        <personname>       
+            <surname>Deák</surname>
+            <firstname>Ruben</firstname>        
+        </personname>    
+        <affiliation>
+            <shortaffil>hallgató</shortaffil>
+            <jobtitle>hallgató</jobtitle>
+            <orgname>Debreceni Egyetem Informatikai Kar</orgname>
+            <orgdiv>PTI</orgdiv>
+            <address>
+                <email>rubendeak15@gmail.com</email>               
+            </address>
+        </affiliation>               
+    </author> 
+
+
+</authorgroup>

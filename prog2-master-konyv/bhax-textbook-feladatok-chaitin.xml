@@ -1,0 +1,324 @@
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+    <info>
+        <title>Helló, Chaitin!</title>
+        <keywordset>
+            <keyword/>
+        </keywordset>
+    </info>
+    <section>
+        <title>Iteratív és rekurzív faktoriális Lisp-ben</title>
+        <para>Tutorált: Talinger Mark Imre</para>
+        <para>
+            Megoldás videó: <link xlink:href="https://youtu.be/z6NJE2a1zIA">https://youtu.be/z6NJE2a1zIA</link>
+        </para>
+    
+        <para>
+            A Lisp egy olyan programozási nyelv amely felkapott lett a MI (mesterséges inteligencia) kutató, fejlesztők körében, habár 
+            a nyelv nem erre a célra jött létre. A nyelv szintaktikája egyedi, listákkat lácol egybe és ezeket dolgozza fel. A listákat 
+            és némely esetben segítségül hívva ezt a program nyelvet matematikai órákon és feladatok számításában használják.
+        </para>
+        <para>
+            Ez a nyelv egy kifejezés orientált nyelv, mely segitségével ebben a feladatban a faktorilásliságot szemléltetjük.
+        </para>
+
+        <para>
+            Iteratívan:
+        </para>
+        <programlisting language="lisp"><![CDATA[
+    (defun faktorialisi (n) 
+        (do 
+            ((i 1 (+ 1 i)) 
+             (prod 1 (* i prod))) 
+            ((equal i (+ n 1)) prod)))
+        ]]></programlisting>
+        <para>
+            A <command>defun</command> szóval adjuk meg a függvény és a benne lévő változó nevét. Majd a <command>do</command> konstrukcióval megadjuk 
+            azokat az utasításokat amelyeket el kell végezni. A következő sorban megnöveli az i értékét, érdekes lehet hogy a műveleti 
+            jelet listában a két érték elé tesszük. A következő sorban szorozzuk az i-t a proddal, majd a következőben addig növelgetjük 
+            az i-t amig egyenlő nem lesz a proddal.
+        </para>
+
+        <para>
+            Rekurzívan:
+        </para>
+        <programlisting language="lisp"><![CDATA[
+    (defun faktorialisr(n) 
+        (if (= n 1) 
+            1 
+            (* n (faktorialisr (- n 1)))))
+        ]]></programlisting>
+        <para>
+            Itt is a <command>defun</command> szóval megadjuk a függvény és benne lévő változó nevét. Majd egy <command>if</command> feltétellel 
+            megnézzük hogy az n egyenlő-e eggyel, ha igen akkor szorozzuk össze az (n-1)-szeresével.
+        </para>
+        
+    </section>        
+
+
+
+
+
+    <section>
+        <title>Gimp Scheme Script-fu: króm effekt</title>
+        <para>
+            Írj olyan script-fu kiterjesztést a GIMP programhoz, amely megvalósítja a króm effektet egy 
+            bemenő szövegre!
+        </para>
+        <para>
+            Megoldás videó: <link xlink:href="https://youtu.be/OKdAkI_c7Sc">https://youtu.be/OKdAkI_c7Sc</link>      
+        </para>
+        <para>
+            Megoldás forrása: <link xlink:href="https://gitlab.com/nbatfai/bhax/tree/master/attention_raising/GIMP_Lisp/Chrome">https://gitlab.com/nbatfai/bhax/tree/master/attention_raising/GIMP_Lisp/Chrome</link>               
+        </para>
+        <para>
+            A <command>GNU Image Manipulation Program</command> (Gimp) egy képszerkesztő, vagy képmanipuláló program melyben rétegenként is felépithető egy kép.  
+        </para>
+        <para>
+            A GIMP-en belüli utasitások helyettesithetők szkriptnyelvekkel is. Az a szkriptnyelv amit mi fogunk használni az a <command>Script-Fu</command>, 
+            amely egy <command>Scheme</command> alapú szkriptnyelv amely egy beépített szkriptnyelv. A Scheme nyelv a <command>Lisp</command> nyelvhez hasonlit 
+            mivel egy családba tartoznak és így a Scheme szintaxisa a Lispével megegyezik.  
+        </para>
+        <para>
+            Ebben a feladatban egy olyan szkriptet használunk amely a bemeneti szöveget krómozott efektel látja el. 
+        </para>
+        <para>
+            A forráskód a következő:
+        </para>
+        <programlisting language="Lisp">
+        <![CDATA[
+        (define (color-curve)
+            (let* (
+                (tomb (cons-array 8 'byte))
+            )
+                (aset tomb 0 0)
+                (aset tomb 1 0)
+                (aset tomb 2 50)
+                (aset tomb 3 190)
+                (aset tomb 4 110)
+                (aset tomb 5 20)
+                (aset tomb 6 200)
+                (aset tomb 7 190)
+            tomb)    
+        )
+        ]]>
+        </programlisting>
+        <para>
+            Ebben a kódrészletben a <command>color-curve</command> függvényünket definiáljuk, létrehozunk egy tömböt amely majd a szövegünk 
+            krómozását fogja végezni, és ehhez kapcsolódó értékeket tartalmaz. A szintaktikán itt láthatjuk is, hogy nagyon hasonló a Lispéhez.
+        </para>
+        <programlisting language="Lisp">
+        <![CDATA[
+        (define (elem x lista)
+
+            (if (= x 1) (car lista) (elem (- x 1) ( cdr lista ) ) )
+
+        )
+
+        (define (text-wh text font fontsize)
+        (let*
+            (
+                (text-width 1)
+                (text-height 1)
+            )
+         
+            (set! text-width (car (gimp-text-get-extents-fontname text fontsize PIXELS font)))    
+            (set! text-height (elem 2  (gimp-text-get-extents-fontname text fontsize PIXELS font)))    
+            
+            (list text-width text-height)
+            )
+        )
+        ]]>
+        </programlisting>
+        <para>
+            Ebben a forrásrészletben az <command>elem</command> majd a <command>text-wh</command> függvények kerülnek létrehozásra. 
+            Az elem függvény paraméterként kap egy listát és egy indexet, ezt fogja visszaadni. Ha ez az index 1, akkor a lista első 
+            eleméről van szó, tehát a <command>car</command> adja vissza, ha viszot nem erről van szó, akkor a <command>cdr</command> fogja visszaadni. 
+            A második függvény a <command>text-wh>/</command> az a szövegünknek fogja a szélességét és a magasságát beállitani, ez egy kezdőérték lesz, 
+            majd ezt követően beállit egy bizonyos értéket nekik. A végén visszaadja a szöveg szélességét és magasságát.
+        </para>
+        <programlisting language="Lisp">
+        <![CDATA[
+
+        (define (script-fu-bhax-chrome text font fontsize width height color gradient)
+        (let*
+            (
+                (image (car (gimp-image-new width height 0)))
+                (layer (car (gimp-layer-new image width height RGB-IMAGE "bg" 100 LAYER-MODE-NORMAL-LEGACY)))
+                (textfs)
+                (text-width (car (text-wh text font fontsize)))
+                (text-height (elem 2 (text-wh text font fontsize)))
+                (layer2)        
+            )
+        ]]>
+        </programlisting>
+        <para>
+            Ebben a kódrészletben pedig a szkriptünket fogjuk létrehozni, valamint néhány paramétert is megadunk. 
+            Ezt követően a <command>let</command> parancs végzi a deklarálásokat. Létrehozunk egy képet, egy réteget, egy szöveg magasságot  
+            és szélességet, thehát ami a szkriptünknek szükséges a működéshez. 
+        </para>
+        <para>
+            Ezután lépésekre van bontva a programunk:
+        </para>
+
+        <programlisting language="Lisp"><![CDATA[
+        (gimp-image-insert-layer image layer 0 0)
+        (gimp-context-set-foreground '(0 0 0))
+        (gimp-drawable-fill layer  FILL-FOREGROUND )
+        (gimp-context-set-foreground '(255 255 255))
+       
+        (set! textfs (car (gimp-text-layer-new image text font fontsize PIXELS)))
+        (gimp-image-insert-layer image textfs 0 0)   
+        (gimp-layer-set-offsets textfs (- (/ width 2) (/ text-width 2)) (- (/ height 2) (/ text-height 2)))
+       
+        (set! layer (car(gimp-image-merge-down image textfs CLIP-TO-BOTTOM-LAYER)))
+        ]]>
+        </programlisting>
+        <para>
+            Az első lépésben hozzáadunk egy réteget adunk a képünkhöz, egy fekete hátteret amellyel filleljük is a foregroundot, 
+            majd a szövegnek fehér szint adunk. A fekete szint a 0 0 0-ás RGB kód adja meg, míg a fehéret a 255 255 255. 
+            A további részletek további réteg beillesztését tartalmazza, offset-beállitást, fontsize pontositást.
+        </para>
+
+        <programlisting language="Lisp"><![CDATA[
+        (plug-in-gauss-iir RUN-INTERACTIVE image layer 15 TRUE TRUE)
+        ]]>
+        </programlisting>
+        <para>
+            A második lépésben plug-in-t használunk, ahhoz, hogy Gauss elmosást alkalmazzunk a szövegen, melyet a számérték szabályoz. 
+        </para>
+
+        <programlisting language="Lisp"><![CDATA[
+        (gimp-drawable-levels layer HISTOGRAM-VALUE .11 .42 TRUE 1 0 1 TRUE)
+        ]]>
+        </programlisting>
+        <para>
+            A harmadik lépésben is különböző értékeket láthatunk, mely a layer-hez kötődik, és a HISTOGRAM-VALUE-t szabályozzuk vele, 
+            mely a képünk frekvenciáját vagyis részletességét adja meg.
+        </para>
+
+        <programlisting language="Lisp"><![CDATA[
+        (plug-in-gauss-iir RUN-INTERACTIVE image layer 2 TRUE TRUE)
+        ]]>
+        </programlisting>
+        <para>
+            A negyedik lépésben szintén Gauss elmosást alkalmazunk, itt már kisebb mértékben, tehát kisebb lesz az elmosás.
+        </para>
+
+        <programlisting language="Lisp"><![CDATA[
+        (gimp-image-select-color image CHANNEL-OP-REPLACE layer '(0 0 0))
+        (gimp-selection-invert image)
+        ]]>
+        </programlisting>
+        <para>
+            Az ötödik lépésben a fekete szinünket fogjuk kiválasztani és elkülöniteni. Ezt követően invertáljuk a szelektálást.
+        </para>
+
+        <programlisting language="Lisp"><![CDATA[
+        (set! layer2 (car (gimp-layer-new image width height RGB-IMAGE "2" 100 LAYER-MODE-NORMAL-LEGACY)))
+        (gimp-image-insert-layer image layer2 0 0)
+        ]]>
+        </programlisting>
+        <para>
+            A hatodik lépésben <command>layer2</command> nevezetű réteget állitunk be, mely a 100as érték miatt átlátszó réteg lesz. 
+            Ezt be is illesszük az <command>insert-layer</command>-el.
+        </para>
+        <programlisting language="Lisp"><![CDATA[
+        (gimp-context-set-gradient gradient) 
+        (gimp-edit-blend layer2 BLEND-CUSTOM LAYER-MODE-NORMAL-LEGACY GRADIENT-LINEAR 100 0 REPEAT-NONE 
+            FALSE TRUE 5 .1 TRUE width (/ height 3) width  (- height (/ height 3)))
+        ]]>
+        </programlisting>
+        <para>
+            A hetedik lépésben a kontexus gradiensét állitjuk be, valamint a layer2-es rétegünk átmenetét állitjuk be és a végeredmény 
+            egy szürke szint fog adni a <command>layer2</command>-nek.
+        </para>
+        <programlisting language="Lisp"><![CDATA[
+        (plug-in-bump-map RUN-NONINTERACTIVE image layer2 layer 120 25 7 5 5 0 0 TRUE FALSE 2)
+        ]]>
+        </programlisting>
+        <para>
+            A nyolcadik lépésben egy plug-in-t használunk, amely egy részletesség és egy térbeli hatást ad hozzá a képünkhöz.
+        </para>
+        <programlisting language="Lisp"><![CDATA[
+        (gimp-curves-spline layer2 HISTOGRAM-VALUE 8 (color-curve))
+      
+        (gimp-display-new image)
+        (gimp-image-clean-all image)
+        )
+        ]]>
+        </programlisting>
+        <para>
+            A kilencedik lépésben a <command>curves-spline</command> függvényt fogjuk használni, melyet követően a <command>layer2</command> 
+            HISTOGRAM-értékét állitjuk be, a végeredmény pedig az, hogy egy krómos hatást érünk el a képen.
+        </para>
+        <programlisting language="Lisp"><![CDATA[
+        (script-fu-register "script-fu-bhax-chrome"
+            "Chrome3"
+            "Creates a chrome effect on a given text."
+            "Norbert Bátfai"
+            "Copyright 2019, Norbert Bátfai"
+            "January 19, 2019"
+            ""
+            SF-STRING       "Text"      "Bátf4i Haxor"
+            SF-FONT         "Font"      "Sans"
+            SF-ADJUSTMENT   "Font size" '(100 1 1000 1 10 0 1)
+            SF-VALUE        "Width"     "1000"
+            SF-VALUE        "Height"    "1000"
+            SF-COLOR        "Color"     '(255 0 0)
+            SF-GRADIENT     "Gradient"  "Crown molding"    
+        )
+        (script-fu-menu-register "script-fu-bhax-chrome" 
+            "<Image>/File/Create/BHAX"
+        )
+        ]]>
+        </programlisting>
+        <para>
+            Végül a szkriptünk regisztrálására kerül sor, hogy használni tudjuk. Ezen belül pedig kezdőértékeket is látunk amelyeket 
+            beállíthatunk.
+        </para>
+        <para>
+            A programunk vagyis szkriptünk futtatásához le kell töltenünk a Gimp nevű alkalmazást. Ezt követően az alkalmazáson belül 
+            a <command>fu-script</command>-eket tartalmazó mappába mentjük a saját szkriptünket (fájlnév.scm). 
+            A Gimp alkalmazásban a <command>Filters</command> azon belül a <command>Script-Fu</command> nevű lehetőségben a 
+            <command>Console</command>-ba behelyezzük a 
+            <command>(script-fu-bhax-chrome "Bátf41 Haxor" "Sans" 120 1000 1000 '(255 0 0) "Crown molding") sort </command> futtatjuk. 
+            Ezt követően megjelenik a krómozott képünk.
+        </para>    
+    </section>        
+
+
+
+
+
+
+    <section>
+        <title>Gimp Scheme Script-fu: név mandala</title>
+        <para>
+            Írj olyan script-fu kiterjesztést a GIMP programhoz, amely név-mandalát készít a
+            bemenő szövegből!               
+        </para>
+        <para>
+            Megoldás videó: <link xlink:href="https://bhaxor.blog.hu/2019/01/10/a_gimp_lisp_hackelese_a_scheme_programozasi_nyelv">https://bhaxor.blog.hu/2019/01/10/a_gimp_lisp_hackelese_a_scheme_programozasi_nyelv</link>      
+        </para>
+        <para>
+            Megoldás forrása: <link xlink:href="https://gitlab.com/nbatfai/bhax/tree/master/attention_raising/GIMP_Lisp/Mandala">https://gitlab.com/nbatfai/bhax/tree/master/attention_raising/GIMP_Lisp/Mandala</link>               
+        </para>
+        <para>
+            Harmadik passz.
+        </para>            
+    </section>    
+
+
+
+
+    <section>
+        <title>Vörös Pipacs Pokol/javíts tovább a javított 19 RF-eden</title>
+        <para>
+            Megoldás forrása: <link xlink:href="https://github.com/nbatfai/RedFlowerHell">https://github.com/nbatfai/RedFlowerHell</link>               
+        </para>
+        <para>
+            Negyedik passz.
+        </para>            
+    </section>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+                                      
+</chapter>                

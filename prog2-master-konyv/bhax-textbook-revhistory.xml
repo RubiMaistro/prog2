@@ -1,0 +1,101 @@
+<revhistory xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+    <revision>
+        <revnumber>0.0.1</revnumber>
+        <date>2020-02-12</date>
+        <authorinitials>nbatfai</authorinitials>
+        <revremark>
+            Az iniciális dokumentum szerkezetének kialakítása.
+        </revremark>
+    </revision>
+    <revision>
+        <revnumber>0.0.2</revnumber>
+        <date>2020-02-14</date>
+        <authorinitials>nbatfai</authorinitials>
+        <revremark>
+            Inciális feladatlisták összeállítása.
+        </revremark>
+    </revision>    
+    <revision>
+        <revnumber>0.0.3</revnumber>
+        <date>2020-02-16</date>
+        <authorinitials>nbatfai</authorinitials>
+        <revremark>
+            Feladatlisták folytatása.
+            Feltöltés a BHAX csatorna 
+            <link xlink:href="https://gitlab.com/nbatfai/bhax">https://gitlab.com/nbatfai/bhax</link>
+            repójába.
+        </revremark>
+    </revision>
+    <revision>
+        <revnumber>0.0.4</revnumber>
+        <date>2020-02-19</date>
+        <authorinitials>nbatfai</authorinitials>
+        <revremark>
+            A Brun tételes feladat kidolgozása.
+        </revremark>
+    </revision>
+    <revision>
+        <revnumber>0.0.5</revnumber>
+        <date>2020-02-27</date>
+        <authorinitials>deakruben</authorinitials>
+        <revremark>
+            Helló, Turing! csomag kész.
+        </revremark>
+    </revision>
+    <revision>
+        <revnumber>0.0.6</revnumber>
+        <date>2020-03-13</date>
+        <authorinitials>deakruben</authorinitials>
+        <revremark>
+            Helló, Chomsky! csomag kész.
+        </revremark>
+    </revision>
+     <revision>
+        <revnumber>0.0.7</revnumber>
+        <date>2020-03-20</date>
+        <authorinitials>deakruben</authorinitials>
+        <revremark>
+            Helló, Caesar! csomag kész.
+        </revremark>
+    </revision>
+     <revision>
+        <revnumber>0.0.8</revnumber>
+        <date>2020-03-27</date>
+        <authorinitials>deakruben</authorinitials>
+        <revremark>
+            Helló, Mandelbrot! csomag kész.
+        </revremark>
+    </revision>
+     <revision>
+        <revnumber>0.0.9</revnumber>
+        <date>2020-04-03</date>
+        <authorinitials>deakruben</authorinitials>
+        <revremark>
+            Helló, Welch! csomag kész.
+        </revremark>
+    </revision>
+      <revision>
+        <revnumber>0.1.0</revnumber>
+        <date>2020-04-10</date>
+        <authorinitials>deakruben</authorinitials>
+        <revremark>
+            Helló, Conway! csomag kész.
+        </revremark>
+    </revision>
+      <revision>
+        <revnumber>0.1.1</revnumber>
+        <date>2020-04-24</date>
+        <authorinitials>deakruben</authorinitials>
+        <revremark>
+            Helló, Schwarzenegger! csomag kész.
+        </revremark>
+    </revision>
+      <revision>
+        <revnumber>0.1.2</revnumber>
+        <date>2020-05-01</date>
+        <authorinitials>deakruben</authorinitials>
+        <revremark>
+            Helló, Chaitin! csomag kész.
+        </revremark>
+    </revision>
+</revhistory>

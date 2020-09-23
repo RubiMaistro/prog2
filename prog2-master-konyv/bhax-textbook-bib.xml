@@ -1,0 +1,95 @@
+<bibliography xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+    <title>Irodalomjegyzék</title>
+    <bibliodiv>
+        <title>Általános</title>
+        <biblioentry xml:lang="hu">
+            <abbrev>MARX</abbrev>
+            <authorgroup>
+                <author>
+                    <personname>
+                        <firstname>György</firstname>
+                        <surname>Marx</surname>
+                    </personname>
+                </author>
+            </authorgroup>
+            <title>Gyorsuló idő</title>
+            <publisher>
+                <publishername>
+                    Typotex
+                </publishername>
+            </publisher>
+            <pubdate>2005</pubdate>
+        </biblioentry>  
+    </bibliodiv> 
+    <bibliodiv>
+        <title>C</title>
+        <biblioentry>
+            <abbrev>KERNIGHANRITCHIE</abbrev>
+            <authorgroup>
+                <author>
+                    <personname>
+                        <firstname>Brian W.</firstname>
+                        <surname>Kernighan</surname>
+                    </personname>
+                </author>
+                <author>
+                    <personname>
+                        <firstname>Dennis M.</firstname>
+                        <surname>Ritchie</surname>
+                    </personname>
+                </author>
+            </authorgroup>
+            <title>A C programozási nyelv</title>
+            <publisher>
+                <publishername>Bp., Műszaki</publishername>
+            </publisher>
+            <pubdate>1993</pubdate>
+        </biblioentry>            
+    </bibliodiv>
+    <bibliodiv>
+        <title>C++</title>
+        <biblioentry>
+            <abbrev>BMECPP</abbrev>
+            <authorgroup>
+                <author>
+                    <personname>
+                        <firstname>Zoltán</firstname>
+                        <surname>Benedek</surname>
+                    </personname>
+                </author>
+                <author>
+                    <personname>
+                        <firstname>Tihamér</firstname>
+                        <surname>Levendovszky</surname>
+                    </personname>
+                </author>
+            </authorgroup>
+            <title>Szoftverfejlesztés C++ nyelven</title>
+            <publisher>
+                <publishername>Bp., Szak Kiadó</publishername>
+            </publisher>
+            <pubdate>2013</pubdate>
+        </biblioentry>            
+    </bibliodiv>
+    <bibliodiv>
+        <title>Lisp</title>
+        <biblioentry>
+            <abbrev>METAMATH</abbrev>
+            <authorgroup>
+                <author>
+                    <personname>
+                        <firstname>Gregory</firstname>
+                        <surname>Chaitin</surname>
+                    </personname>
+                </author>
+            </authorgroup>
+            <title>META MATH! The Quest for Omega</title>
+            <publisher>
+                <publishername>
+                    <link xlink:href="http://arxiv.org/PS_cache/math/pdf/0404/0404335v7.pdf">http://arxiv.org/PS_cache/math/pdf/0404/0404335v7.pdf</link>
+                </publishername>
+            </publisher>
+            <pubdate>2004</pubdate>
+        </biblioentry> 
+    </bibliodiv>    
+</bibliography>     

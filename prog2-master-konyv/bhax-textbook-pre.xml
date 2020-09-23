@@ -1,0 +1,112 @@
+<preface xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+    <title>Előszó</title>
+    <para xml:id="bhax-textbook-pre.Eloszo">
+        Amikor programozónak terveztem állni, ellenezték a környezetemben, mondván, hogy kell  
+        szövegszerkesztő meg táblázatkezelő, de az már van... nem lesz programozói munka.
+    </para>                 
+    <para>
+        Tévedtek. Hogy egy generáció múlva kell-e még tömegesen hús-vér programozó vagy
+        olcsóbb lesz allokálni igény szerint pár robot programozót a felhőből?
+        A programozók dolgozók lesznek vagy papok?
+        Ki tudhatná ma. 
+    </para>
+    <para>
+        Mindenesetre a programozás a teoretikus kultúra csúcsa. A GNU mozgalomban látom annak 
+        garanciáját, hogy ebben a szellemi kalandban a gyerekeim is részt vehessenek majd. Ezért programozunk.
+    </para>  
+
+    <section>
+        <title>
+            Funnily about programming laguages from <command>Anupam Chugh</command> 
+        </title>
+            <para>
+                <command>Copyright Anupam Chugh, Independent iOS Developer</command>
+            </para>
+
+    <para> C </para>
+        <para>I might be the oldest, but you still have to allocate me space. Pointing at others is my favorite hobby.</para>
+
+    <para> C++ </para>
+        <para>You can hate us, despise us, but we’ll find our ways into your framework. We believe in friends at work.</para>
+
+    <para> Java </para>
+        <para>We’re getting old and were always verbose. But pay us and we’ll give you long term support.</para>
+
+    <para> Python </para>
+        <para>We’ve made it possible to write pseudo-code in real even if you don’t understand it. Not a semicolon or a 
+        bracket but extra whitespace is all it takes to cause chaos.</para>
+
+    </section> 
+
+
+    <section>
+        <title>Hogyan forgasd</title>
+        <para>
+            A könyv célja egy stabil programozási szemlélet kialakítása az olvasóban. Módszere, hogy hetekre 
+            bontva ad egy tematikus feladatcsokrot. Minden feladathoz megadja a megoldás forráskódját és forrásokat
+            feldolgozó videókat.
+            Az olvasó feladata, hogy ezek tanulmányozása után maga adja meg a feladat megoldásának lényegi
+            magyarázatát, avagy írja meg a könyvet.
+        </para>
+        <para>
+            Miért univerzális? Mert az olvasótól (kvázi az írótól) függ, hogy kinek szól a könyv. 
+            Alapértelmezésben gyerekeknek, mert velük készítem az iniciális változatot. 
+            Ám tervezem felhasználását az egyetemi programozás oktatásban is. Ahogy szélesedni tudna a 
+            felhasználók köre, akkor lehetne kiadása különböző korosztályú gyerekeknek, családoknak, 
+            szakköröknek, programozás kurzusoknak, felnőtt és továbbképzési műhelyeknek és sorolhatnánk... 
+        </para>
+        <section>
+            <title>Milyen nyelven nyomjuk?</title>
+            <para>
+                C (mutatók), C++ (másoló és mozgató szemantika) és Java (lebutított C++) nyelvekből kell egy jó alap, 
+                ezt kell kiegészíteni pár R (vektoros szemlélet), Python (gépi tanulás bevezető), Lisp és Prolog (hogy lássuk
+                mást is) példával.
+            </para>
+        </section>
+        <section>
+            <title>Hogyan nyomjuk?</title>
+            <para>
+                Rántsd le a <link xlink:href="https://gitlab.com/nbatfai/bhax">https://gitlab.com/nbatfai/bhax</link>
+                git repót, vagy méginkább forkolj belőle magadnak egy sajátot a GitLabon, ha már saját könyvön dolgozol!
+            
+                <screen><![CDATA[]]></screen> 
+            
+            </para>
+            <para>
+                Ha megvannak a könyv DocBook XML forrásai, 
+                akkor az alább látható <command>make</command> parancs ellenőrzi, hogy &#x201E;jól formázottak&#x201D; és 
+                &#x201E;érvényesek-e&#x201D; ezek az XML források, majd 
+                elkészíti a <application>dblatex</application> programmal a könyved pdf változatát, íme:
+                <screen><![CDATA[batfai@entropy:~$ cd glrepos/bhax/thematic_tutorials/bhax_textbook/
+batfai@entropy:~/glrepos/bhax/thematic_tutorials/bhax_textbook$ make
+rm -f bhax-textbook-fdl.pdf
+xmllint --xinclude bhax-textbook-fdl.xml --output output.xml
+xmllint --relaxng http://docbook.org/xml/5.0/rng/docbookxi.rng output.xml --noout
+output.xml validates
+rm -f output.xml	
+dblatex bhax-textbook-fdl.xml -p bhax-textbook.xls
+Build the book set list...
+Build the listings...
+XSLT stylesheets DocBook - LaTeX 2e (0.3.10)
+===================================================
+Stripping NS from DocBook 5/NG document.
+Processing stripped document.
+Image 'dblatex' not found
+Build bhax-textbook-fdl.pdf
+'bhax-textbook-fdl.pdf' successfully built]]></screen>             
+
+            Ha minden igaz, akkor most éppen ezt a legenerált <filename>bhax-textbook-fdl.pdf</filename> fájlt olvasod.
+            </para>
+            <tip>
+              <title>A DocBook XML 5.1 új neked?</title>
+              <para>
+                  Ez esetben forgasd a <link xlink:href="https://tdg.docbook.org/tdg/5.1/">https://tdg.docbook.org/tdg/5.1/</link>
+                  könyvet, a végén találod az informatikai szövegek jelölésére használható gazdag &#x201E;API&#x201D; elemenkénti
+                  bemutatását.                  
+              </para>            
+            </tip>            
+        </section>
+        
+    </section>            
+
+</preface>    

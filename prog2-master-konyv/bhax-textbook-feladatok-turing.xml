@@ -1,0 +1,776 @@
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+    <info>
+        <title>Helló, Turing!</title>
+        <keywordset>
+            <keyword/>
+        </keywordset>
+    </info>
+    <section>
+        <title>Végtelen ciklus</title>
+        <para>
+            Írj olyan C végtelen ciklusokat, amelyek 0 illetve 100 százalékban dolgoztatnak egy magot és egy olyat, amely  
+            100 százalékban minden magot!
+        </para>
+        <para>
+            A végtelen ciklusban a feltétel mindig teljesűl (true) ezért az utasítások újra lefutnak,
+            így nincs olyan feltétel ami miatt kilépne a ciklus.
+            Például: for(;;)
+        </para>                    
+        <para>
+            Egy mag 0 százalékban:               
+        </para>
+        <programlisting language="c"><![CDATA[int
+#include <stdio.h>
+int
+main ()
+{
+  while(true){
+	sleep(100);
+    
+  return 0;
+}
+]]>
+        </programlisting>               
+        <para>
+        Magyarázat:
+        Az unistd header tartalmazza a sleep() függvényt, ezért kell include-olni az stdio.h header 
+        (standart input/output) mellett. Az int main() a fő függvényünk, a while() pedig a ciklus.
+        A ciklusba a feltételt a ()-ban adjuk meg és amíg ez igaz addig a {}-ban megadott utasítások
+        végrehajtódnak és a ciklus újra és újra lefut. A példában a ciklus feltétele "true" ami azt jelenti,
+        hogy a feltétel igaz, tehát a ciklus mindig újraindul, amíg ki nem lőjük. A sleep(100) függvény
+        pedig azért kell, mivel ez altatja a processzor folyamat szálát. A függvényben megadott érték jelenti azt, 
+        hogy hány másodpercig altatja a processzort, jelen esetben 100 ms-ig.
+        </para>                       
+    
+        <para>
+            Egy mag 100 százalékban:               
+        </para>        
+        <programlisting language="c"><![CDATA[#include <unistd.h>
+#include <stdio.h>
+
+int main(){
+  while(true){
+	}
+	return 0;
+}
+]]>
+        </programlisting>   
+        <para>
+        Magyarázat:
+Ez az előző példához hasonló. Az include-ok és a ciklus magyarázata megegyezik, az előző példáéval. 
+Itt annyi a különbség, hogy nincs benne a sleep() függvény, azaz a szál nincs altatva, így a végtelen 
+ciklus 100%-ban dolgoztat 1 szálat.
+        </para>     
+        <para>
+            Minden mag 100 százalékban:               
+        </para>
+
+        <programlisting language="c"><![CDATA[#include <omp.h>
+#include <stdio.h>
+#include <omp.h>
+
+int main(void)
+{
+	#pragma omp parallel
+	{
+		for(;;)
+		{
+
+		}
+	}
+	return 0;
+}
+]]>
+        </programlisting>        
+        <para>
+            A programunk, az előzőhöz képest egy openmp-vel bővült. #pragma omp parallel sor adja azt az utasítást 
+a gépnek, hogy a feladat az összes szálon fusson, vagyis párhuzamosan minden szálon.
+(Ezért a fordításnál -fopenmp kapcsoló szükséges még a parancsba.)          
+        </para>
+        </section>  
+
+
+
+
+
+     <section>
+        <title>Lefagyott, nem fagyott, akkor most mi van?</title>
+
+        <para>
+        Mutasd meg, hogy nem lehet olyan programot írni, amely bármely más programról eldönti, hogy le fog-e fagyni vagy sem!
+        </para>
+        <para>
+        Megoldás videó:
+        </para>
+        <para>
+        Megoldás forrása:  tegyük fel, hogy akkora haxorok vagyunk, hogy meg tudjuk írni a <function>Lefagy</function>
+        függvényt, amely tetszőleges programról el tudja dönteni, hogy van-e benne vlgtelen ciklus:              
+        </para>
+        <programlisting language="c"><![CDATA[Program T100
+{
+
+	boolean Lefagy(Program P)
+	{
+		 if(P-ben van végtelen ciklus)
+			return true;
+		 else
+			return false; 
+	}
+
+	main(Input Q)
+	{
+		Lefagy(Q)
+	}
+}]]></programlisting>            
+        <para>
+            A program futtatása, például akár az előző <filename>v.c</filename> ilyen pszeudókódjára:
+            <screen><![CDATA[T100(t.c.pseudo)
+true]]></screen>            
+            akár önmagára
+            <screen><![CDATA[T100(T100)
+false]]></screen>  
+            ezt a kimenetet adja.          
+        </para>
+        <para>
+            A T100-as programot felhasználva készítsük most el az alábbi T1000-set, amelyben a
+            Lefagy-ra épőlő Lefagy2 már nem tartalmaz feltételezett, csak csak konkrét kódot:
+        </para>
+        <programlisting language="c"><![CDATA[Program T1000
+{
+
+	boolean Lefagy(Program P)
+	{
+		 if(P-ben van végtelen ciklus)
+			return true;
+		 else
+			return false; 
+	}
+
+	boolean Lefagy2(Program P)
+	{
+		 if(Lefagy(P))
+			return true;
+		 else
+			for(;;); 
+	}
+
+	main(Input Q)
+	{
+		Lefagy2(Q)
+	}
+
+}]]></programlisting>            
+                    
+        <para>
+            Mit fog kiírni erre a <computeroutput>T1000(T1000)</computeroutput> futtatásra?
+                                
+            <itemizedlist>
+                <listitem>
+                    <para>Ha T1000 lefagyó, akkor nem fog lefagyni, kiírja, hogy true</para>                        
+                </listitem>
+                <listitem>
+                    <para>Ha T1000 nem fagyó, akkor pedig le fog fagyni...</para>                        
+                </listitem>
+            </itemizedlist>
+            akkor most hogy fog működni? Sehogy, mert ilyen <function>Lefagy</function>
+            függvényt, azaz a T100 program nem is létezik.                
+        </para>
+        <para>
+            Tanulság:
+Ha a T100-t és T1000-t létező programnak tekintjük és T1000-ben meghívjuk saját magát. 
+A T100 alapján ha a programunkba van végtelen ciklus, akkor igaz (true) értéket ad a Lefagy program 
+a Lefagy2 programnak. Tehát az is igaz (true) értéket fog adni, viszont ha a Lefagy hamis (false) értéket 
+ad vissza akkor a Lefagy2 belép egy végtelen ciklusba és a program le fog fagyni. 
+Olyan program tehát mint a T100, nem működik mivel ha egy olyan program érkezik bele amiben 
+van végtelen ciklus, akkor a program leáll mert a ciklus nem áll meg.
+        </para>
+    </section> 
+
+
+
+
+                
+    <section>
+        <title>Változók értékének felcserélése</title>
+
+        <para>
+            Írj olyan C programot, amely felcseréli két változó értékét, bármiféle logikai utasítás vagy kifejezés
+            nasználata nélkül!
+        </para>
+
+        <para>
+        A feladat két változónak az értékeinek felcserélése. Az x = 2 és y = 3 példában 
+        ez nem tűnik nehéznek ha egy segédváltozót használunk aminek megadjuk x-értékét aztán 
+        x-nek az y-értékét végül y-nak pedig értékül adjuk a segédváltozó értékét.
+        A következő példában egy másfajta változócserét fogunk alkalmazni, amely számolással
+        cseréli fel az x és y értékeit.
+        </para>
+    <programlisting language="c"><![CDATA[
+    #include <stdlib.h>
+    #include <stdio.h>
+
+    int main(){
+
+        int x = 2, y = 3;
+
+        printf("%s\n%d %d\n, kulonbseggel:",x,y);
+
+        x -= y;
+        y += x;
+        x = y-x;
+        
+        printf("%d %d\n",x,y);
+
+    return 0;
+    }
+    ]]></programlisting>
+        <para>
+            Magyarázat:
+            A fejlécet már ismerjük a 2.1-ből. A printf() függvény a kiíratást végzi, 
+            benne az első argumentum a  a kíratás formátuma, a többi pedig a változók kiíratása. 
+            A „%s” azt jelenti, hogy egy szöveget fogunk kiíratni, amit a "%d" követ amely,
+            egész tipusú változót jelent, a „\n” pedig a sortörést jelenti. 
+            Aztán egy kis matematikai számítás, végül újra egy kiíratás, hogy megmutassuk, hogy
+            a változók felcserélődtek.
+        </para>
+    <para>
+        Elsősorban egy kis bevezető: 
+        x += y egyenlő x = x + y kifejezéssel
+        (ez a formátum csak egy rövidítés, későbbi programozásban hasznos dolog lesz)
+    </para>
+<para>
+    A lépések egyszerűbben a következők:
+    x = 2, y = 3
+    x -= 3 így az x értéke -1 
+    y += -1 ez azt jelenti hogy y-hoz hozzáadjuk az x-et (a -1-t) így x = -1 és y = 2
+    x = y-x azaz x = 2-(-1) = 2+1 = 3 tehát az x értéke 3 és az y értéke 2 lett.
+    Így kész is van a csere.
+</para>
+    </section> 
+
+
+
+
+
+    <section>
+        <title>Labdapattogás</title>
+
+        <para>
+            Megoldás forrása: <link xlink:href="https://bhaxor.blog.hu/2018/08/28/labdapattogas">https://bhaxor.blog.hu/2018/08/28/labdapattogas</link>
+        </para>
+
+        <programlisting language="c"><![CDATA[
+#include <stdio.h>
+#include <curses.h>
+#include <unistd.h>
+
+int main ( void ) 
+{
+
+	WINDOW *ablak;
+	ablak = initscr ();
+
+	int x = 0;
+	int y = 0;
+
+	int xone =0 , yone = 0;
+
+	int xmax, ymax;
+	
+	for(;;)
+	{
+		getmaxyx ( ablak, ymax, xmax );
+		
+		mvprintw ( y, x, "O" );
+
+		refresh();
+		usleep (100);
+
+		x = x + xone;
+		y = y + yone;
+
+		if ( x >= xmax-1 ) {
+			xone *= -1;
+		}
+		if ( x <= 0 ) {
+			xone *= -1;
+		}
+		if ( y >= yone-1) {
+			yone *= -1;
+		}
+		if ( y >= ymax-1 ) {
+			yone *= -1;
+		}
+	}
+
+	return 0;
+}
+        ]]></programlisting>
+
+        <para>
+            Magyarázat:
+            Az új dolog ami a fejlécnél feltuűnik az a curses.h header. 
+            Ez képernyő kezelési függvényeket tartalmaz, és a program 
+            megjelenítéséhez szükségünk van rá. 
+            A main() függvényben a "void" kifejezés azt jelenti, hogy csak megjelenítünk 
+            a képernyőn valamit.
+        </para>
+        <programlisting language="c"><![CDATA[
+            WINDOW *ablak;
+            ablak = initscr ();
+        ]]></programlisting>
+        <para>
+            Így formázzuk meg a kimenetet. 
+            Az initscr () függvény curses módba lépteti a terminált.
+        </para>
+        <para>
+            A deklarált x-en és y-on lesz a kezdő értékünk. 
+            Az xone és yone pedig a lépésközöt mutatja, jelen esetben 1. 
+            (lépésenként a koordináta rendszeren xone, yone-al való elmozdulást). 
+            Az xmax és ymax lesznek a határértékek, hogy a program csak az ablakon belül mozogjon. 
+        </para>
+        <para>
+            A végtelen ciklus miatt a labda pattogás nem áll ki nem lőjük a programot.
+            A getmaxyx() függvény meghatározza az ablak méretét, a refresh() függvény pedig
+            az ablakot frissíti. A mvprint() függvény az x és y koordináta tengelyen megjeleníti
+            jelen esetben az "O" karaktert. A usleep() függvény altatja a ciklust, azaz mennyi 
+            időn belül induljon újra a ciklus, tehát a labda pattogásának sebességét is ezzel megadjuk.
+        </para>
+        <programlisting language="c"><![CDATA[
+            x = x + xone;
+            y = y + yone;
+        ]]></programlisting>
+        <para>
+            Megnöveljük az értékeket, minden ciklus lefutásnál (mozog a "labda"). 
+            A következő négy if-el pedig azt vizsgáljuk, hogy a labda az ablak szélén van e, 
+            ha igen akkor -1 -el szorozzuk így a labda irányt változtat. 
+            A fordításnál -lncourses kapcsolót is kell használnunk a fejlécben megjelenő curses.h miatt. 
+        </para>
+        <para>
+            Egy másik megoldás az ""if" logikai feltételek használata nélkül:
+        </para>
+
+    <programlisting language="c"><![CDATA[
+        #include <stdio.h>
+        #include <stdlib.h>
+        #include <curses.h>
+        #include <unistd.h>
+
+        int
+        main (void)
+        {
+            int xj = 0, xk = 0, yj = 0, yk = 0;
+            int mx = 80 * 2, my = 24 * 2;
+
+            WINDOW *ablak;
+            ablak = initscr ();
+            noecho ();
+            cbreak ();
+            nodelay (ablak, true);
+
+            for (;;)
+            {
+                xj = (xj - 1) % mx;
+                xk = (xk + 1) % mx;
+
+                yj = (yj - 1) % my;
+                yk = (yk + 1) % my;
+
+                clear ();
+
+                mvprintw (0, 0,
+                        "--------------------------------------------------------------------------------");
+                mvprintw (24, 0,
+                        "--------------------------------------------------------------------------------");
+                mvprintw (abs ((yj + (my - yk)) / 2),
+                        abs ((xj + (mx - xk)) / 2), "X");
+
+                refresh ();
+                usleep (1)
+            }
+            return 0;
+        }
+    ]]></programlisting>
+
+        <para>
+            Magyarázat: 
+            A prgoramunk ugyan azt csinálja mint az "if"-es változata. Csak ugye most logikai kifejezés,
+            utasítás nélkül. A megoldáshoz szükségünk van matematikai számításokra, ehez deklarálunk egész tipusú
+            változókat. A számításokat egy végtelen ciklusban számoljuk és mvprinw-vel íratjuk ki a képernyőre. A
+            clear()-el minden egyes számítás előtt letisztítjuk az ablakot, az eslő kettő mvprintw-vel a felső és alsó
+            határokat rajzoljuk ki, a harmadikkal pedig a "Labdát". Az usleep() függvény itt is a pattogás sebbeségét határozza
+            meg.
+        </para>
+    </section>                     
+
+    <section>
+        <title>Szóhossz és a Linus Torvalds féle BogoMIPS</title>
+
+        <para>
+            Ez a program a gépünk szó hosszát fogja kiírni (jelen esetben az intiger tipus méretét), 
+            azaz az int méretét. 
+        </para>
+        <para>
+            A BogoMIPS a processzorunk sebbeségét lemérő program amit Linus Torvalds írt meg, a BogoMIPS-ben 
+            használt while ciklus feltétellel írjuk meg a programot. 
+        </para>
+
+        <programlisting language="c"><![CDATA[
+            #include <stdio.h>
+
+            int main()
+            {
+
+            int x = 1;
+            int bit = 0;
+
+            do 
+            bit++;
+            while(a<<=1);
+            printf("%d %s\n",bit,"bites a szohossz.");
+            }
+        ]]></programlisting>
+        <para>
+            A fejlécet ismerjük, a main() függvény a fő függvényünk, amelyben megadunk egy változónak egy
+            tetszőleges értéket, jelen esetben 1-t. A bit változó számolni fogja, hogy hányszor fut le a
+            ciklus. A programot hátultesztlős ciklussal do{}while() ciklussal futtatjuk, mivel az elöltetsztelő
+            while() ciklus nem számolná bele az első lépést. 
+        </para>
+        <para>
+            A ciklus addig fut újra és újra amíg az x értéke nem 0. Tehát az x értéke kezdetben 1, a bináris
+            értéke pedig 0001, a &lt;&lt; (bitshift) operátor csak annyit csinál, hogy egy 0-val eltolja az 1-et,
+            tehát a 0001-ből egy lépés után 0010 lesz ami 2, továbbá a második lépés után 0100 ami 4.
+            A ciklus tehát addig fut amíg csupa 0 érték lesz a gépünk szóhossza, azaz az 1-est kitolja a 
+            szóhosszból, így az értékünk 0 lesz, a while ciklus befejeződik és a printf kíratja a bit értékét
+            vagyis hogy hányat lépett az 1-es (hányszor futott le a ciklus), ez aszám megadja hogy hány bites
+            a szóhossz (jelen esetben az int tipus 32 bites lesz),
+        </para>
+    </section>                     
+    <section>
+        <title>Helló, Google!</title>
+
+        <para>
+            A PageRank egy keresőmotor a Googleban. A programot két ﬁatal írta meg 1998-ban, 
+            nevét az egyik kitalálója Larry Page után kapta. 
+        </para>
+        <para>
+            A következőben, egy 4 weblapból álló PageRank-et fogunk megnézni. 
+            A lapok PageRank-ét az alapján nézzük, hogy hány oldal osztotta meg a saját honlapján 
+            az oldal hiperlinkjét. 
+        </para>
+    
+        <programlisting language="c"><![CDATA[
+            #include <stdio.h> 
+            #include <math.h>
+
+            void kiir (double tomb[], int db) 
+            { 
+                int k;
+                    for (k = 0; k < db; ++k) 
+                        printf ("%f\n", tomb[k]);
+            }
+
+            double tavolsag (double PageR[], double PageRmatrix[], int n) 
+            { 
+                double osszeg = 0.0; 
+                int i;
+
+                    for (i = 0; i < n; ++i) 
+                {
+                        osszeg += (PageRmatrix[i] - PageR[i]) * (PageRmatrix[i] - PageR[i]);
+                }
+                return sqrt(osszeg);
+            }
+
+                int main (void) 
+                {
+                    double Honlap[4][4] = { {0.0, 0.0, 1.0 / 3.0, 0.0}, 
+                                        {1.0, 1.0 / 2.0, 1.0 / 3.0, 1.0}, 
+                                        {0.0, 1.0 / 2.0, 0.0, 0.0}, 
+                                        {0.0, 0.0, 1.0 / 3.0, 0.0} };
+                                    
+                    double PageR[4] = { 0.0, 0.0, 0.0, 0.0 }; 
+
+                    double PageRmatrix[4] = { 1.0 / 4.0, 1.0 / 4.0,
+                        1.0 / 4.0, 1.0 / 4.0 };
+                    
+                int i, j;
+
+                for (;;)
+                {
+                    for (i = 0; i < 4; ++i)
+                    {
+                        PageR[i] = 0.0;
+                    for (j = 0; j < 4; ++j) 
+                    {
+                        PageR[i] += (Honlap[i][j] * PageRmatrix[j]);
+                    }        
+                    ]]
+                
+
+                    for ( i = 0; i < 4; ++i ) 
+                {
+                    PageRmatrix[i] = PageR[i];
+                }
+                }
+
+                kiir (PageR, 4);
+
+            return 0;
+            }
+        ]]></programlisting>
+        
+        <para>
+            A math.h header tartalmazza a matematikai számításokhoz szükséges függvényeket. 
+            A main() fügvénnyben létrehozunk egy mátrixot, ami a lapok összeköttetését adja meg. 
+            Ha az érték 0 akkor a lap nincs összekötve az adott lappal és önmagával sincs. 
+            Ahol 1/2 vagy 1/3 az érték az oldal másik oldallal való összeköttetését jelenti.
+        </para>
+        <para>
+            Például az 1/2: Az oldal 2 oldallal van összekötve.
+        </para>
+        <para>
+            A PageR tömb fogja a PageRank értéket tárolni. A PageRmatrix tömb pedig a mátrixal való számításokhoz kell. 
+            A következő lépés egy végtelen ciklus, ez majd a számítások végén a "break" parancsal lép ki, ha a 
+            megadott feltétel teljesül. 
+        </para>
+        <para>
+            A for ciklusban van maga a PageRank számítása ami a tavolság() függvényt is meghívja, 
+            és egy részszámolást tartalmaz. A végtelen cikluson belül lévő ciklusok azért 4-ig mennek 
+            mert 4 weblapot nézünk. A ciklusbol a "break" parancsal lépünk ki ha a tavolsag() függvényben 
+            kapott eredmény kisebb mint 0.00000001. 
+            A végén a kiir() függvény megkapja a PageR értékeket és az weblapok számát és kiíratja.
+        </para>
+    </section>
+
+
+
+
+
+    <section>
+        <title>100 éves a Brun tétel</title>
+
+        <para>
+            A tétel kimondja hogy az ikerprímek reciprokösszege a Brun konstanthoz konvergál, ami egy véges érték. 
+            A tételt Viggo Brun-ről nevezték el a tételt aki bebizonyította 1919-ben.
+        </para>
+        
+        <para>
+            Megoldás forrása: https://github.com/RubiMaistro/Prog1/blob/master/burn.R
+        </para>
+        <para>
+            Az R nyelvű matlab könyvtár telpítési parancsai:
+        </para>
+        <para>
+            sudo apt-get install r-base
+        </para>
+        <para>
+            sudo apt-get install libopenblas-base r-base
+        </para>
+        <para>
+            sudo apt-get install gdebi
+        </para>
+        <para>
+            cd ~/Downloads
+        </para>
+        <para>
+            A végtelen cikluson belül lévő ciklusok azért 4-ig mennek 
+            mert 4 weblapot nézünk. A ciklusbol a "break" parancsal lépünk ki ha a tavolsag() függvényben 
+            kapott eredmény kisebb mint 0.00000001. 
+            A végén a kiir() függvény megkapja a PageR értékeket és az weblapok számát és kiíratja. rstudio-xenial-1.1.379-amd64.deb
+        </para>
+        <para>
+            A számoláshoz kell egy matlab könyvtár. A program fő része az stp függvény, a 
+            függvény megkapjax-et. X egy szam lesz ami megmondja meddig kell a prímeket számolni. 
+            Ehez a primes függvényt használjuk. A primes(x) kiírja x-ig a prímeket. A diff vektorban 
+            eltároljuk a primes vektorban tárolt egymás melletti prímek különbségét. A számítást úgy végezzük, 
+            hogy a 2-es prímszámtól indulva kivonjuk a prímből az előtte lévő prímet. Az idx el vizsgaljuk meg, 
+            hogy mely prímek különbsége 2 és ezek hol vannak (a helyüket a which függvény adja meg). 
+            A t1primes vektorban elhelyezzük ezeket a prímeket. 
+            A t2primes vektorbapedigamiezeknélaprímeknélkett˝ovelnagyobb(azaz ikerprímek). 
+            rt1plust2 vektorban végezzük a recikropképzést és a pár reciprokát összeadjuk. 
+            A returnban pedig a sum függvénnyel vissza adjuk ezek összegét. 
+            Végül a plot() függvénnyel lerajzoljuk graﬁkusan. 
+        </para> 
+
+    </section>
+
+
+
+
+
+    <section>
+        <title>A Monty Hall probléma</title>
+
+        <para>
+            Bevezetés a megértéshez:
+            A kérdés vagy probléma egy vetélkedő játékból indul, amelyben van 3 ajtó és az egyik mögött egy értékes autó van, 
+            a másik kettő mögött 1-1 kecske, és amelyiket választja a játékos azt nyereményként megkapja. 
+            A versenyzőnek a 3 ajtó közül választania kell vagy sem. 
+        </para>
+        <para>
+            Megoldás:
+            Első ránézésre mindenki azt mondaná, hogy nem számít, hogy vált-e vagy sem mert 50-50% az esélye, 
+            hogy melyik ajtó mögött van az autó. 
+            Mivel már nem 3 hanem 2 ajtó közül kell választani, így már ﬁgyelembe se veszik azt a harmadik ajtót. 
+            De a megoldás az, hogy nagyobb az esélyünk akkor ha az előző döntésünket megváltoztatjuk 
+            és a másik ajtót választjuk. 
+        </para>
+        <para>
+            Magyarázat: 
+            Kezdetben 3 ajtó közül 1 ajtót kell választanunk, azaz 1/3 az eséyle, hogy eltaláljuk a jó megoldást 
+            és 2/3 hogynem. Ezek után a műsorvezető kinyit egy ajtót ami mögött nincs a nyeremény. 
+            Ez a valószínűségen nem változtat, úgyanúgy 1/3 eséllyel választottuk azt az 
+            ajtót ami mögött a nyeremény van. Viszont azok az ajtók közül ami mögött nincs semmi, 
+            már csak az egyik van csukva. Biztosra tudjuk, hogy a nyeremény a maradék két 
+            ajtó közül valamelyik mögött van. Tehát 2/3 az esélye annak, hogy a másik ajtó mögött 
+            van a nyeremény, mivel ha elsőre azt az ajtót választottuk amelyik mögött egy kecske van,
+            és amikor megkapjuk a változtatásra a lehetőséget és élük a lehetőséggel és a másik ajtót választjuk,
+            akkor biztosan az autót megnyerjük. 
+        </para>
+
+        <para>
+            A problémával kapcsolatban egy R nyelvben írt szimuláció a következő:
+        </para>
+        <programlisting language="R"><![CDATA[
+            kiserletek_szama=10000 
+            kiserlet = sample(1:3, kiserletek_szama, replace=T) 
+            jatekos = sample(1:3, kiserletek_szama, replace=T) 
+            musorvezeto=vector(length = kiserletek_szama)
+
+            for (i in 1:kiserletek_szama) 
+            {
+                if(kiserlet[i]==jatekos[i])
+                {
+                mibol=setdiff(c(1,2,3), kiserlet[i])
+                }
+
+                else
+                {
+                mibol=setdiff(c(1,2,3), c(kiserlet[i], jatekos[i]))
+                }
+                musorvezeto[i] = mibol[sample(1:length(mibol),1)]
+            }
+
+            nemvaltoztatesnyer = which(kiserlet==jatekos) 
+            valtoztat=vector(length = kiserletek_szama)
+                for (i in 1:kiserletek_szama) 
+                {
+                    holvalt = setdiff(c(1,2,3), c(musorvezeto[i], jatekos[i])) 
+                    valtoztat[i] = holvalt[sample(1:length(holvalt),1)]
+                }
+            valtoztatesnyer = which(kiserlet==valtoztat)
+
+            sprintf("Kiserletek szama: %i", kiserletek_szama) 
+            length( nemvaltoztatesnyer )   length( valtoztatesnyer ) 
+            length( nemvaltoztatesnyer ) / length( valtoztatesnyer ) 
+            length( nemvaltoztatesnyer ) + length( valtoztatesnyer )
+
+            }
+        ]]></programlisting>
+        <para>
+            A kisérletet 10000x fogjuk eljátszani, a kisérlet vektorban 1 és 3 "ajtó" közül választunk 10000x. 
+            A replace=T-vel tesszük lehetővé, hogy egy eredmény többször is kijöhessen. A játékos valasztásait a 
+            jatekos vektornál ugyan így meghatározzuk. 
+            A sample() fügvénnyel végezzük a kiválasztást. A műsorvezető vektort a length függvényel a 
+            kisérletek számával tesszük egyenlővé. 
+            Következik a for ciklus ami i=1 től a kisérletek számáig fut (10000). A ciklusban egy feltétel 
+            vizsgálat következik, az if-el megvizsgáljuk, hogy a játékos álltal választott ajtó megegyezik-e a 
+            kisérletben szereplő ajtóval. 
+            Ha a feltétel igaz egy vektorba bele tesszük azokat az ajtokat amiket a játékos nem választott, 
+            az else ágon pedig ha a feltétel nem igaz, akkor azt az ajtót eltároljuk amit nem ő választott és a 
+            nyereményt rejtő ajtót.
+        </para>
+        <para>
+            A műsorvezető vektorban pedig azt az ajtót amit ki fog nyitni. A nemvaltoztat és nyer 
+            vektorban azok az esetek vannak amikor a jatékos azt az ajtót választotta elsőre ami mögött 
+            az ajtó van és nem változtat a döntésén. A valtoztat vektorban pedig azt mikor megváltozatja 
+            a döntését és így nyer ezt egy for ciklussal vizsgaljuk. A legvégén kiíratjuk az eredményeket, 
+            hogy melyik esetben hányszor nyert.
+        </para>
+        
+    </section>
+
+
+
+
+    <section>
+        <title>Minecraft-MALMÖ bevezető</title>
+        <para>
+            Egy kis bevezető tájékoztatást szeretnék adni a MALMÖ projektel kapcsolatban amellyel a továbbiakban nagyon érdekes és 
+            különleges feladatokat oldhatunk meg.
+        </para>
+        <para>
+            A <command>MALMÖ</command> egy kreativitást igénylő projekt melynek az alapja a nagy többség által ismert <command>Minecraft</command> nevű játék.
+            A Minecraft Malmö projekt a Mojang fejlesztése, melynek első változtatát <command>2016</command> júliusában publikáltak, 
+            a projekt a mesterséges intelligenciára alapoz.
+        </para>
+        <para>
+            A projekt vezetői: <command>Katja Hofmann</command>a fő kutató, <command>Andre Kramer</command> kutató mérnök és még sok más kutató. 
+            Céljuk a projekktel, hogy a Mesterséges Intelligencia ágát egy új környezetbe épitve fejlesszék, kutassák és  
+            hogy sokan beszálljanak a projektbe, ezért is választották a Minecraft nevű játékot, ami nagy ismeretkörrel 
+            rendelkezik és ideális teret és körülményeket ad ennek a projektnek. 
+        </para>   
+        <para>
+            A projektben számtalan kreatív lehetőséggel rendelkezünk ahogyan ezt a projekt vezetői is említik. A lehetőségünk az ágens irányításával kezdve a 
+            különböző blockok azonosításával és a környezet felismerésével a blockok mozagtásán át, a különböző sziutációkban, az npc és mob közelség
+            reakcióáig és még tovább egy kreatív programozó és fan számára kimeríthetetlen lehet.      
+        </para>
+        <para>  
+            Ebben könyvben a MALMÖ projekt feladataiban csak a projekt egy minimális részét fogjuk érinteni.
+        </para> 
+        <para>
+            A <link xlink:href="https://github.com/nbatfai/RedFlowerHell">Red Flower Hell</link> repóban különböző érdekes programkódok elérhetők. 
+        </para>
+        <para>
+            Ebben az évben a DE-IK PTI karon a Red Flower Hell (RFH) MALMÖ projekttel foglalkozunk. Ennek célja, hogy a hallgatókat a mesterséges inteligencia 
+            kutatása és programozása felé ösztönözze, melynek nem tudhatjuk mennyire hasznos értéke lesz a mesterséges inteligencia tudomány fejlődésére nézve.      
+        </para>
+        <para>
+            A <link xlink:href="https://www.microsoft.com/en-us/research/project/project-malmo/">MALMÖ projekt</link> hivatalos oldala itt elérhető 
+            ahol több és részletesebb információt kaphatunk a projekttel kapcsolatban.
+        </para>
+        <para>
+            Valamint amikor már elérünk a Schwarzenegger fejezethez, kaphatunk egy rövid összefoglalót is az 
+            általunk kidolgozott projekt részekből.
+        </para>
+    </section>
+
+
+
+
+    <section>
+        <title>Vörös Pipacs Pokol/csiga folytonos mozgási parancsokkal</title>
+        <para>
+            Megoldás videó: <link xlink:href="https://youtu.be/uA6RHzXH840">https://youtu.be/uA6RHzXH840</link>      
+        </para>
+        <para>
+            Megoldás forrása elérhető a köveltekő linken:
+        </para>
+        <para>
+            <link xlink:href="https://github.com/nbatfai/RedFlowerHell">https://github.com/nbatfai/RedFlowerHell</link>               
+        </para>
+        <para>
+            Link saját repóból: <link xlink:href="https://github.com/RubiMaistro/MALM-/blob/master/csigakorbe.py"> Csiga mozgása folytonosan</link>
+        </para> 
+
+        <para> 
+            A feladat alapja, hogy Steve az ágens, csiga vonalban haladva jussok minél feljebb a tölcsérszerű aréna 
+            aljáról a tetejére ameddig a láva engedi ami ugyanis folyik fentről lefelé és Steve amint a lávát eléri meghal.
+        </para>
+        <para>
+    		A megoldásához folytonos mozgást használunk. A <command>self.agent_host.sendCommand(utasítás)</command> parancs szükséges 
+            ahol az utasítás helyen kell megadni Stevenek mit csináljon. Ezek a mozgást leíró utasítások, melyek paraméterét 
+            alapvetően, úgy kell használni mint a kapcsolókat, ha 0 az értéke nem, ellenben ha 1 akkor elvégzi a mozgást. 
+        </para>
+        <para>
+            Minden szint falának elérésekor ugrik egyet a <command>jumpmove</command> paranncsal, 
+            és jobbra fordulva megy tovább. Minden újabb körben feljebb-feljebb jut Steve és így a körök is egyre hosszabbak 
+            lesznek. A mozgás időtartamát a <command>time.sleep()</command> paranccsal adhatjuk meg, azaz az argumentumában 
+            megadott másodpercig fut. Minden kör egyértelműen 4 hosszú előre haladásból áll, ez a mozgás alapja, ezt kell kiegészíteni
+            a fordulásokkal és ugrásokkal.
+    	</para>
+          
+    </section>    
+    
+</chapter>                

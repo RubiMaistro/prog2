@@ -1,0 +1,85 @@
+<info xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+
+    <xi:include href="bhax-textbook-title.xml">
+        <xi:fallback>
+            <para>
+                <emphasis>XInclude: bhax-textbook-title.xml file not found</emphasis>
+            </para>
+        </xi:fallback>
+    </xi:include>               
+
+    <xi:include href="bhax-textbook-subtitle.xml">
+        <xi:fallback>
+            <para>
+                <emphasis>XInclude: bhax-textbook-subtitle.xml file not found</emphasis>
+            </para>
+        </xi:fallback>
+    </xi:include>               
+
+    <xi:include href="bhax-textbook-titleabbrev.xml">
+        <xi:fallback>
+            <para>
+                <emphasis>XInclude: bhax-textbook-titleabbrev.xml file not found</emphasis>
+            </para>
+        </xi:fallback>
+    </xi:include>               
+
+    <xi:include href="bhax-textbook-authors.xml">
+        <xi:fallback>
+            <para>
+                <emphasis>XInclude: bhax-textbook-authors.xml file not found</emphasis>
+            </para>
+        </xi:fallback>
+    </xi:include>               
+
+    <xi:include href="bhax-textbook-edt.xml">
+        <xi:fallback>
+            <para>
+                <emphasis>XInclude: bhax-textbook-edt.xml file not found</emphasis>
+            </para>
+        </xi:fallback>
+    </xi:include>               
+
+    <pubdate>2020</pubdate>
+    <copyright>
+        <year>2020</year>
+        <holder>Deák Ruben</holder>
+    </copyright>
+    <legalnotice>           
+        <para>                
+            Copyright (C) 2019, 2020, Norbert Bátfai Ph.D., batfai.norbert@inf.unideb.hu, nbatfai@gmail.com, 
+        </para>
+        <para>
+            Permission is granted to copy, distribute and/or modify this document
+            under the terms of the GNU Free Documentation License, Version 1.3
+            or any later version published by the Free Software Foundation;
+            with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+            A copy of the license is included in the section entitled "GNU
+            Free Documentation License".                
+        </para>
+        <para>
+            <link xlink:href="https://www.gnu.org/licenses/fdl.html">https://www.gnu.org/licenses/fdl.html</link>                
+        </para>
+            
+        <para>
+            Engedélyt adunk Önnek a jelen dokumentum sokszorosítására, terjesztésére és/vagy módosítására 
+            a Free Software Foundation által kiadott GNU FDL 1.3-as, vagy bármely azt követő verziójának 
+            feltételei alapján. Nincs Nem Változtatható szakasz, nincs Címlapszöveg, nincs Hátlapszöveg.                
+        </para>
+        <para>
+            <link xlink:href="http://gnu.hu/fdl.html">http://gnu.hu/fdl.html</link>                
+        </para>
+        <para>
+        A tananyag elkészítését az EFOP-3.4.3-16-2016-00021 számú projekt támogatta. A projekt az Európai Unió támogatásával, az Európai Szociális Alap társfinanszírozásával valósult meg.
+        </para>        
+    </legalnotice>   
+    
+    <xi:include href="bhax-textbook-revhistory.xml">
+        <xi:fallback>
+            <para>
+                <emphasis>XInclude: bhax-textbook-revhistory file not found</emphasis>
+            </para>
+        </xi:fallback>
+    </xi:include>               
+                               
+</info>   
