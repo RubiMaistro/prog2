@@ -1,0 +1,558 @@
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+    <info>
+        <title>Helló, Calvin!</title>
+        <keywordset>
+            <keyword/>
+        </keywordset>
+    </info>
+
+    <section>
+        <title>Android telefonra a TF objektum detektálója</title>
+
+        <para>
+            A feladat mindössze annyi, hogy kipróbáljuk a TensorFlow Objektum Detektáló programját.
+            A program lényege, hogy a telefonunk kameráján keresztül, a program megprobálja felismerni 
+            az adott tárgyakat, vagy például, hogy ember-e az adott objektum. Ehez egy %-ot csatol, 
+            ami azt jelzi, hogy mennyire biztos az objektum felismerés.
+        </para>
+
+        <para>
+            A detektálások a következő eredményeket adták:
+        </para>
+
+        <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img2/ObjDetect/image1.png" format="PNG" scale="40" />
+                </imageobject>
+        </mediaobject>
+
+        <para>
+            Nem teljesen ismerte fel a tárgyakat annak amik valójában, de egy másik szemszögből már 
+            mást tárgyként ismerte fel a detektáló. Látjuk, hogy a plüss kutyát felismeri, de mellette 
+            még egy macskát is felismert, más esetben pedig mackónak ismerte fel. 
+            A bőröndöt viszont egyből felismeri, habár volt amikor egy bőröndön több bőröndött detektált. 
+        </para>
+
+        <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img2/ObjDetect/image2.png" format="PNG" scale="40" />
+                </imageobject>
+        </mediaobject>
+
+        <para>
+            Itt viszont már ügyesen felismerte a tárgyakat, a karórát, a motorbiciklit, a laptopot és 
+            annak a billentyűzetét is. De volt olyan eset amikor a golyóstollat fogkevének ismerte fel.  
+        </para>
+
+        <para>
+            Összességében a TensorFlow Detektáló a tesztelés során elég jól teljesített, de nem hibátlanúl, 
+            viszont egy másik szemszögből képes korigálni a felismerést.
+        </para>
+        
+    </section>
+
+
+    <section>
+        <title>MNIST</title>
+
+        <para>
+            Az MNIST egy adatbázis amiben nagyméretű, kézzelírott számjegyek találhatók. 
+            Ezeket képfeldolgozó rendszerek tanítására használják, ezért az egyik fő célja a gépi tanítás. 
+            Maga az adatbázis 10 000 teszt képet, és 60 000 tanuláshoz való képet tartalmaz. 
+            A prgoram az MNIST segítségével megpróbálja felismerni a kézzel rajzolt számot. 
+            A gépi tanuláshoz tensorflowot használunk. A Tensorflow egy nyílt fórráskódó platform a gépi tanuláshoz. 
+            Most pedig lássuk a programunkat és hogy hogyan is kelt életre.
+            A progamhoz szükséges letölteni a Tensorflowt és  a Pythont, ugyanis a forrás kód a python nyelvű. 
+        </para>
+
+        <para>
+            Parancssorból a letöltést következőképpen tehetjük meg.
+        </para>
+
+        <programlisting language="java"><![CDATA[
+            //tensorflow telepítése:
+            sudo pip3 install tensorflow==1.14
+
+            //python telepítése:
+            apt -get install python3
+        ]]></programlisting>
+
+        <para>
+            A program futtatásához még szükség van a matplotlib könyvtárra, ez fogja a kirajzoltatást végezni. 
+            A program megértésében és futtatásában Kiss Máté segédkezett. A program kód pedig a következő:
+        </para>
+
+        <programlisting language="java"><![CDATA[
+            # Copyright 2015 The TensorFlow Authors. All Rights Reserved.
+            #
+            # Licensed under the Apache License, Version 2.0 (the "License");
+            # you may not use this file except in compliance with the License.
+            # You may obtain a copy of the License at
+            #
+            # http://www.apache.org/licenses/LICENSE-2.0
+            #
+            # Unless required by applicable law or agreed to in writing, software
+            # distributed under the License is distributed on an "AS IS" BASIS,
+            # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+            # See the License for the specific language governing permissions and
+            # limitations under the License.
+            # ==============================================================================
+            # Norbert Batfai, 27 Nov 2016
+            # Some modifications and additions to the original code:
+            # https://github.com/tensorflow/tensorflow/blob/r0.11/tensorflow/examples/tutorials/mnist/ ←-
+            mnist_softmax.py
+            # See also http://progpater.blog.hu/2016/11/13/hello_samu_a_tensorflow-bol
+            # ==============================================================================
+            """A very simple MNIST classifier.
+            See extensive documentation at
+            http://tensorflow.org/tutorials/mnist/beginners/index.md
+            """
+            from __future__ import absolute_import
+            from __future__ import division
+            from __future__ import print_function
+
+            import argparse
+
+            # Import data
+            from tensorflow.examples.tutorials.mnist import input_data
+
+            import tensorflow as tf
+            import matplotlib.pyplot
+
+            FLAGS = None
+
+            def readimg():
+                file = tf.read_file("sajat8a.png")
+                img = tf.image.decode_png(file)
+                return img
+
+            def main(_):
+                mnist = input_data.read_data_sets(FLAGS.data_dir, one_hot=True)
+
+                # Create the model
+                x = tf.placeholder(tf.float32, [None, 784])
+                W = tf.Variable(tf.zeros([784, 10]))
+                b = tf.Variable(tf.zeros([10]))
+                y = tf.matmul(x, W) + b
+
+                # Define loss and optimizer
+                y_ = tf.placeholder(tf.float32, [None, 10])
+
+                # The raw formulation of cross-entropy,
+                #
+                # tf.reduce_mean(-tf.reduce_sum(y_ * tf.log(tf.nn.softmax(y)),
+                # reduction_indices=[1]))
+                #
+                # can be numerically unstable.
+                #
+                # So here we use tf.nn.softmax_cross_entropy_with_logits on the raw
+                # outputs of ’y’, and then average across the batch.
+                cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits = y,labels = y_)) # add name to args
+                train_step = tf.train.GradientDescentOptimizer(0.5).minimize(cross_entropy)
+                sess = tf.InteractiveSession()
+
+                # Train
+                tf.initialize_all_variables().run()
+                print("-- A halozat tanitasa")
+
+                for i in range(1000):
+                    batch_xs, batch_ys = mnist.train.next_batch(100)
+                    sess.run(train_step, feed_dict={x: batch_xs, y_: batch_ys})
+
+                    if i % 100 == 0:
+                        print(i/10, "%")
+                print("----------------------------------------------------------")
+
+                # Test trained model
+                print("-- A halozat tesztelese")
+                correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(y_, 1))
+                accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+                print("-- Pontossag: ", sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels}))
+                print("----------------------------------------------------------")
+
+                print("-- A MNIST 42. tesztkepenek felismerese, mutatom a szamot, a tovabblepeshez csukd be az ablakat")
+
+                img = mnist.test.images[42]
+                image = img
+
+                matplotlib.pyplot.imshow(image.reshape(28, 28), cmap=matplotlib.pyplot.cm.binary)
+                matplotlib.pyplot.savefig("4.png")
+                matplotlib.pyplot.show()
+
+                classification = sess.run(tf.argmax(y, 1), feed_dict={x: [image]})
+
+                print("-- Ezt a halozat ennek ismeri fel: ", classification[0])
+                print("----------------------------------------------------------")
+
+                print("-- A sajat kezi 8-asom felismerese, mutatom a szamot, a tovabblepeshez csukd be az ablakat")
+
+                img = readimg()
+                image = img.eval()
+
+                image = image.reshape(28*28)
+
+                matplotlib.pyplot.imshow(image.reshape(28, 28), cmap=matplotlib.pyplot.cm.binary)
+                matplotlib.pyplot.savefig("8.png")
+                matplotlib.pyplot.show()
+
+                classification = sess.run(tf.argmax(y, 1), feed_dict={x: [image]})
+
+                print("-- Ezt a halozat ennek ismeri fel: ", classification[0])
+                print("----------------------------------------------------------")
+
+            if __name__ == ’__main__’:
+                parser = argparse.ArgumentParser()
+                parser.add_argument(’--data_dir’, type=str, default=’/tmp/tensorflow/mnist/input_data’, help=’Directory for storing input data’)
+
+                FLAGS = parser.parse_args()
+
+                tf.app.run()
+        ]]></programlisting>
+
+        <para>
+            A kód elején beimportáljuk a tensorflow-ot és a matplotlib-et. Ezek után következik a rajzolt kép
+            beolvasása. A következo kódrészletben történik az összehasonlítás, az mnist.test paranccsal. 
+            Az alap képünk 28x28 ezért a Mnist teszt képet átkonvertálja 28x28 as képre, majd a sess.run() elvégzi
+            az összehasonlítást, és ennek a vissza térési eredménye a felismert szám. 
+            A plt.imshow sorban megjelenítjük a képet, majd a plt.savefig sorban pedig, lementjük és kiíratjuk a felismert számot, 
+            itt ismét a sess.run() végzi a hasonlítást, majd kiiratjuk az eredményt.
+        </para>
+
+        <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img2/mnistAbra.png" format="PNG" scale="60" />
+                </imageobject>
+        </mediaobject>
+
+        <para>
+            Az MNIST folyamatainak megértésében segít az alábbi modelt (forrás: towardsdatascience.com).
+        </para>
+
+        <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img2/mnistAbra.png" format="PNG" scale="60" />
+                </imageobject>
+        </mediaobject>
+
+        <para>
+            Ahogy tudjuk, a számjegyek osztályozása egy konvolúciós nerurális hálozat (azaz CNN) használatával történik. 
+            A modell meghatároz egy CNN-t amiben 2 konvolúciós réteg van, melyeket két teljesen összekapcsoltréteg követ
+        </para>
+
+    </section>
+
+
+    <section>
+        <title>EPAM: Back To The Future</title>
+
+        <para>
+            Ebben a feladatban egy kicsit betekintést kaphatunk az AOP (Aspect Orientated Programming) programozásba. 
+            Hiszen itt nem objektumokkal hanem feltételekkel, avagy vonatkozásokkal foglalkozunk.
+        </para>
+
+        <para>
+            Ez egy másfajta gondolkodás, ezért a porgam kód részekre van bontva.
+        </para>
+
+        <programlisting language="java"><![CDATA[
+            package epam.backToTheFuture;
+
+            import java.util.concurrent.CompletableFuture;
+            import java.util.concurrent.ExecutorService;
+            import java.util.concurrent.Executors;
+
+            public class BackToTheFuture {
+
+                private static ExecutorService executorService = 
+                    Executors.newFixedThreadPool(2);
+                
+                public static void main(String[] args) {
+                    
+                    CompletableFuture<String> shortTask = 
+                        CompletableFuture.supplyAsync(
+                            () -> {sleep(500); return "Hi"; }, 
+                            executorService);
+                    
+                    CompletableFuture<String> mediumTask = 
+                        CompletableFuture.supplyAsync(
+                            () -> {sleep(750); return "Hey"; }, 
+                            executorService);
+                    
+                    CompletableFuture<String> longTask = 
+                        CompletableFuture.supplyAsync(
+                            () -> {sleep(1000); return "Hello"; }, 
+                            executorService);
+        ]]></programlisting>
+
+            <para>
+                Először is létrehoztunk egy osztályt, aminek egy privát objektumot hozutnk létre egy ExecutorService 
+                példányt aminek a beállítottuk, hogy a 2 szálon fusson. Ez képes lesz Future(jővőbeli) folyamatok kezelésére. 
+                Ehez létrehozunk három CompletableFuture változót, amelyek egy-egy folyamatot tartalmaznak, és inicializálva 
+                lesznek az <command>executorService</command> szerint. Mindegyik kap egy lambda kiejezést, amelyek először altatva 
+                lesznek és aztán vissza adnak egy-egy Stringet, az első altava lesz 500ms-t és vissza adja a "Hi" Stringet, 
+                a második 750ms-t és "Hey"-t, végül a harmadik 1000ms-t és "Hello"-t.
+            </para>
+
+        <programlisting language="java"><![CDATA[
+                    CompletableFuture<String> result = 
+                        longTask.applyToEitherAsync(
+                            shortTask, String::toUpperCase, 
+                            executorService);
+                    
+                    result = result.thenApply(s -> s + " World");
+                    
+                    CompletableFuture<Void> extraLongTask = 
+                        CompletableFuture.supplyAsync(
+                            ()-> { sleep(1500); return null; }, 
+                            executorService);
+                    
+                    result = result.thenCombineAsync(mediumTask, 
+                        (s1, s2) -> s2 + ", " + s1, 
+                        executorService);
+
+        ]]></programlisting>
+
+            <para>
+                A lényegesebb rész most következik, hiszen létrehozunk egy negyedik CompletableFuture változót, 
+                aminek értéket adunk a harmadikat, a longTaskot, viszont a shortTask szerint és egy function szerint, 
+                ami jelen esetben egy toUpperCase függvény ami nagybetűssé teszi a longTask-ot, majd átadjuk a Servicenek. 
+                A result változóhoz hozzáfűzzünk a végéhez a thenApply() metódussal a "World" Stringet, hogyha az előző 
+                interakció befejeződőt. Majd egy extraLongTask változót több ideig altalva (1500ms) vissza adunk egy null 
+                értéket, és megadjuk az executorService-t. Majd a result-ot összekombináljuk, a mediumTask értékét, a "Hey"-t 
+                adjuk meg amihez lambdával hozzáadjuk a másik két tárolt értéket, végül megadjuk az executorService-t.
+            </para>
+
+        <programlisting language="java"><![CDATA[ 
+                    System.out.println(result.getNow("Bye"));
+                    sleep(1500);
+                    System.out.println(result.getNow("Bye"));
+                    
+                    result.runAfterBothAsync(extraLongTask, 
+                        () -> System.out.println("After both!"), 
+                        executorService);
+                    
+                    result.whenCompleteAsync(
+                        (s, throwable) -> System.out.println("Complete: " + s), 
+                        executorService);
+                    
+                    executorService.shutdown();  
+                }
+
+                private static void sleep(int sleeptime) {} 
+            }
+        ]]></programlisting>
+
+            <para>
+                A program ezen részén lesznek a kiiratások. Előbb a resultal egy egyszerű "Bye"-t iratunk ki, 
+                majd alatatás után ugyan ezt akarjuk kiiratni, de nem ezt kapjuk, sőt van olyan eset amikor egyik 
+                kiiratáskor sem a "Bye"-t kapjuk meg, hanem az összekombinált Stringet, ezek véletlenszerűek. 
+                Miután megvoltak a kiiratások, lesz egy folyamat ami akkor fut le ha az előtte lévők végrehajtódtak, 
+                ezt a runAfterBothAsync() metódussal érjük el, ami lambdával kiiratja az "After both!" szöveget. 
+                Végül amikor elkészült teljesen a szinkornizáció, lefut a whenCompleteAsync() metódus ami, 
+                kiiratja az eldobható kombinációt amit egy lambda irat ki, majd lezárjuk az executorService-t. 
+            </para>
+
+        <para>
+            Ezek a különböző véletlenszerű eredmények.
+        </para>
+
+        <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img2/Future.png" format="PNG" scale="60" />
+                </imageobject>
+        </mediaobject>
+
+    </section>
+
+
+    <section>
+        <title>EPAM: AOP</title>
+
+        <para>
+            Ebben a feladatban az AOP (Aspect Object Programming) paradigmát használjuk. 
+            Ez a fajta programozás eltér az OO (Object Orientated) programozástól, hiszen itt nem az 
+            objektumok a legfontosabb részei a programoknak. Ugyanakkor osztályokkal és azok objektumaival 
+            is foglalkoznunk kell. Lényegében ez a paradigma használatkor a program folyamatokból épül fel, 
+            ugyanakkor háttér folyamatoknak is nevezhető folyamatokból. Aspecteket, azaz vonatkozásokat, avagy 
+            feltételeket szabhatunk a programban lévő függvényekhez, vagy metódusokhoz.
+        </para>
+
+        <para>
+            Amikor meghívtunk egy függvényt, hogy elvégezze a feladatát társíhatunk mellé egy aspectet, 
+            ami azt jelenti, hogy az aspect valamilyen szinten függeni fog a függvénytől és annak futásától. 
+            Egy aspect egy olyan interakció amit függvényként is felfoghatunk. 
+            Az aspecteknek inicializálhatunk metódusokat amiktől függhetnek, 
+            valamint az aspektek tudják, hogy futnak-e a számukra lényeges függvények.
+            Tulajdonképpen több fajta aspect létezik. Mivel egy aspekt tudja, mikor fut le 
+            az a függvény amelyik számára fontos, ezért vannak olyan aspektek amelyek a függvények 
+            előtt lefutnak, de akkor vannak olyanok is amik a függvények után futnak le. 
+        </para>
+        
+        <para>
+            De léteznek olyanok is amik egy függvényt körülölelnek, például ebben a feladatban is egy ilyet nézünk meg. 
+            A körülölelő vagy around aspecteknek két része van, az első amelyik a függvény előt fut le, 
+            a második pedig a függvény után fut le. Például egy függvény futási idejét meg lehet oldani egy 
+            around aspect segitségével. 
+        </para>
+
+        <para>
+            Egy időmérés program, először le kell tölteni a SpringAOP és az AspectJ 
+            könyvtárakat majd ezeket megfelelően kell a programhoz importolni. 
+        </para>
+
+        <programlisting language="java"><![CDATA[
+            import java.lang.annotation.ElementType;
+            import java.lang.annotation.Retention;
+            import java.lang.annotation.RetentionPolicy;
+            import java.lang.annotation.Target;
+
+            @Retention(RetentionPolicy.RUNTIME)
+            @Target(ElementType.METHOD)
+            public @interface CustomTimer {
+            }
+        ]]></programlisting>
+
+        <para>
+            Ebben a kódban tulajdonképpen ahogyan eddig is használtunk interfészeket, 
+            így használhatunk itt is, ebben az esetben erre alapozzunk majd azt az osztályt 
+            amelyik az időmérést fogja végezni. Megadtuk az irányelvet a <command>Retention</command> 
+            kulcsszóban, azaz a RUNTIME (időmérés). Megadtuk azt is, hogy mikor kell ezt végezze a <command>Target</command> 
+            kulcsszóban, tehát a célja az időmérésnek a METHOD vagyis minden metódus.
+        </para>
+
+        <programlisting language="java"><![CDATA[
+            import org.aspectj.lang.ProceedingJoinPoint;
+            import org.aspectj.lang.annotation.Around;
+            import org.aspectj.lang.annotation.Aspect;
+            import org.springframework.stereotype.Service;
+            import org.springframework.util.StopWatch;
+
+            @Aspect
+            @Service
+            public class CustomTimerAspect {
+
+                @Around("@annotation(com.epam.training.CustomTimer)")
+                public Object timeAnnotatedMethod(ProceedingJoinPoint pjp) throws Throwable {
+                    // start stopwatch
+                    StopWatch stopWatch = new StopWatch(pjp.getTarget().toString());
+                    stopWatch.start();
+
+                    Object retVal = pjp.proceed();
+
+                    // stop stopwatch
+                    stopWatch.stop();
+
+                    System.out.println("Execution time for " + pjp.getTarget().toString() + ": " + stopWatch.getTotalTimeMillis() + " ms");
+
+                    return retVal;
+                }
+            }
+        ]]></programlisting>
+
+        <para>
+            Itt az Around Aspectet látjuk, amit az <command>Aspect</command> kulcsszóval jeleztük az osztály előtt előtt, 
+            tehát ez azt jelenti, hogy minden függvény ami ebben az osztályban szerepel azoknak aspectnek kell lenniük.
+            A timeAnnotatedMethod() metódus lesz az egyetlen függvény ebben az esetben, ami előtt az <command>Around</command>
+            kulcsszó szerepel. Ennek megadtuk az <command>annotation</command> kulcsszóval, hogy mely függvények futásakor 
+            hajtódjon végre az aspect. Itt megadhatunk általános annotációt is, például adhatunk meg függvényt úgy, hogy elé írjuk 
+            a tipusát is, ekkor pl egy "int" tipusú függvény után egy * karaktert használva, minden int tipusú függvény futásakor 
+            az aspect is lefut. A függvény paramétere egy függvény lesz, amit egy viszonyítási pontként használunk, hiszen ezen 
+            függvény köré építjük fel az aspektet. Jelen esetben létrehozunk egy StopWatch osztály objektumot ami az időt méri. 
+            Majd elindítjuk és aztán az objektumnak is helyet adunk a futásra az Object példányosítással, majd leállítjuk az időt 
+            és végül kiiratjuk a függvényt és a hozzá tartozó futási időt. 
+        </para>
+
+        <programlisting language="java"><![CDATA[
+            import org.springframework.stereotype.Service;
+
+            @Service
+            public class ExampleService {
+
+                @CustomTimer
+                public void exampleMethodToTime() throws InterruptedException {
+                    System.out.println("Testee start!");
+
+                    Thread.sleep(1000);
+
+                    System.out.println("Testee end!");
+                }
+            }
+        ]]></programlisting>
+
+        <para>
+            Ez csak egy példa a futásra aminek megadtuk a <command>CustomTimer</command> kulcsszóval a létrehozott interfészt, 
+            ezért lefut majd az aspect is. Tulajdonképpen szemléltettük is két kiiratással az aspect működését.
+        </para>
+
+        <programlisting language="java"><![CDATA[
+            import org.springframework.aop.framework.autoproxy.ProxyCreationContext;
+            import org.springframework.beans.annotation.AnnotationBeanUtils;
+            import org.springframework.core.SpringVersion;
+
+            @SpringBootApplication
+            @EnableAspectJAutoProxy
+            public class MainApplication {
+
+                public static void main(String[] args) {
+                    SpringVersion.run(MainApplication.class, args);
+                }
+
+                @Bean
+                public CommandLine commandLineRunner(ProxyCreationContext ctx) {
+                    return args -> ctx.getBean(ExampleService.class).exampleMethodToTime();
+                }
+
+            }
+        ]]></programlisting>
+
+        <para>
+            Ez a MainApplication osztály ahol létrehoztunk egy egyszerű metódust ami CommandLine osztály tipusú. 
+            A függvény egszerüen csak vissza adja az argumentum bemeneteket. A main() metódusban 
+            csak meghívásra kerül a konzol bemenet olvasó, és mivel ez egy metódus, az aspekt interakcióba is 
+            fog lépni. Jelen esetben azt mérjük majd, hogy a felhasználó mennyi ideig gépelt a konzolban.
+        </para>
+
+        <programlisting language="java"><![CDATA[
+            <?xml version="1.0" encoding="UTF-8"?>
+            <project xmlns="http://maven.apache.org/POM/4.0.0"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+                <parent>
+                    <artifactId>unideb-prog2-parent</artifactId>
+                    <groupId>com.epam.training</groupId>
+                    <version>1.0-SNAPSHOT</version>
+                    <relativePath>../..</relativePath>
+                </parent>
+                <modelVersion>4.0.0</modelVersion>
+
+                <artifactId>aop-performance-test</artifactId>
+
+                <dependencies>
+                    <dependency>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-starter-aop</artifactId>
+                    </dependency>
+
+                    <dependency>
+                        <groupId>org.junit.jupiter</groupId>
+                        <artifactId>junit-jupiter</artifactId>
+                    </dependency>
+                    
+                    <dependency>
+                        <groupId>org.hamcrest</groupId>
+                        <artifactId>hamcrest</artifactId>
+                    </dependency>
+                </dependencies>
+            </project>
+        ]]></programlisting>
+
+        <para>
+            Fontos még az XML rész is ahol deklaráljuk az egész programot és honnan kezelni, 
+            avagy innen konfigurálhatjuk az aspecteket, hogy melyek működjenek és hogyan. 
+            A szükséges könyvtárakat itt implementáljuk és a Bean részeket is bele írhatjuk, 
+            valamint az aspecteket és a hozzá tartozó paramétereket.
+        </para>
+
+    </section>
+    
+</chapter>

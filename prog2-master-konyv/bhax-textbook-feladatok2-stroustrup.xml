@@ -1,0 +1,468 @@
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+    <info>
+        <title>Helló, Stroustrup!</title>
+        <keywordset>
+            <keyword/>
+        </keywordset>
+    </info>
+
+    <section>
+        <title>JDK osztályok</title>
+
+        <para>
+            Ebben a feladatban a Boost C++ programot nézünk meg amely kilistázza a JDK összes osztályát.
+        </para>
+
+        <para>
+            Az első feladat a Boost könyvtárat telepíteni, ha még nincs a gépünkön akkor azt az alábbi módon 
+            tudjuk megtenni linuxon: <command>sudo apt-get install libboost-all-dev</command>. 
+            Azért van erre szükségünk, ugyanis az elérési utat és a kiterjesztést is ezel tudjuk elvégezni.
+        </para>
+
+        <programlisting language="java"><![CDATA[
+            #include <iostream>
+            #include <string>
+            #include <map>
+            #include <iomanip>
+            #include <fstream>
+            #include <vector>
+            #include <boost/filesystem.hpp>
+            #include <boost/filesystem/fstream.hpp>
+            #include <boost/program_options.hpp>
+            #include <boost/tokenizer.hpp>
+            #include <boost/date_time/posix_time/posix_time.hpp>
+
+            using namespace std;
+            using namespace boost::filesystem;
+
+            int fajlok = 0;
+            void read_file ( boost::filesystem::path path, std::vector<std::string> acts )
+            {
+
+                if ( is_regular_file ( path ) ) {
+                    std::string ext ( ".java" );
+
+                    if ( !ext.compare ( boost::filesystem::extension ( path ) ) ) {
+                        std::cout<< path.string() <<"\n";
+                        std::string actpropspath = path.string();
+                        std::size_t end = actpropspath.find_last_of ( "/" ) ;
+                        std::string act = actpropspath.substr ( 0, end );
+
+                        acts.push_back(act);
+                        fajlok++;
+                    }
+                } else if ( is_directory ( path ) )
+                    for ( boost::filesystem::directory_entry & entry :
+                            boost::filesystem::directory_iterator ( path ) )
+                                read_file ( entry.path(), acts );
+            }
+
+            int main ( int argc, char *argv[] ){
+                {
+                    string path="src";
+                    vector<string> acts;
+                    read_file(path,acts);
+                    cout<<"fajlok: "<< fajlok << std::endl;
+
+                    return 0;
+                }
+            }
+        ]]></programlisting>
+        
+        <para>
+            A programnak egyszerűen csak a ".java" végzősésű fájlokat az elérési útjukkal együtt kilistázza, 
+            majd a végén összeszámolja, hogy hányat talált.
+            A programban elején az alap szükséges includeok láthatók, valamint a telepített boost mappából a boost includeok. 
+            Egy egész tipusú változóval számoljuk meg, hogy hány fájlt talált, ez a fajlok változó.
+            A read_file() függvényben egy if() feltételben megvizsgáljuk az elérési út valódiságát, 
+            és beolvassuk a mappákat és fájlokat, majd egy másik if()-ben létrehozunk egy stringet 
+            aminek az értéke ".java" lesz, ami alapján vizsgáljuk a fájlok kiterjesztését. 
+            Ha talál a program egy ilyen fájlt, akkor a fajlok változót megnöveli eggyel. 
+            Egy vectorba fogjuk elmenteni az összes .java kiterjesztésű fájlt az elérési úttal együtt. 
+            Az else ágban vizsgáljuk, hogy ha mappát olvasott a program, akkor lépjen a mappába.
+        </para>
+
+        <para>
+            A main() függvényben pedig csak az elérési utat definiáljuk egy stringben, 
+            majd egy vektort is létrehozva átadjuk a read_file() függvénynek két paraméterként. 
+            Végül a fajlok változó értékét is kiiratjuk, ami a ".java" fájlok számát fogja jelenteni.
+        </para>
+
+    </section>
+
+
+
+    <section>
+        <title>EPAM: It's gone. Or is it?</title>
+
+        <para>
+            A feladatban rámutatunk arra az esetre amikor egy fájlba akarunk írni és az ehez szükséges 
+            matódust meghívva a fájlban nem törénik semmilyen változás, azaz nem sikerült a fájlba iratás, 
+            addig amíg be nem zárjuk a fájl írót.
+        </para>
+
+        <programlisting language="java"><![CDATA[
+            import java.io.FileWriter;
+            import java.io.IOException;
+            import java.io.Writer;
+
+            public class FinalizeFixedExample {
+
+                public static void main(String[] args) throws Exception {
+                    try (BugousStuffProducer stuffProducer = new BugousStuffProducer("src\\EPAM\\someFile.txt")) {
+                        stuffProducer.writeStuff();
+                    }
+                }
+
+                private static class BugousStuffProducer implements AutoCloseable {
+                    private final Writer writer;
+
+                    public BugousStuffProducer(String outputFileName) throws IOException {
+                        writer = new FileWriter(outputFileName);
+                    }
+
+                    public void writeStuff() throws IOException {
+                        writer.write("Stuff");
+                    }
+
+                    @Override
+                    public void close() throws Exception {
+                        writer.close();
+                    }
+                }
+            }
+        ]]></programlisting>
+
+        <para>
+            A kód egyszerű, egy main metódusban egy try()-nak paraméterként adunk egy példányosítást. 
+            Ez a példány a BugousStuffProducer() osztály példánya lesz, amely fájlba iratással foglalkozik. 
+            A példányosításkor paramétert adunk az objketumnak, ez egy fájl elérési utvonala, neve és kiterjesztése 
+            lesz, amit a konstruktorban felhasználunk, hiszen inicializálunk erre az útvonalra egy fájl írót. 
+            Majd a try blockban meghívjuk a writeStuff() metódust ami a "Stuff" szót fogja beleírni a fájlba. 
+            A feldatok röviden ennyik, viszont elfelejtettünk valamit, a fájlba írót bezárni. 
+            Viszont ez nem probléma mivel implementáltuk az osztálynak az AutoCloseable interfészt, 
+            ami elősegíti az objektumok automatikus bezárását. Egy egyszerű close() metódsuban van 
+            a fájl írót bezáró close() függvény, amelyet ezért nem kell meghívni.
+        </para>
+
+        <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img2/Autocloseable.png" format="PNG" scale="50" />
+                </imageobject>
+        </mediaobject>
+
+    </section>
+
+
+
+    <section>
+        <title>EPAM: Kind of equal</title>
+
+        <para>
+            A <command>var</command> kulcsszót ismerhetjük meg amely egy lokális változót hoz létre 
+            amely megkönnyíti a programozók dolgát, mivel nem kell típust adni a változónak.
+        </para>
+
+        <para>
+            Megoldás forrása: 
+            <link xlink:href=""></link>
+        </para>
+        <para>
+            A programkód a következő:
+        </para>
+
+        <programlisting language="java"><![CDATA[
+            package com.epam.training;
+
+            import static org.hamcrest.CoreMatchers.is;
+            import static org.hamcrest.MatcherAssert.assertThat;
+
+            import org.junit.jupiter.api.Test;
+
+            public class KindofEqualTest {
+
+                public void testKindofEqualExercise() {
+                    
+                    String first = "...";
+                    String second = "...";
+                    String third = new String("...");
+
+                    var firstMatchesSecondWithEquals = first.equals(second);
+                    var firstMatchesSecondWithEqualToOperator = first == second;
+                    var firstMatchesThirdWithEquals = first.equals(third);
+                    var firstMatchesThirdWithEqualToOperator = first == third;
+
+                    assertThat(firstMatchesSecondWithEquals, is(true));
+                    assertThat(firstMatchesSecondWithEqualToOperator, is(true));
+                    assertThat(firstMatchesThirdWithEquals, is(true));
+                    assertThat(firstMatchesThirdWithEqualToOperator, is(false));
+                }
+            }
+            ]]></programlisting>
+
+            <para>
+                A program elején 3 szöveg (string) tipusú változót hozunk létere amelyeknek az értékük "..." lesz. 
+                Aztán a <command>var</command> kulcsszóval létrehozunk 4 logikai (boolean) változót. 
+                Az elsőnek a adunk egy equals metódus által az első és második String összehasonlításából adódó logikai értéket, 
+                majd a másodiknak az első és márosodik változóknak az <command>==</command> operátorral összehasonlított logikai értékét. 
+                A harmadiknak az első és harmadik változót összehasonlító equals() metódus logikai értékét. Végül pedig az első 
+                és harmadik változó egyszerű operátorral való összehasonlításának az értékét.
+            </para>
+
+            <para>
+                Végül az assertThat() metódusban mind a négy logikai változónak megadjuk ez értékét. 
+                Ne legyen egyenlő egy egyszerű String egy String tipusú objketum értékével, 
+                ezért false értéket adunk annak a változónak az assertThat() metódus segitségével, 
+                még akkor is ha az értékeik megegyezhetnek.
+            </para>
+
+        <programlisting language="java"><![CDATA[
+
+            import org.junit.runner.JUnitCore;
+            import org.junit.runner.Result;
+            import org.junit.runner.notification.Failure;
+
+            public class MainClass {
+
+                public static void main(String[] args) {
+                    
+                    Result result = JUnitCore.runClasses(Junit5Test.class);
+                    
+                    for(Failure failure : result.getFailures()) {
+                        System.out.println(failure.getMessage());
+                    }
+                    
+                    System.out.println(result.wasSuccessful());
+                }
+            }
+        ]]></programlisting>
+
+        <para>
+            A junit tesztelés a main() metódusban fog lefutni. A Result osztálynak létrehozunk egy objektumot, 
+            aminek megadjuk, hogy a Junit5Test oszátlyt nézze a teszteléskor. Egy for ciklusban a Failure osztálynak 
+            létrehozunk minden ciklus futásakor egy objektumot ami a hibákat fogja megkapni, a resulton keresztül 
+            a Junit5Test osztályból. Majd ezt mindig kiiratjuk a konzolra, végül a resultra meghívjuk a wasSuccessful() 
+            metódust ami logikai értékként vissza adja, hogy sikeres volt-e a tesztelés.
+        </para>
+
+        <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img2/kindOfEqualJunitTest.png" format="PNG" scale="80" />
+                </imageobject>
+        </mediaobject>
+
+    </section>
+
+
+
+    <section>
+        <title>EPAM: Java GC</title>
+
+        <para>      
+            A javaban léteznek úgynevezett Gargabe Collectorok, ami lefordíva szemétgyűjtőket jelent. A szemétgyűjtés megkönnyíti a dolgunkat, 
+            hiszen eltávolítja a memóriából azokat az objektumokat amelyeket már nem használunk.
+        </para>
+        <para>
+            Megoldás forrása: 
+            <link xlink:href="https://medium.com/@hasithalgamge/seven-types-of-java-garbage-collectors-6297a1418e82">
+                https://medium.com/@hasithalgamge/seven-types-of-java-garbage-collectors-6297a1418e82</link>
+        </para>
+        <para>
+            A szemétgyűjtők típusai a következők:
+        </para>
+
+        <para>
+            A <command>Soros szemétgyűjtő</command> befagyasztja az összes alkalmazásszálat amikor fut, ezért nem alkalmas több szálon 
+            futó alkalmazásokban használni, ebből adódóan célszerű egyszálas környezetben alkalmazni. 
+            A soros szemétgyűjtő engedélyezéséhez a következő argumentumot használhatjuk: 
+            <command>java -XX: + UseSerialGC -jar Application.java</command>
+        </para>
+
+        <para>
+            A <command>Párhuzamos szemétgyűjtő</command> már több szálat fog használni és hasonlóan a soros szemétgyűjtőhöz 
+            ez is lefagysztja az össze alkalmazásszálat a szemétszállítás alatt. 
+            Ezt a szemétgyűjtést általában olyan alkalmazásokban használják amely alkalmazások 
+            eltűrik az alkalmzás szüneteket. 
+        </para>
+
+        <para>
+            A <command>CMS (Concurrent Mark Sweep) szemétgyűjtő</command> több processzor szálon dolgozik. 
+            Egy halmazba gyűjti azokat az alkalmazásokat amelyekben végre kell hajtani a szemétgyűjtést.
+            EZ lényegében olyan alkalmazásokhoz használható amelyek képesek 
+            eltűrni a rövidebb szemétgyűjtési szüneteket. 
+            Futás közben megosszák a processzor erőforrásait a szemétgyűjtővel. 
+            Ez a fajta szemétgyűjtés több CPU-t használ mint a párhuzamos szemétgyűjtő, 
+            ezért hatékonyabbnak is mondható. 
+            Az összes alkalmazásszálat csak az objektumok megjelölése során és vagy bármely 
+            halmazváltozás változás során futtatja. 
+            Engedélyezéshez: <command>java -XX: + USeParNewGC -jar Application.java</command>
+        </para>
+
+        <para>
+            A <command>G1 (Garbage First) szemétgyűjtő</command> több processzoros gépeken futó alkalmazásokhoz készült. 
+            A memóriát széválasztja régiókra és párhuzamosan gyűjt bennük. Sokkal hatékonyabb mint a 
+            CMS gyűjtő. Két fázisa van a szemétgyűjtőnek, a jelölés és a söprés. 
+            A jelöléskor kupacokra vagy régiókra bontja a memóriát és mindegyiket átnézi és megjelöli. 
+            Majd a söpréskor tudja előre hol vannak az üres részek és itt kezd, ezért is nevezik 
+            First Garbage-nek és párhuzamosítva végzi a szemétgyűjtést. 
+            Engedélyezéshez: <command>java -XX:+UseG1GC -jar Application.java</command>
+        </para>
+
+        <para>
+            Az <command>Epsilon szemétgyűjtő</command> egy passzív szemétgyűjtő, ez azt jelenti hogy nem gyűjti folyamatosan 
+            a fel nem használt objektumokat hanem csak akkor amikor az alkalmazások kifogynak a memóriából 
+            és akár már összeomlanak is. A célja az alkalmazások teljesítményének mérése és kezelése. 
+            Tehát meghatározott idő után kezdi a söprést, ez által megtudhatjuk mennyi a memória küszöbértéke 
+            és tudhatjuk mennyire szemetel a programunk. 
+            Ha minden teljesítményt ki kell szorítanunk az alkalmazásunkból, 
+            az Epsilon lehet a legjobb megoldás egy GC-hez. 
+        </para>
+
+        <para>
+            A <command>Z szemétgyűjtő</command> előnye, hogy nem állítja le az applikációt több 10 msre a gyűjtés közben. 
+            Ez a gyűjtő tulajdonképpen alkalmas az alacsony késést igénylő vagy nagy kupacot használó programokhoz. 
+            Ezt a szemétgyűjtőt az Oracle fejleszette ki és mutatta be a Java 11-ben. 
+            Több terrabájton képes végezni a gyűjtést, a késés pedig átlagosan 1 ms, a G1 és a Parallel gyűjtőkkel 
+            szemben ami ezeknél akár 200 ms is lehetséges. Még kísérleti állapotban van ez a gyűjtő ezért még csak 
+            64 bites Linux rendszereken érhető el. Adatbázis rendszerekben használja az Oracle ezt a tipusú szemétgyűjtést.
+        </para>
+        <para>
+            A ZGC három fázisban végzi a jelölést:
+        </para>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    1. A világ rövid leállási fázisa (Short stop-the-world phase) : 
+                </para>
+                <para>
+                    Megvizsgálja a GC gyökereit, a halom többi részére mutató helyi változót. 
+                    Ezeknek a gyökereknek a száma általában minimális, és nem változik a terhelés nagyságával, 
+                    ezért a ZGC szünetei nagyon rövidek, és nem nőnek a halom növekedésével.
+                </para>
+            </listitem>
+
+            <listitem>
+                <para>
+                    2. Egyidejű fázis (Concurrent phase) : 
+                </para>
+                <para>
+                    Bejárja az objektum grafikonját, és megvizsgálja a színes mutatókat, megjelölve az elérhető objektumokat. 
+                    A teherzáró megakadályozza a GC fázis és az alkalmazás bármilyen tevékenysége közötti aktivitást.
+                </para>
+            </listitem>
+            
+            <listitem>
+                <para>
+                    3. Áthelyezési fázis (Relocation phase) : 
+                </para>
+                <para>
+                    A létező objektumokat a halom nagy részeinek felszabadítása érdekében mozgatja, hogy gyorsabbá váljon az allokáció. 
+                    Amikor az áthelyezési fázis elkezdődik, a ZGC oldalakra osztja a kupacot, és egyszerre egy oldalon dolgozik. 
+                    Miután a ZGC befejezte a gyökerek mozgatását, az áthelyezés többi része egyidejűleg történik.
+                </para>
+            </listitem>
+        </itemizedlist>
+
+        <para>
+            A <command>Shenandoah szemétgyűjtő</command> egy nagyon alacsony szünetidővel rendelkező szemétgyűjtő 
+            amit a több munka elvégzésével segít elő. Ez a gyűjtő egyidejű tömörítést végez és memóriaterületeket foglal le 
+            a már használaton kívüli objektumok tárolására. Párhuzamos CPU-ciklusokat bizotít a szünetidő javítására, 
+            ezáltal több memóriát igényel, de ez a leggyorasbb szemétgyűjtő. 
+            Egyidejűleg több kis fázisban dolgozza fel a halmot:
+        </para>
+     
+            <para>
+                1. Előkészíti a halmot az egyidejű jelöléshez és beolvassa a gyökérkészletet és 
+                a hossza a gyökérkészlet méretének felel meg, nem pedig a kupacnak.
+            </para>
+
+            <para>
+                2. Ezután egy párhuzamos fázis bejárja a kupacot, és azonosítja az elérhető és elérhetetlen tárgyakat.
+            </para>
+    
+            <para>
+                3. Befejezi a jelölés folyamatát a függőben lévő kupac frissítések törlésével és a gyökérkészlet újbóli beolvasásával.
+            </para>
+
+            <para>
+                4. Ezután egy másik párhuzamos fázis kimásolja az objektumokat az utolsó jel fázisban azonosított régiókból. 
+                Ez a folyamat különbözteti meg Shenandoah-t a többi GC-től, mivel agresszíven tömöríti a kupacot az 
+                alkalmazásszálakkal párhuzamosan.
+            </para>
+
+            <para>
+                5. A következő fázis a ciklus harmadik (és legrövidebb) szünetét váltja ki. 
+                Ez biztosítja, hogy minden GC menetek kész kiürítését.
+            </para>
+
+            <para>
+                6. Egy párhuzamos fázis bejárja a kupacot, és frissíti a ciklus korábban áthelyezett 
+                objektumokra való hivatkozásokat.
+            </para>
+
+            <para>
+                7. A ciklus utolsó szüneteltetése befejezi a hivatkozások frissítését a gyökérkészlet frissítésével.
+            </para>
+
+            <para>
+                8. Végül az utolsó szakasz visszakéri a kiürített régiókat, amelyekben most nincsenek utalások.
+            </para>
+
+        <para>
+            A Shenandoah GC-t a háromféleképpen konfigurálhatjuk. 
+            Amikor a GC megkezdi a ciklusait, hogyan választja ki a régiókat az evakuáláshoz.
+        </para>
+
+        <itemizedlist>
+            <listitem>
+                <para>
+                    Adaptív : Megfigyeli a GC ciklusokat, és elindítja a következő ciklust, így befejeződik, mielőtt az alkalmazás kimeríti a kupacot. 
+                    Ez az alapértelmezett mód.
+                </para>
+            </listitem>
+
+            <listitem>
+                <para>
+                    Statikus : GC ciklust indít a kupac foglaltság és az allokációs nyomás alapján.
+                </para>
+            </listitem>
+
+            <listitem>
+                <para>
+                    Kompakt : GC ciklusokat folyamatosan futtat. Shenandoah új ciklust indít, amint az előző befejeződik, 
+                    vagy az utolsó ciklus óta kiosztott kupac mennyisége alapján. 
+                </para>
+            </listitem>
+        </itemizedlist>
+
+        <para>
+            Shenandoah-nak gyorsabban kell gyűjtenie a kupacot, mint amennyit a kiszolgáló alkalmazás lefoglal. 
+            a az allokációs nyomás túl nagy, és nincs elegendő hely az új allokációkhoz, akkor hiba lép fel. 
+            Shenandoah konfigurálható mechanizmusokkal rendelkezik ehhez a helyzethez.
+        </para>
+        <para>
+            <command>Pace</command> : 
+            Ha Shenandoah elkezdi lemaradni a kiosztás mértékétől, akkor leállítja a kiosztási szálakat, hogy utolérje. 
+            Shenandoah legfeljebb 10 ms késést vezet be. Ha az ütemezés nem sikerül, 
+            Shenandoah a következő lépésre lép: a degenerált GC-re.
+        </para>
+        <para>
+            <command>Degenerált GC</command> : 
+            Ha kiosztási hiba lép fel, Shenandoah elindítja a leállítás fázisát az aktuális GC ciklus befejezéséhez. 
+            Mivel a stop-the-world nem küzd az erőforrások alkalmazásával, a ciklusnak gyorsan be kell fejeződnie és 
+            ki kell derítenie az elosztási hiányt. Gyakran a degenerált ciklus akkor következik be, 
+            amikor a ciklus legtöbb munkája már befejeződött. A GC napló teljes szünetként fogja jelenteni.
+        </para>
+        <para>
+            <command>Teljes GC</command> : 
+            Ha az ingerlés és a degenerált GC egyaránt kudarcot vall, Shenandoah teljes GC ciklusra esik vissza. 
+            Ez az utolsó GC garantálja, hogy az alkalmazás memórián kívüli hibával fog kudarcot okozni.
+        </para>
+        <para>
+            A Shenandoah ugyanazokat az előnyöket kínálja, mint a ZGC, nagy halmokkal, de több hangolási lehetőséggel.  
+            Szünetideje nem biztos, hogy olyan rövid, mint a ZGC, de kiszámíthatóbbak.
+        </para>
+
+    </section>
+
+</chapter>

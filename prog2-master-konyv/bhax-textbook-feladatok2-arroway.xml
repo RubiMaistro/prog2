@@ -14,7 +14,7 @@
             véletlenszerű számot.
         </para>
         <para>
-            Megoldás forrása:                
+            Megoldás forrása: <link xlink:href="https://github.command/RubiMaistro/codes-prog2/tree/master/Arroway/PolarGen%20-%20random%20number%20generator">PolarGenerator</link>               
         </para>
         <para>
             A programot három fő részre lehet osztani, a főosztály azaz a main, a kisegítő mellék osztály és 
@@ -152,15 +152,18 @@
             Ebben a forrásban egy hasonló generálást láthatunk mint a kovetkezo() metódusban amit fent láthattunk, 
             de ez valamennyivel pontosabb számítást végez.
         </para>
-        <para>
-            (Console futási kép)
-        </para>
+        <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img2/PolarGen.png" format="PNG" scale="60" />
+                </imageobject>
+        </mediaobject>
 
         <para>
             A követzkező program pedig ugyan az mint amit láthattunk feljebb csak C++ nyelven:
         </para>
         <para>
-            (link)
+            Link: <link xlink:href="https://github.command/RubiMaistro/codes-prog2/blob/master/Arroway/PolarGen%20-%20random%20number%20generator/PolarGen.cpp">
+            https://github.command/RubiMaistro/codes-prog2/blob/master/Arroway/PolarGen.cpp</link>
         </para>
 
 
@@ -172,23 +175,34 @@
         <title>Gagyi</title>
     
         <para>
-            Megoldás forrása:                
+            Megoldás forrása: <link xlink:href="https://github.command/RubiMaistro/codes-prog2/tree/master/Arroway/Gagyi%20-%20java%20Integer%20range">
+            Gagyi</link>             
         </para>
 
         <para>
-            Javaban az Integer tipusú számokat a java -128 és 127 között eltárolja a poolba. (Feltételezi a java, hogy a
-            program sokat fog kissebb számokkal dolgozni, és ha Intiger típusú szám kell, akkor a poolbol kivesz.) Ha
-            a -128 és 127 közötti intervallumból szeretnénk értéket adni egy változónak, akkor az elore eltárolt pool-ból ˝
-            fog hozzá memória címet rendelni. Ez úgy történik, hogy ebben az esetben meghívódik az Intiger.value.Of
-            függvény, ami kiosztja a címet. Ha a megadott tartományok kívül rendelünk a változóhoz értéket, például
-            -129 akkor viszont ugyan ez a függvény létrehoz egy új objektumot. Ezek alapján ha x és t változó értéke
-            egyenlő és ezen értéke az adott tartományon belül vannak, akkor azonos lesz a két változó címe. Viszont ha ˝
-            x és t értéke azonos, de nem a -128 és 127 tartományból lesz, akkor a két változó címe nem fog megegyezni,
-            mivel két külön objektum fog létrejönni ezeknek a számoknak.
+            Érdekesség a javaról:
+        </para>
+        <para>
+            A java feltételezi hogy kis számokat kell használnia ezért futáskor létrehoz a Thread pooljában egy rész tárhelyet, 
+            amelybe -128-tól 127-ig fog eltárolni összesen 255 egész számot és mindegyikhez rendel egy memóriacímet.
+        </para>
+        <para>
+            Ha a -128 és 127 közötti intervallumból szeretnénk értéket adni egy változónak, akkor az előre eltárolt pool-ból 
+            fog hozzá memória címet rendelni. Amikor megtörténik a kérés, a java meghívja az Integer.value.of függvényt amely 
+            kiosztja a memóriacímet.
+        </para>
+        <para>
+            Ha ezen tartományon kívül rendelünk értéket a változóhoz, például -129-et vagy akár 128-at akkor ugyan ez a függvény 
+            létrehoz egy új objektumot. 
+        </para>
+        <para>
+            Ezek alapján ha x és t változó értéke egyenlő és ezen értéke az adott tartományon belül vannak, akkor azonos lesz a két változó címe. 
+            Viszont ha x és t értéke azonos, de nem a -128 és 127 tartományból lesz, akkor a két változó címe nem fog megegyezni, mivel két külön 
+            objektum fog létrejönni ezeknek a számoknak.
         </para>
 
         <para>
-            Első esetben, amikor nem kerül végtelen ciklusba mert a feltétel nem teljesül.
+            Első esetben: 
         </para>
 
         <programlisting language="java"><![CDATA[
@@ -211,13 +225,23 @@
                 }
             }
         ]]></programlisting>
-
-
+        
+        <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img2/Gagyi_egyszer.png" format="PNG" scale="60" />
+                </imageobject>
+        </mediaobject>
         <para>
-            (még átdolgozás)
+            Nem kerül a program végtelen ciklusba mert a feltétel nem teljesül, mivel a tartományon belül esik a két szám értéke, 
+            ezért azonos a két szám memóriacíme, az előre eltárolt poolnak köszönhetően. (Tartomány: -128 - 127)
         </para>
         <para>
-            Második esetben, amikor teljesül a while() feltétele és végtelen ciklusba kerül.
+            Viszont láthatjuk a Consoleban egy 1-est mivel hátultesztelő, azaz végfeltételes ciklust használunk a programban, 
+            ez elősegíti azt hogy már Consoleban észleljük, hogy nincs végtelen ciklus, tehát az "a" lépegető változó csak egy 
+            futást fog számolni, majd kiirja.
+        </para>
+        <para>
+            Második esetben:
         </para>
 
         <programlisting language="java"><![CDATA[
@@ -241,25 +265,52 @@
             }
          ]]></programlisting>
 
+         <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img2/Gagyi_vegtelen.png" format="PNG" scale="60" />
+                </imageobject>
+        </mediaobject>
+        
          <para>
-
+             Amikor teljesül a while() feltétele és végtelen ciklusba kerül, mivel az Integer tipusú változók értéke 
+             az előre definiált pool tartományon kívül esik. (Tartomány: -128 - 127)
+         </para>
+         <para>
+            Ebben a programban már láthatjuk is a végtelen ciklust a Consoleban is, mivel szintén az "a" változó értéke minden ciklus lefutás 
+            után növekszik eggyel.
          </para>
 
     </section>   
 
 
-        <section>
-        <title>Yoda</title>
+    <section>
+        <title>Yoda Conditions</title>
         <para>
-            A Yoda egy programozási sítlus, pontosabban Yoda feltételeknek hívjuk. A lényege az, hogy az
-            összehasonlító kifejezésben megcseréljük a változót és a konstanst. Eredetileg a konstanshoz hasonlítjuk a
-            változót, azaz a konstans a bal míg a változó a jobb oldalon helyeszkedik el. De a Yoda feltételek szerint
-            fordítva, azaz a konstans lesz a jobb oldalon és a változó a bal oldalon. Ez a megszokott színtaxistól
-            eltérő. A nevét a Csillagok Háborújábol ismert Yoda mesterről kapta, mivel furán beszéli az angolt, vagyis szavakat
-            cserél fel és nem a szokványos angol szintaxis szerint beszél.
+            Ez egy programozási szintaxis.
         </para>
         <para>
-            Megoldás forrása:                
+            A nevét a Csillagok Háborújábol ismert Yoda mesterről kapta, aki másképp beszéli az angolt, mivel nem 
+            szokványosan beszéli az angol nyelvet, hanem a szavakat mondattanilag helytelenül használja. 
+            Tehát felcseréli a szavak sorrendjét, viszont ettől eltekintve még érthető amit mondani akar.
+        </para>
+        <para>
+            Példa egy mondatra és Yoda mester aranyköpésére:
+        </para>
+        <para>
+            You have becommande powerful, I sense the dark side in you.
+        </para>
+        <para>
+            Becommande powerful you have, the dark side in you I sense.
+        </para>
+        <para>
+            Yoda Master Conditions Generator: <link xlink:href="https://lingojam.command/EnglishtoYoda">https://lingojam.command/EnglishtoYoda</link>
+        </para>
+        <para>
+            Ezt átvihetjük a programozásba is, mivel a java lehetővé teszi. A továbbiakban példát láthatunk ilyen fajta 
+            programozási szintaxisra is.
+        </para>
+        <para>
+            Megoldás forrása: <link xlink:href="https://github.command/RubiMaistro/codes-prog2/tree/master/Arroway/Yoda%20Conditions">Yoda Condition</link>
         </para>
         <para>
             A program ami java.lang.NullPointerEx-el leáll, ha nem követjük a Yodaconditionst:
@@ -277,10 +328,23 @@
                 }          
             }
          ]]></programlisting>
-        <para>
-            Ha a Yoda stílusban írjuk a programot, ezt a híbát kiküszöböltük. További elonye a Yoda stílusnak, 
-            hogy el tudjuk kerülni a nem biztonságos viselkedésű null típusokat.
+
+         <para>
+            A programban az összehasonlító kifejezésben megcseréljük a változót és a konstanst. 
+            Eredetileg a konstanshoz hasonlítjuk a változót, azaz a konstans a bal míg a változó a 
+            jobb oldalon helyeszkedik el. De a Yoda feltételek szerint fordítva, azaz a konstans lesz a 
+            jobb oldalon és a változó a bal oldalon. 
         </para>
+        <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img2/Yoda.png" format="PNG" scale="60" />
+                </imageobject>
+        </mediaobject>
+         <para>
+            A java nem képes String tipust összehasonlitani null tipussal, ezért dob hibát. Ezzel a módszerrel 
+            elkerülhetjük a null Stringeket.
+         </para>
+
     </section> 
 
 
@@ -296,7 +360,7 @@
             fog működni a programunk. Ekkor ajánlott és kötelező is felüldefiniálni a metódust.
         </para>
         <para>
-            Megoldás forrása:  (repó)              
+            Megoldás forrása: <link xlink:href="https://github.command/RubiMaistro/codes-prog2/blob/master/EPAM/Java%20Obj%20Methods/Ember.java">Java Object Methods</link>              
         </para>
         <programlisting language="java"><![CDATA[
             public class Methods {
@@ -334,7 +398,20 @@
         ]]></programlisting>
     
         <para>
-            (kifejtés)
+            A fenti kódban létrehoztunk egy Methods nevű osztályt amiben függvények vannak.
+            Majd minden beéített függvény előtt egy Override kulcsszót, amely azt jelenti hogy az utána
+            következő beéített függvény a programban felüldefiniált.
+        </para>
+        <para>
+            Mivel az osztályban nincs létrehozva az egy Constructoron kívül semmi más, ezért a beéített függvényeket
+            nincs értelme felüldefiniálni. Ez a progam csak egy osztálynak a váza.
+        </para>
+        <para>
+            Amikor egy osztályban több változót és függvényt hozunk létre akkor bizonyos metódusokat érdemes felüldefiniálni.
+        </para>
+        <para>
+            Például a hashCode() függvényt érdemes felüldefiniálni mivel minden objektumnak más kell legyen a hash kódja. Ebben az
+            esetben ha egy hashcode alapú mapel dolgozunk akkor a felüldefiniálással elkerülhetjük az objektumok összekeverését.
         </para>
         <programlisting language="java"><![CDATA[
             public class Main {
@@ -353,129 +430,53 @@
                 }
             }
         ]]></programlisting>
+        <para>
+            A main() osztályban létrehozunk objektumokat és meghívjuk a definiált függvényeket.
+        </para>
+            <para>
+                Komplexebb program a beéített függvényekkel: 
+                <link xlink:href="https://github.command/RubiMaistro/codes-prog2/blob/master/EPAM/Java%20Obj%20Methods/Ember.java">
+                https://github.command/RubiMaistro/codes-prog2/blob/master/EPAM/Java%20Obj%20Methods/Ember.java</link>
+            </para>
+        <para>
+            A beípitett függvények optimalizálás okának a magyarázata:
+        </para>
+        <para>
+            A hashCode() metódus. Minden objektum és változó amit létrehozunk rendelkezik egy azonsoítóval, ezt nevezzük hash kódnak. 
+            (Egy komplex programban mindenképp felül kell definiálni a metódust, hogy optimálisan működjön a programra nézve.)
+        </para>
+        <para>
+            A toString() metódus. A függvény standard visszatérési értéke: class packageNév.osztalyNév és hash kód. 
+        </para>
+        <para>
+            Ha változtatni szeretnénk a visszatérési értékén, akkor érdemes felüldefiniálni.
+        </para>
+        <para>
+            Az equals() metódus. Ez a függvény az összehasonlító függvény. Tehát ahogyan a hash kódnál úgy itt is, ha már a program 
+            komplex akkor több a hibalehetőség, így érdemes a programhoz optimalizálni. 
+        </para>
+        <para>
+            A clone() metódus. Ez a függvény képes lemásolni egy objektumot teljesen, hogy a hash kódja is teljesen megegyezik
+            a másolandó objektuméval. 
+        </para>
+        <para>
+            A wait() metódus. Arra kényszeríti az aktuális processzor szálat hogy megvárjon egy másikat amíg az nem végez.
+        </para>
+        <para>
+            A notify() és notifyAll() metódusok. Az első egyet a második pedig az összes várakozó szálat felébreszti amelyeket a wait()
+            függvénnyel várakoztatunk a programban.
+        </para>
+        <para>
+            Lássunk példát egy néhány beépített java object metódusra:
+        </para>
+        <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img2/OBJMethods.png" format="PNG" scale="50" />
+                </imageobject>
+        </mediaobject>
+        <para>
+            Részletesen a metódusok felüldefiniálásánál (Override) lehet követni a függvények működését, a linkben megtalálható a részletes programkód.
+        </para>
     </section>    
-
-
-    <section>
-        <title>EPAM: Objektum példányosítás programozási mintákkal</title>
-        <para>
-            Több fajta példányosítási mintát hozhatunk létre a java programozási nyelvben. 
-            Ezek minden esetben más-más célra lesznek a legmegfelelőbbek.
-        </para>
-        <para>
-            (kidolgozás)
-        </para>
-        <para>
-            Megoldás forrása:                
-        </para>
-        <para>
-            Sinlgeton
-        </para>
-        <programlisting language="java"><![CDATA[
-
-        ]]></programlisting>
-        
-        <para>
-           Singleton Main
-        </para>
-
-        <programlisting language="java"><![CDATA[
-            public class Singleton {
-
-                public static void main(String[] args) {
-
-                    SingleObject object = SingleObject.getInstance();
-                    SingleObject obj2 = SingleObject.getInstance();
-
-                    //show the message
-                    object.showMessage();
-                    
-                    obj2.showMessage();
-                }
-            }
-        ]]></programlisting>
-
-        <para>
-            (kifejtés)
-        </para>
-        <para>
-            Factory
-        </para>
-
-            <programlisting language="java"><![CDATA[
-                import java.io.*;
-
-                abstract class Plan{  
-                    protected double rate;  
-                    abstract void getRate();  
-
-                    public void calculateBill(int units){  
-                        System.out.println(units*rate);  
-                    }  
-                }
-
-                class  DomesticPlan extends Plan{  
-                    //@override  
-                    public void getRate(){  
-                        rate=3.50;              
-                    }  
-                }
-
-                class  CommercialPlan extends Plan{  
-                    //@override   
-                        public void getRate(){   
-                            rate=7.50;  
-                    }
-                }
-
-                class GetPlanFactory{  
-                    
-                    //use getPlan method to get object of type Plan   
-                        public Plan getPlan(String planType){  
-                                if(planType == null){  
-                                return null;  
-                                }  
-                            if(planType.equalsIgnoreCase("DOMESTICPLAN")) {  
-                                    return new DomesticPlan();  
-                                }   
-                            else if(planType.equalsIgnoreCase("COMMERCIALPLAN")){  
-                                    return new CommercialPlan();  
-                                }    
-                        return null;  
-                    }  
-                    }
-
-                public class Factory {
-
-                    public static void main(String[] args) throws IOException {
-                        
-                        GetPlanFactory planFactory = new GetPlanFactory();  
-                        
-                        System.out.print("Enter the name of plan for which the bill will be generated: ");  
-                        BufferedReader br=new BufferedReader(new InputStreamReader(System.in));  
-                    
-                        String planName=br.readLine();  
-                        System.out.print("Enter the number of units for bill will be calculated: ");  
-                        int units=Integer.parseInt(br.readLine());  
-                    
-                        Plan p = planFactory.getPlan(planName);  
-                        //call getRate() method and calculateBill()method of DomesticPaln.  
-                    
-                        System.out.print("Bill amount for "+planName+" of  "+units+" units is: ");  
-                            p.getRate();  
-                            p.calculateBill(units);  
-
-                    }
-
-                }
-            ]]></programlisting>
-
-        <para>
-            (kifejtés)
-        </para>
-
-
-    </section>   
-        
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
 </chapter>                

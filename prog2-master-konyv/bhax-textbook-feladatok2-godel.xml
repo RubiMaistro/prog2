@@ -1,0 +1,838 @@
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+    <info>
+        <title>Helló, Gödel!</title>
+        <keywordset>
+            <keyword/>
+        </keywordset>
+    </info>
+
+    <section>
+        <title>EPAM: Mátrix szorzás Stream API-val</title>
+        <para>
+            Ebben a feladatban a java nyelv Stream API-jával ismerkedhetünk meg ami a Java 8-ban került be először a nyelvbe. 
+            A Stream API tulajdonképpen azért került be a javaba, hogy megkönnyítse a programozók dolgát 
+            különböző strukturákon való végig iteráláshoz. Ebben a feladatban a Stream API segitségével fogunk végig 
+            iterálni mátrixokon úgy, hogy ehez nem szükséges ciklusokat használnunk. 
+            A feladat lényege, hogy a mátrix szorzást implementáljuk streameléssel.
+        </para>
+        <para>
+            A Stream egy kollekció ami nem változtatja meg az adatok szerkezetét, csupán csak az eredményét adják 
+            egymás után láncolt metódusoknak. Ezeket a metódusokat operátoroknak hívjuk amelyeknek két tipusa létezik, 
+            a közbenső operátorok és a terminális operátorok. 
+            A közbenső operátorok streamelés közben végzik el a bizonyos feltételeiket, amelyek alapján streameljük 
+            a strukturát, tulajdonképpen feltétlekkétn tekinthetünk rájuk. A terminális operátorok mindig az egymás 
+            után láncolt metódusok utolsó eleme, ezek zárják le a streamelést.
+        </para>
+
+        <para>
+            Előre nézzük meg, hogyan is fog a mátrix szorzás létrejönni.
+        </para>
+
+        <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img2/matrixMultiply.png" format="PNG" scale="60" />
+                </imageobject>
+        </mediaobject>
+
+        <para>
+            A main() függvényben létrehozunk tömböket, amelyek a mátrixokat definiálják és objektumokat amikben a mátrixokat tároljuk. 
+            Az <command>lm</command> objektumban a matrix-t és az <command>am</command> objektumban pedig a matrix2 tömböket, 
+            ezek egyszerű AbstractMatrix osztály tipusú példányok. A LambdaMatrix osztálynak is létrehozunk egy objektumot, 
+            ami megkapja az előbbi két mátrix szorzatát, amelyet az <command>lm</command> mátrixra hívjuk a szorzó függvényt, 
+            ami a multiply() metódus, és paramétreben megadjuk az <command>am</command> mátrixot. Végül kiiratjuk az 
+            <command>mm</command> objektum mátrixát, ezt a toString() metódus segitségével tesszük.
+        </para>
+
+        <para>
+            A programkód a következő:
+        </para>
+        
+        <programlisting language="java"><![CDATA[
+            public interface Matrix {
+
+                void setElement(int x, int y, int value);
+                Matrix multiply(Matrix input);
+            }
+        ]]></programlisting>
+
+        <programlisting language="java"><![CDATA[
+
+            import java.util.Arrays;
+
+            public abstract class AbstractMatrix implements Matrix {
+
+                protected final int[][] matrix;
+                protected final int rowsLenght;
+                protected final int columnsLenght;
+
+                public AbstractMatrix(int[][] matrix) {
+                    this.matrix = matrix;
+                    this.rowsLenght = matrix.length;
+                    this.columnsLenght = matrix[0].length;
+                }
+
+                public AbstractMatrix(int rowsLenght, int columnsLenght) {
+                    this.matrix = new int[rowsLenght][columnsLenght];
+                    this.rowsLenght = rowsLenght;
+                    this.columnsLenght = columnsLenght;
+                }
+        ]]></programlisting>
+
+            <para>
+                Létrehoztunk egy Matrix interfészt amelynek van egy függvénye, később ezt hívjuk meg a számoláshoz. 
+                Majd egy AbstractMatrix osztályt hoztunk létre amelynek van három protected változója, 
+                ezek a mátrix, a sorai és az oszlopai amiknek értéket adunk a konstruktoron keresztül, 
+                amit a felhasználótól kértünk.
+            </para>
+        
+        <programlisting language="java"><![CDATA[
+            @Override
+            public void setElement(int x, int y, int value) {
+                matrix[x][y] = value;
+            }
+
+            @Override
+            public Matrix multiply(Matrix input) {
+                if (input instanceof AbstractMatrix) {
+                    return multiply((AbstractMatrix) input);
+                }
+                throw new IllegalArgumentException("The input matrix should be an instance of AbstractMatrix");
+            }
+
+        ]]></programlisting>
+
+            <para>
+                Az első metódus három paraméter alapján beállít bizonyos értékeket a mátrixnak. 
+                A paraméterek a következők, az első a mátrix sora indexe, a második a mátrix oszlop indexe 
+                és a harmadik pedig maga az érték.
+            </para>
+
+            <para>
+                A második metódus később a mátrix szorzást végzi. Itt csak egy feltétel alapján 
+                eldönti, hogy a paraméterben kapott mátrix és a meglévő mátrix szorozható-e egymással. 
+                Ha ez nem lehetséges, akkor egy kivételkezeléssel dob egy hiba üzenetet.
+            </para>
+
+        <programlisting language="java"><![CDATA[
+
+            @Override
+            public int hashCode() {
+                final int prime = 31;
+                int result = 1;
+                result = prime * result + columnsLenght;
+                result = prime * result + Arrays.deepHashCode(matrix);
+                result = prime * result + rowsLenght;
+                return result;
+            }
+
+            @Override
+            public boolean equals(Object obj) {
+                if (this == obj)
+                    return true;
+                if (obj == null)
+                    return false;
+                if (getClass() != obj.getClass())
+                    return false;
+                AbstractMatrix other = (AbstractMatrix) obj;
+                if (columnsLenght != other.columnsLenght)
+                    return false;
+                if (!Arrays.deepEquals(matrix, other.matrix))
+                    return false;
+                if (rowsLenght != other.rowsLenght)
+                    return false;
+                return true;
+            }
+
+        ]]></programlisting>
+
+            <para>
+                Ezen, hashCode és equals metódusok felüldefiniálása szükséges, hogy a program optimálisan 
+                működjön. Ezen a felüldefiniálásokat az Eclipse automatikusan felajánlja az osztályban tárolt 
+                változók függvényben.
+            </para>
+
+        <programlisting language="java"><![CDATA[
+            
+            @Override
+            public String toString() {
+                
+                System.out.println("Matrix:");
+                
+                for (int row = 0; row < this.rowsLenght; row++) {
+                    for (int col = 0; col < this.rowsLenght; col++) {
+                        System.out.print(this.matrix[row][col] + ", ");
+                    }
+                    System.out.print("\n");
+                }
+                return "[rowsLenght=" + this.rowsLenght + ", columnsLenght="
+                        + this.columnsLenght + "]\n";
+            }
+
+            abstract protected Matrix multiply(AbstractMatrix input);
+            
+        }
+        ]]></programlisting>
+
+            <para>
+                A toString() metódus felüldefiniálását is automatikusan felajánlja az Eclipse,
+                de ebben az esetben az nem lesz tökéletes. Ezért át van írva, hogy kiirassa 
+                a mátrix elemeit és vissza adja a mátrix sorainak és oszlopainak számát. 
+            </para>
+        
+        <programlisting language="java"><![CDATA[
+            import java.util.Arrays;
+            import java.util.stream.IntStream;
+
+            public class LambdaMatrix extends AbstractMatrix {
+
+                public LambdaMatrix(int[][] matrix) {
+                    super(matrix);
+                }
+
+                public LambdaMatrix(int rowsLenght, int columnsLenght) {
+                    super(rowsLenght, columnsLenght);
+                }
+
+                @Override
+                protected Matrix multiply(AbstractMatrix input) {
+                    int[][] result = Arrays.stream(this.matrix)
+                        .map(r -> IntStream.range(0, input.columnsLenght)
+                            .map(i -> IntStream.range(0, input.rowsLenght)
+                                .map(j -> r[j] * input.matrix[j][i]).sum())
+                            .toArray())
+                        .toArray(int[][]::new);
+                    return new LambdaMatrix(result);
+                }
+            }
+        ]]></programlisting>
+
+        <para>
+            Egy LambdaMatrix osztályt létrehozva ami örökli az AbstractMatrix osztály tulajdonságait, 
+            definiáljuk a mátrix szorzást végző metódust, ez a multiply() metódus. 
+            Először két konstruktort fut le annak függvényében, hogyan adtunk meg mátrixt az objektumban. 
+            Majd a multiply() metódus paraméterként kap egy objektumot, ami egy mátrixot fog tartalmazni. 
+            A függvényben létrehozunk egy két dimenziós tömböt, amine az értéke egy streamelés lesz, 
+            ez ajda meg az új mátrixnak a másik kettő szorzatát. Egyszerűen streameljük az elmentett mátrixot, 
+            aminek map()-ekkel megyünk végig először a sorain, majd az oszlopain egy-egy lambdával és végül 
+            egy harmadik map()-ben egy lambda segitségével össze szorozzuk a tárolt mártix sorainak az értékeit 
+            a paramétreben kapott mátrix oszlopaiban lévő elemekkel, majd ezeket össze adjuk. 
+            Végül a létrejött elemeket a toArray() metódussal a két dimenziós tömbbe rakjuk, amit vissza adunk 
+            egy új LambdaMatrix objektumként.
+        </para>
+
+        <programlisting language="java"><![CDATA[
+            public class MatrixMain {
+
+                public static void main(String[] args) {
+                    
+                    int[][] matrix = {{1,-2,-3},{5,5,-5},{2,8,-9}};
+                    int[][] matrix2 = {{-1,2,3},{-1,-2,5},{7,4,3}};
+                    
+                    AbstractMatrix lm = new LambdaMatrix(matrix);
+                    AbstractMatrix am = new LambdaMatrix(matrix2);
+                    LambdaMatrix mm =  (LambdaMatrix) lm.multiply(am);
+                    
+                    System.out.println("lm matrix " + lm.toString());
+                    System.out.println("am matrix " + am.toString());
+                    System.out.println("mm matrix " + mm.toString());
+                    
+                }
+            }
+        ]]></programlisting>
+
+        <para>
+            Ez a main megegyezik a feladata elején bemutatott main függvénnyel, 
+            a különbség csak az, hogy kiiratjuk mind a három mátrix értékeit. 
+            Futtatás eredménye a következő.
+        </para>
+
+        <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img2/matrixMultiply2.png" format="PNG" scale="120" />
+                </imageobject>
+        </mediaobject>
+        
+    </section>
+
+
+
+    <section>
+        <title>EPAM: LinkedList vs ArrayList</title>
+        <para>
+            A Java nyelvben is léteznek úgynevezett tömbök, amelyeknek a célja, hogy ha programozók több változót használnak 
+            akkor azokat egy strukturában és egy helyre gyűjthetik, ezáltal könnyebb a használatuk és az elérésük. 
+            Viszont a tömbnek kötelezően meg kell adni a méretét amikor definiáljuk, ezért ha több elemre 
+            lenne szükségünk mint amennyit a tömb létrehozásakor definiáltunk, akkor egy problémába ütközünk, hiszen 
+            nem adhatunk a tömbhöz több elemet mint amennyit el tud tárolni.
+        </para>
+        <para>
+            Erre a problémára alkották meg a listát, amely szabadon bővíthető tetszőleges számú elemmel és ezzel párhuzamosan 
+            a lista mérete is nőni fog. Ebben a feladatban a Láncolt listát (LinkedList) és a Tömb listát (ArrayList) fogjuk 
+            összehasonlítani előnyeivel és hátrányaival együtt.  
+        </para>
+        <para>
+            A listák és létrehozásunk:
+        </para>
+        <para>
+            ArrayList: Ez egy olyan lista amelynek a strukturája egy egyszerű tömbhöz hasonlít, a különbség viszont az, hogy ezt 
+            tetszőleges számú elemmel lehet bővíteni. 
+        </para>
+        <programlisting language="java"><![CDATA[
+            ArrayList<Integer> array = new ArrayList<Integer>();
+        ]]></programlisting>
+        <para>
+            LinkedList: Ez egy olyan lista amely elemei mutatókkal kapcsolódnak egymáshoz, ez azt jelenti, hogy egy elem csak 
+            azt tudja hogy milyen elem van előtte, tehát amelyik elem rá mutat, és azt hogy melyik következik utána, 
+            azaz melyikre mutat. A lista definicíója röviden, elemek láncolt sorozata.
+        </para>
+        <programlisting language="java"><![CDATA[
+            LinkedList<Integer> linky = new LinkedList<Integer>();
+        ]]></programlisting>
+
+        <para>
+            A következőkben a létrehozott listákon különböző méréseket fogunk végezni:
+        </para>
+        <para>
+            Feltöltjük a listákat elemekkel:
+        </para>
+        <para>
+            ArrayList:
+        </para>
+        <programlisting language="java"><![CDATA[
+            // Upload
+            // ArrayList :
+            final long startTimeArrayList = System.nanoTime();
+                for(int i = 0; i < 10000; i++)
+                    array.add(i);
+            final long finishTimeArrayList = System.nanoTime();
+            
+            long runningTimeArrayList = finishTimeArrayList - startTimeArrayList;
+
+            // LinkedList :
+            final long startTimeLinkedList = System.nanoTime();
+                for(int i = 0; i < 10000; i++)
+                    linky.add(i);
+            final long finishTimeLinkedList = System.nanoTime();
+            
+            long runningTimeLinkedList = finishTimeLinkedList - startTimeLinkedList;
+        ]]></programlisting>
+
+        <para>
+            Mindkét listát egy-egy <command>for()</command> ciklusban az <command>add()</command> metódussal
+            10000 elemmel töltöttük fel, melyek értéke 1-től 10000-ig mindig az index értékét kapta meg. 
+            Tehát egy azon elemek szerepelnek mindkét listában. A <command>System.nanoTime()</command> az aktuális 
+            időt tartalmazza, az időt a feltöltés előtt is és a feltöltés után is egy-egy változónak megadtuk, 
+            majd e két változó, tehát a kezdés időpontja és a befejzés időpontjának a különbözetéből kapjuk meg mennyi 
+            ideig tartott az elemek helyfoglalása és tárolása.
+        </para>
+
+        <programlisting language="java"><![CDATA[
+            System.out.println("Array list fill in time: " + runningTimeArrayList);
+            System.out.println("Linked list fill in time: " + runningTimeLinkedList);
+        ]]></programlisting>
+        <para>
+            Kétszer futtattuk le:
+        </para>
+        <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img2/Fill_in_list_img1.png" format="PNG" scale="100" />
+                </imageobject>
+        </mediaobject>
+        <mediaobject>
+            <imageobject>
+                <imagedata fileref="img2/Fill_in_list_img2.png" format="PNG" scale="100" />
+            </imageobject>
+        </mediaobject>
+        <para>
+            A fenti két futási képen láthatjuk, hogy a listák feltöltési ideje váltakozó, egyszer az egyik 
+            egyszer a másik töltődik fel hamarabb, hiszen a mamória lefoglalás véletlenszerűen törénik. 
+            Az ArrayList feltöléskor keres a memóriában egy rekeszt ahova elkezdi tárolni az elemeket, 
+            ha ez a memória rekesz megtelt de még érkeznek elemek a feltöltéshez akkor keres egy másik rekeszt 
+            amelyben belefér az eddig feltöltött elemek rekesze és hozzácsatolja a listához a soron következő többi elemet is. 
+            Tehát az adatokat egy helyen tárolja és együtt mozognak az adatok. 
+            A LinkedList pedig láncolt elemek sorozata, tehát a memória foglalás egyszerűen törénik. 
+            Elemenként foglalunk memóriában helyet az elemeknek, majd ezek egyszerűen mutatókkal lesznek összekapcsolva, 
+            ezért megtörténhez az is hogy az elemek nem egymás mellet lesznek a memóriában.  
+        </para>
+
+        <para>
+            Végezzünk törlést a listából:
+        </para>
+
+        <programlisting language="java"><![CDATA[
+            // Remove
+            // from ArrayList :
+            final long startTimeRemoveFromArrayList = System.nanoTime();
+                array.remove(200);
+            final long finishTimeRemoveFromArrayList = System.nanoTime();
+            
+            long arrayRemoveTime = finishTimeRemoveFromArrayList - startTimeRemoveFromArrayList;
+            
+            // frome LinkedList :
+            final long startTimeRemoveFromLinkedList = System.nanoTime();
+                linky.remove(200);
+            final long finishTimeRemoveFromLinkedList = System.nanoTime();
+            
+            long linkyRemoveTime = finishTimeRemoveFromLinkedList - startTimeRemoveFromLinkedList;
+        ]]></programlisting>
+
+        <mediaobject>
+            <imageobject>
+                <imagedata fileref="img2/remove_from_list_img1.png" format="PNG" scale="100" />
+            </imageobject>
+        </mediaobject>
+
+        <para>
+            Egy egyszerű törlést végeztünk mindkét listából, ebben a kódban a 200. elemet töröltük ki mindkét listából, 
+            ehez a <command>remove()</command> metódust használtuk és az eltelt időt mértük mindkét esetben.
+            Mivel az ArrayList-ből való törlés azt eredményezi, hogy a törölt elem után következő elemek az indexelésnek 
+            megfelelően egyel kisebb indexbe csúsznak, sokkal több idő kellet a törléshez majd a helyreálláshoz 
+            mint a LinkedList-ből való törléshez, hiszen itt csak meg kell keresni az elemet amit törlünk, majd 
+            az előtte lévő elem már nem a törölt elemre kell mutasson hanem a törlött elem után következő elemre.
+        </para>
+
+        <programlisting language="java"><![CDATA[
+            array.remove(6000);
+            linky.remove(6000);
+        ]]></programlisting>
+
+        <mediaobject>
+            <imageobject>
+                <imagedata fileref="img2/remove_from_list_img2.png" format="PNG" scale="100" />
+            </imageobject>
+        </mediaobject>
+
+        <para>
+            A két listából a két-két elem törlésének az idejét a fenti kódban használt módon mértük. 
+            A futási képen látható egy másik eset amikor a 10000 elemű listákból a 6000. elemeket töröltük. 
+            Ebben az esetben a LinkedList volt lassabb, hiszen meg kellett találja a memóriában a törlendő elemet, 
+            de ezt csak az előtte lévő összes elemen keresztül való végig iterálás során tehette meg. 
+            Az ArrayList esetében pedig a mérések alapján rájöhettünk, hogy egyre nagyobb indexű elem törlése 
+            esetén egyre kevesebb elemet kell átmozgatni a helyreállás elősegítése érdekében.
+        </para>
+        <para>
+            Még néhány számítás:
+        </para>
+        <para>
+            1 millió elemű listákból a 2000. elemeket törölve az ArrayList-ben 100x-os a futási idő:
+        </para>
+
+        <mediaobject>
+            <imageobject>
+                <imagedata fileref="img2/remove_from_list_img4.png" format="PNG" scale="100" />
+            </imageobject>
+        </mediaobject>
+
+        <para>
+            10 millió elemű listákból a 10000. elemeket törölve az ArrayList-ben 500x-os a futási idő:
+        </para>
+
+        <mediaobject>
+            <imageobject>
+                <imagedata fileref="img2/remove_from_list_img3.png" format="PNG" scale="100" />
+            </imageobject>
+        </mediaobject>
+
+        <programlisting language="java"><![CDATA[
+            array.get(200);
+            linky.get(200);
+        ]]></programlisting>
+
+        <mediaobject>
+            <imageobject>
+                <imagedata fileref="img2/getFromList.png" format="PNG" scale="100" />
+            </imageobject>
+        </mediaobject>
+
+        <para>
+            A két listából a két-két elem megtalálásának az idejét a törléskor használt módon mértük. 
+            A LinkedList ideje ebben az esetben is több, hiszen amíg el nem jut a keresett elemhez addig 
+            az elem előtt lévő elemeken végig kell iteráljon.
+        </para>
+
+        <para>
+            Még néhány számítás:
+        </para>
+        <para>
+            1 millió elemű listákban a 20000. elem megtalálása a LinkedList-ben 20x-os futási időt eredményez:
+        </para>
+
+        <mediaobject>
+            <imageobject>
+                <imagedata fileref="img2/getFromList2.png" format="PNG" scale="100" />
+            </imageobject>
+        </mediaobject>
+
+        <para>
+            1 millió elemű listákban a 100. elem megtalálása a mindkét esetben hasonló futási időt eredményez:
+        </para>
+
+        <mediaobject>
+            <imageobject>
+                <imagedata fileref="img2/getFromList3.png" format="PNG" scale="100" />
+            </imageobject>
+        </mediaobject>
+
+        <para>
+            ArrayList: Ezt a strukturát akkor érdemes haszálni ha kevesebb elemmel akarunk dolgozni és 
+            a listából több alkalommal akarunk elemeket megkeresni. Ez a struktúra több elem keresésre, 
+            akár elemek cseréjére alkalmas a futási idő szempontjából. 
+            Alkalmatlan viszont az egyes elemek törlésére, a sok adat mozgatás szempontjából.
+        </para>
+        <para>
+            LinkedList: Ezt a struktúrát akkor érdemes használni amikor sok elemmel akarunk dolgozni és 
+            sokszor akarunk elemeket mozgatni, illetve törölni. Ez a struktúra nem alkalmas elemek többszöri keresésére. 
+            Elemek rendezésére és törlésre célszerűbb a használta.
+        </para>
+        
+    </section>
+
+
+
+    <section>
+        <title>EPAM: Refactoring</title>
+        <para>
+            Ebben a feladatban kódrészleteket írunk át lambda kifejezések segitségével. 
+            A lambda kifejezések olyan egyszerű függvényeket helyettesítenek amelyeket nem szükséges 
+            külön definiálva megírni mert így időt és helyet spórolhatunk meg, egy lambda kifejezés 
+            igazából egy röviden megírt függvény. De ugyanakkor lambda kifejezéseket lehet definiálni, 
+            ekkor egy osztályt kell megadni típusként és a nevet amelyre hivatkozunk, 
+            így a lambdát többször is meghívhatjuk.
+        </para>
+
+        <para>
+            Lambda kifejezés implementációja:
+        </para>
+        <programlisting language="java"><![CDATA[
+            // (praméterek) -> { utsítás kifejezések }
+            // pl.
+                
+                () -> System.out.println("Ez egy lambda kifejezés.");
+        ]]></programlisting>
+
+        <para>
+            Rendelkezésre áll egy kód amelyben lambda kifejezéseké kellene írni az egyes függvéyneket:
+        </para>
+        
+        <programlisting language="java"><![CDATA[
+            package Lambda;
+
+            import java.util.ArrayList;
+            import java.util.Arrays;
+            import java.util.List;
+            import java.util.function.Consumer;
+
+            public class LegacyRefactoring {
+
+                public void legacy() {
+                    Runnable runnable = new Runnable() {
+                        @Override
+                        public void run() {
+                            System.out.println("Runnable!");
+                        }
+                    };
+                    runnable.run();
+
+                    Calculator calculator = new Calculator() {
+                        @Override
+                        public Integer calculate(Integer number) {
+                            return number * number;
+                        }
+                    };
+
+                    Integer result = calculator.calculate(3);
+                    System.out.println("Calculation result: " + result);
+
+                    List<Integer> inputNumbers = Arrays.asList(1, null, 3, null, 5);
+                    List<Integer> resultNumbers = new ArrayList<>();
+                    for (Integer number : inputNumbers) {
+                        if (number != null) {
+                            Integer calculationResult = calculator.calculate(number);
+                            resultNumbers.add(calculationResult);
+                        }
+                    }
+
+                    Consumer<Integer> method = new Consumer<Integer>() {
+                        @Override
+                        public void accept(Integer integer) {
+                            System.out.println(integer);
+                        }
+                    };
+                    System.out.println("Result numbers: ");
+                    resultNumbers.forEach(method);
+
+                    Formatter formatter = new Formatter() {
+                        @Override
+                        public String format(List<Integer> numbers) {
+                            StringBuilder sb = new StringBuilder();
+                            for (Integer number : numbers) {
+                                String stringValueOfNumber = String.valueOf(number);
+                                sb.append(stringValueOfNumber);
+                            }
+                            return sb.toString();
+                        }
+                    };
+                    System.out.println("Formatted numbers: " + formatter.format(resultNumbers));
+                }
+            }
+        ]]></programlisting>
+
+        <para>
+            A program egy lista elemein számítást végéz majd az elemeket összefűzi és sztring típusá alakítja. 
+            Ebben a kódban egyetlen függvényben végzünk mindent. Az egyes függvények amelyeket lambdákkal írunk át, 
+            a Runnable osztály példányosítása, Calculator példányosítása, Consumer metódus létrehozása és Formatter példányosítása 
+            majd az értékének a vissza adása.
+        </para>
+
+        <para>
+            Szükség van a következő interfészekre:
+        </para>
+
+             <programlisting language="java"><![CDATA[
+            interface Print {
+                public void simplePrint();
+            }
+
+            interface Formatter {
+                String format(List<Integer> numbers);
+            }
+
+            interface Calculator {
+                Integer calculate(Integer number);
+            }
+            ]]></programlisting>
+
+        <para>
+            Az elsőt használni fogjuk kiiratáskor, a másodikat egy lista összefűzéshez, majd a harmadikat egy számoláshoz.
+        </para>
+
+        <para>
+            Lambda kifejezésekkel átírva a program kód a következő: Felül az könyvtárak importálása, 
+            majd a Refactored osztályban egy void tipusú függvény amelyet majd meghívunk és ki fogja 
+            iratni a függvény értékét, majd maga a függvény lambdákkal kifejezve.
+        </para>
+
+        <programlisting language="java"><![CDATA[
+            package Lambda;
+
+            //import java.util.Arrays;
+            import java.util.List;
+            import java.util.Objects;
+            import java.util.function.Consumer;
+            import java.util.stream.Collectors;
+
+            class Refactored {
+                
+                public void doSomething(Print obj) {
+                    obj.simplePrint();
+                }
+
+                public String refactored(List<Integer> inputNumbers) {
+                    
+                    Runnable runnable = createRun();
+                    runnable.run();
+                    
+                    //Calculator calculator = createCalculator();
+                    //System.out.println("Calculation: " + calculator.calculate(3));
+                    
+                    List<Integer> resultNumbers = inputNumbers
+                            .stream()
+                            .filter(Objects::nonNull)       // number -> number != null
+                            //.map(calculator::calculate)     // number -> calculator.calculate(number)
+                            .collect(Collectors.toList());
+                    
+                    Consumer <Integer> cons = createConsumerMethod();
+                    System.out.println("Numbers: ");
+                    resultNumbers.forEach(cons);
+                    
+                    Formatter formatter = createFormatter();
+                    String str = formatter.format(resultNumbers);
+                    
+                    return str;
+                }
+            ]]></programlisting>
+
+            <para>
+                A <command>refactored()</command> amely egy listát kap paraméterként függvényben létrehoztunk egy 
+                példányt a Runnable függvénynek, amely az első lambda kifejezés, 
+                és meghívjuk a <command>run()</command> függvényt, majd egy példányt hozunk létre a Calculatornak és 
+                meghívjuk a <command>calculate()</command> függvényét, ez a második lambda. 
+                Ebben a kódban nem használtam a Calculator osztályt, tehát nem számol a progam semmit, ezért van kommentezve.
+                Egy Integer tipusú listát létrehozva a Stream API segitségével - (A Stream API-t a Gödel fejezet első feladatában fejtettem ki) 
+                - végig iterálunk a listán bizonyos szempontok szerint majd összesítjük az elemeket. 
+                A Consumer osztálynak létrehozunk egy példányt, ez a harmadik lambda, és majd ebbe mentjük az elemeket.
+                Végül a Formatter osztálynak is létrehozunk egy példányt és egy sztring tipusú változónak adjuk az elemeket amelyeket összefűzzük 
+                a Stream API-val, ez a negyedik lamdba.
+            </para>
+            
+            <para>
+                Lambda kifejezések: Egy lambdának mindig van visszatérési értéke ha definiáljuk, ez azt jelenti hogy ha egy Osztályhoz 
+                rendeljük, azaz megadjuk tipusként az osztályt és nevet adunk a lambdának.
+            </para>
+
+            <programlisting language="java"><![CDATA[
+        
+                
+                // 1st lambda : runnable()
+                private Runnable createRun () {
+                    return () -> System.out.println("Runnable!");
+                }
+
+            ]]></programlisting>
+            
+            <para>
+                Az első lamda: Itt egy kiiratást hoztunk létre ami lefut ha ezt megadjuk a Runnable osztály plédányának és 
+                a példánnyal hívjuk a <command>run()</command> függvény.
+            </para>
+
+            <programlisting language="java"><![CDATA[
+                
+                // 2nd lambda : calculator()
+                private Calculator createCalculator () {
+                    
+                    Calculator simple = (number) -> number * number;
+                    
+                    return simple;
+                }
+
+            ]]></programlisting>
+
+            <para>
+                A második lambda: Ez a lambda létrehoz egy objektumot a Calculator osztálynak, ami egy paramétert kap, 
+                majd ezt a paramétert négyzetre emeli azaz megszorozza önmagával, és végül ezt az értéket vissza adja.
+            </para>
+
+            <programlisting language="java"><![CDATA[
+                
+                // 3rd lambda : consumer()
+                private Consumer <Integer> createConsumerMethod () {
+                    return System.out::println;
+                }
+                
+            ]]></programlisting>
+
+            <para>
+                A haramdik lambda: Ez a lambda egy kiiratást fog végezni, mindenre amit megadunk neki, hiszen a visszatérési 
+                értéke egy teljes kiiratás. 
+            </para>
+
+        <programlisting language="java"><![CDATA[
+
+                // 4th lambda : formated()
+                private Formatter createFormatter () {
+                    return numbers -> numbers.stream()
+                            .map(String::valueOf)
+                            .collect(Collectors.joining());
+                }
+            }
+        ]]></programlisting>
+        
+        <para>
+            A negyedik lambda: Itt már egy kicsit összetettebb lambda látható, hiszen a Formatter osztálynak hoz létre egy 
+            példányt ami visszatér egy Streammel. Ami azt jelenti hogy a megadott elemeket összefűzi a <command>joining()</command> 
+            függvény segitségével, majd ezzel az értékkel tér vissza.
+        </para>
+
+        <programlisting language="java"><![CDATA[
+            public class Main {
+
+            public static void main(String[] args) {
+                
+                List<Integer> list = Arrays.asList(2,0,2,0);
+                String str = "year";
+                Refactored obj = new Refactored();
+                
+                Print simplePrint = () -> { System.out.println(obj.refactored(list) + " " + str); };
+                
+                // Use lambda expression
+                obj.doSomething(simplePrint);
+                
+            }
+
+        }
+        ]]></programlisting>
+
+        <para>
+            A <command>main()</command> metódusban egy listát hoztunk létre amiben értékeket vettünk fel, majd egy String változót 
+            aminek az értéke "year" és végül egy példányt hozunk létre a Refactored osztálynak. 
+            A Print interfésznek is létrehozunk egy példányt és definiáljuk a függvényét, ami jelen esetben egy lambda 
+            segitségével kiiratja a lista elemeit. Ebben az esetben ez egy beépített lambda amelynek nincs neve tehát 
+            csak ezen a helyen hasznélható, ha máshol is hasonlót szeretnénk használni akkor meg kell írni újra. 
+            Végül az obj objektumnak meghívjuk a <command>doSomething()</command> függvényét melynek az értéke a simplePrint lesz, 
+            ami a <command>refacoted()</command> metódus értékét fogja kiiratni.
+        </para>
+        
+        <mediaobject>
+            <imageobject>
+                <imagedata fileref="img2/refactored.png" format="PNG" scale="50" />
+            </imageobject>
+        </mediaobject>
+
+    </section>
+
+
+
+    <section>
+        <title>Gengszterek</title>
+        <para>
+            Ebben a feladatban adott a Robotautó Világbajnokság nevű program amelynek az egyik kódrészében 
+            egy lambdát fogunk implementálni. A prgoram tulajdonképpen egy térképet fog megjeleníteni 
+            ahol autókat jelenítünk meg, ezek típusa lehet rendőr autó vagy gengszter autó. 
+            Ezek az autók mozgást végeznek a térképen lévő város utcáin és rendőr feladata, 
+            hogy az összes gengsztert elkapja.
+        </para>
+        <para>
+            A program C++ programozási nyelven íródott, C++-ban is léteznek lambda kifejezések, 
+            így a lambda kifejezést C++ nyelven írjuk meg.
+        </para>
+
+        <para>
+            Egy lambda kifejezés implementációja:
+        </para>
+        
+        <programlisting language="java"><![CDATA[
+            [] (paraméterek) -> visszatérési érték típus
+            {
+                metódusok
+            }
+        ]]></programlisting>
+
+        <para>
+            A lambda kifejezés az OOWC-ben pedig a következő:
+        </para>
+
+        <programlisting language="java"><![CDATA[
+            std::sort ( 
+                gangsters.begin(), 
+                gangsters.end(), 
+                [this, cop] ( Gangster x, Gangster y )
+                {
+                    return dst ( cop, x.to ) < dst ( cop, y.to );
+                } 
+            );
+        ]]></programlisting>
+
+        <para>
+            A rendezést a <command>sort()</command> függvénnyel történik. 
+            A paraméterei: 
+            Végig iterálunk az összes gangsters példányon amik a gengsztereket jelentik, 
+            ehez a kezdő és vég értékeket adjuk meg. 
+        </para>
+        <para>
+            A lambda kifejezés: 
+            A következő paraméter két objektumot, egy x-et és egy y-t vár. Majd egy összehasonlítás kiértékelődésének 
+            az eredménye adja vissza azt a gengszter objektumot ami közelebb van a rendőrhöz.
+        </para>
+        <para>
+            Majd a programban ezen kiértékelődés alapján idul el a rendőr autó a legközelebbi gengszter nyomába.
+        </para>
+
+        <mediaobject>
+            <imageobject>
+                <imagedata fileref="img2/gangsters.png" format="PNG" scale="100" />
+            </imageobject>
+        </mediaobject>
+        
+    </section>
+
+</chapter>

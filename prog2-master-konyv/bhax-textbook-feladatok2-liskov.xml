@@ -1,0 +1,510 @@
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+    <info>
+        <title>Helló, Liskov!</title>
+        <keywordset>
+            <keyword/>
+        </keywordset>
+    </info>
+
+    <section>
+        <title>EPAM: Interfész, Osztály, Absztrak Osztály</title>
+        <para>      
+            A java egy objektum orientlált nyelv. A javaban minden példányokhoz, vagy azaz objektumokhoz és osztályokhoz van társítva. 
+            Az osztály egy objektumkészítő, amellyel létrehozhatunk új objektumokat. Olyan dolgokat, tárgyakat, élőlényeket érdemes 
+            osztályban definiálni amelyek közös tulajdonságokkal rendelkeznek, mint például az autó, aminek van színe, súlya, kereke stb..
+        </para> 
+        <para>
+            Az osztályok számunkra megkönnyítik a programozást mivel egy átláthatóbb osztályozott környezeten keresztül biztosítva bármely más programozó 
+            egy kis tanulmányozással megérti a programíró célját a programmal kapcsolatban. Egy osztályban érdemes olyan függvéyneket létrehozni 
+            amelyeket sűrűn használ a programunk, ezzel egy helyre csoportosítva őket, programozói nézetben könnyebb tájékozódni a program kódban.
+        </para>
+        <para>
+            Az osztályoknak kifejtettségnek megfelelően három fő típusaba sorolható.
+        </para>
+        <para>
+            Megoldás forrása: 
+                <link xlink:href="https://github.command/RubiMaistro/codes-prog2/tree/master/EPAM/Class%20Types">Classes</link>
+        </para>
+
+        <para>
+            Osztály ( Simple Class ) :
+        </para>
+        <para>
+            Egy osztály a következőképpen néz ki:
+        </para>
+        <programlisting language="java"><![CDATA[
+        class Worker_Simple {
+            public long payment;
+            public int worktime;
+            
+            public Worker_Simple() {
+                payment = 210000;
+                worktime = 8;
+            }
+            
+            public void getPayment() {
+                System.out.println("The payment of prog: " + payment + " Ft.");
+            }
+            
+            public void getWorktime() {
+                System.out.println("The worktime of prog: " + worktime + " hour/day.");
+            }
+        }
+            ]]></programlisting>
+        <para>
+            Egy osztály létrehozása a class kulcsszóval majd egy név megadásával történik. 
+            Létrehoztuk a Worker_Simple osztályt ami tartalmazni fog két változót, a payment és a worktime 
+            változókat. 
+        </para>
+        <para>
+            Az osztálynak létezik egy inicializáló függvénye is amely neve hivatkozik maga az osztály 
+            nevére, ezt konstruktornak nevezzük, jelen esetben kezdőértéket adunk a két változónak.
+            Majd két függvény is helyet foglal amelyek feladata egy kiiratás lesz a változókra hivatkozva.
+        </para>
+        <para>
+            A teljes kód a main() fő függvénnyel megtalálható a következő linken:
+        </para>
+            <para>
+                <link xlink:href="https://github.command/RubiMaistro/codes-prog2/blob/master/EPAM/Class%20Types/SimpleClass.java">
+                https://github.command/RubiMaistro/codes-prog2/blob/master/EPAM/Class%20Types/SimpleClass.java</link>
+            </para>
+
+
+        <para>
+            Interfész ( Interface ) :
+        </para>
+        <para>
+            Egy interfész deklarációja a következőképpen néz ki.
+        </para>
+        <programlisting language="java"><![CDATA[
+        interface Worker_interface {
+            public void getPayment();
+            public void getWorktime();
+        }
+            ]]></programlisting>
+        <para>
+            Létrehozása az interface kulcsszóval majd egy névvel történik. Majd mint egy osztályban
+            függvényeket hozunk létre amelyeknek csak a deklarációja látható. A kifejtést egy örökített
+            osztályban fogjuk végrehajtani.
+        </para>
+
+        <programlisting language="java"><![CDATA[
+        class Programmer_interface implements Worker_interface {
+
+            public long payment = 210000;
+            public int worktime = 8;
+            
+            public void getPayment() {
+                System.out.println("The payment of prog: " + this.payment + " Ft.");
+            }
+            
+            public void getWorktime() {
+                System.out.println("The worktime of prog: " + this.worktime + " hour/day.");
+            }
+        }        
+            ]]></programlisting>
+        <para>
+            Egy osztály az implements kulcsszóval fogja örökölni az interfész osztály tulajdonságait.
+            Több interfészt örökölhet egy osztály, ebben az esetben az interfészek neveit veszzővel
+            elválasztva felsorolhatjuk.
+        </para>
+        <para>
+            Jelen esetben egy interfészt örökölt az osztály amelyben már az előre definiált függvényeket kifejtettük.
+        </para>
+        <para>
+            A teljes programkód a main() függvénnyel együtt megtalálható a következő linken:
+        </para>
+            <para>
+                <link xlink:href="https://github.command/RubiMaistro/codes-prog2/blob/master/EPAM/Class%20Types/InterfaceClass.java">
+                https://github.command/RubiMaistro/codes-prog2/blob/master/EPAM/Class%20Types/InterfaceClass.java</link>
+            </para>
+
+        <para>
+            Absztrakt ( Abstract class ) :
+        </para>
+        <para>
+            Egy absztrakt osztály a következőképpen néz ki:
+        </para>
+
+        <programlisting language="java"><![CDATA[
+        abstract class Worker_abstract {
+            public abstract void getPayment();
+            
+            public void getWorktime(int worktime) {
+                System.out.println("The worktime of prog: " + worktime + " hour/day.");
+            }
+        }
+            ]]></programlisting>
+        
+        <para>
+            Az absztrakt osztály az előbb említett két osztály ötvözetén alapszik, hiszen ebben az osztály típusban 
+            van olyan függvény amely csak definiálva van, és van kifejtett is.
+        </para>
+        <para>
+            Azt a függvényt amelyik csak definiált, a létrehozásnál abstract kulcsszóval kell jelezni, amelyik pedig 
+            nincs jelezve azt kötelesek vagyunk kifejteni.
+        </para>
+
+        <programlisting language="java"><![CDATA[
+        class Programmer_abstract extends Worker_abstract {
+
+            public long payment = 210000;
+            public int worktime = 8;
+            
+            public void getPayment() {
+                System.out.println("The payment of prog: " + this.payment + " Ft.");
+            }
+            
+        }      
+            ]]></programlisting>
+        <para>
+            Egy osztály amelyik absztrakt osztály tulajdonságokat örököl extends kulcsszóval örököltetünk.
+        </para>
+        <para>
+            A Programmer_abstract osztályban láthatjuk a getPayment() függvény kifejtését amit az absztrakt osztályban 
+            definiáltunk. Létrehozunk változókat amelyeket a függvények használhatnak. Ebben az osztályban ugyan nem 
+            jelenik meg az absztrakt függvényben kifejtett függvény de az osztály megörökli és használni tudja.
+        </para>
+        <para>
+            A teljes programkód a main() függvénnyel együtt megtalálható a következő linken:
+        </para>
+            <para>
+                <link xlink:href="https://github.command/RubiMaistro/codes-prog2/blob/master/EPAM/Class%20Types/AbstractClass.java">
+                https://github.command/RubiMaistro/codes-prog2/blob/master/EPAM/Class%20Types/AbstractClass.java</link>
+            </para>
+        <para>
+            Mindhárom osztály ugyan azt fogja csinálni ezért ugyan az a kimenetük is, viszont csak kódban térnek el. 
+            A Consoleban a futtatásuk után a következő figyelhető meg.
+        </para>
+        <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img2/ClassFutas.png" format="PNG" scale="60" />
+                </imageobject>
+        </mediaobject>
+    </section>
+
+
+
+
+    <section>
+        <title>EPAM: Liskov féle helyettesíthetőség elve, öröklődés</title>
+        <para>
+            A Liskov elv alapján az örököltetett osztályoknak cserélhetőknek kell lenniük az alaptípusukra, 
+            azaz az alaposztályra való hivatkozásnak helyettesíthetőnek kell lennie egy örököltetett osztályra, 
+            anélkül, hogy ez befolyásolná a viselkedést.
+        </para>
+        <para>
+            Az elv lényege, hogy ha egy B tipusú osztály az A tipusúnak egy alosztálya akkor a B tipusú objektumok
+            helyettesíthetőek A tipusú objektumokkal, így megtartva a program tulajdonságait.  
+        </para>
+        <para>
+            Az öröklődés fogalma egy Java programozónak nem idegen, ez tulajdonképpen 
+            kulcsfontosságú a java programokban.
+            Az öröklés két osztály között jön létre, így hivatkozhatunk egy ős osztályra és egy alosztályára. 
+            Minden ami az ős osztályban létrejött azt örökli az alosztálya is, ezért a Liskov elv felhasználásával és 
+            érvénybelépésével helyettesíhetjük egy osztály objektumánt egy főbb osztályéval.
+        </para>
+        <para>
+            Megoldás forrása:
+                <link xlink:href="https://github.command/RubiMaistro/codes-prog2/tree/master/EPAM/Liskov%20helyettes%C3%ADthet%C5%91s%C3%A9g%20elv">
+                Liskov féle helyettesíthetőség elve</link>
+        </para>
+        <para>
+            Az örököltetést és a Liskov helyettesíhetőség elvet bemutató kódrész a következő:
+        </para>
+        <programlisting language="java"><![CDATA[
+            class Vehicle {
+                public Vehicle() {
+                    System.out.println("Vehicle.");
+                }
+                
+                public void start() {
+                    System.out.println("elso.");
+                }
+            }
+
+            class Car extends Vehicle {
+                public Car() {
+                    System.out.println("Car.");
+                }
+                
+                @Override
+                public void start() {
+                    System.out.println("masodik.");
+                }
+            }
+
+            class Supercar extends Car {
+                public Supercar() {
+                    System.out.println("Supercar");
+                }
+                
+                @Override
+                public void start() {
+                    System.out.println("harmadik.");
+                }
+            }
+
+            ]]></programlisting>
+
+            <para>
+                Láthatjuk az osztályok közötti összefüggéseket, az ősosztályokat és az alosztályokat.
+                Létrehoztunk egy Vehicle osztályt aminek egy konstruktora van és egy start() függvénye, 
+                mindkettő egy egyszerű kiiratás. Majd létrehozunk egy új osztályt, a Car osztályt ami örököli a Vehicle 
+                osztály tulajdonságait, az örököltetést extends kulcsszóval végezzük el. Majd egy harmadik osztályt hozunk 
+                létre, a Supercar osztályt ami örökli a Car osztály tulajdonságait. Ezen utóbbi osztályokban is jelen lesz a 
+                start() függvény, ezeket viszont felül kell definiálni, ezzel is megkülönböztetve az osztályokat, a felüldefiniálást 
+                a függvény elé írt Override kulcsszóval végezzük el.
+            </para>
+
+            <programlisting language="java"><![CDATA[
+            public class Inherrit {
+
+                public static void main(String[] args) {
+                    
+                    Vehicle firstVehicle = new Supercar();
+                    firstVehicle.start();
+                    System.out.println(firstVehicle instanceof Car);
+                    
+                    Car secondVehicle = (Car) firstVehicle;
+                    secondVehicle.start();
+                    System.out.println(secondVehicle instanceof Supercar);
+                    
+                    /*  Nem lehet hivatkozni:
+                            Supercar thirdVehicle = new Vehicle();
+                            thirdVehicle.start();
+                    */
+                    
+                }
+
+            }
+            ]]></programlisting>
+
+            <para>
+                A Main() metódusban először létrehozunk egy objektumot a Vehicle osztálynak ami Supercar osztály 
+                tipusú objektum lesz. Ezen tipusú példányosítás azt eredményezi, hogy a Vehicle osztályba létrehozott objektum 
+                végig fog haladni az alosztályokon, az az örökölés folyamon addig amíg el nem ér a Supercar osztályhoz. 
+                A fordító minden osztályban megvizságlja, hogy a létrehozott objektum olyan tipusú-e, ez annyit jelent, hogy 
+                megnézi, hogy a Supercar osztály megegyezik e a Vehicle osztállyal, nem, akkor megy tovább, jön a Car osztály, ezzel megegyezik-e, 
+                nem, akkor megy tovább, jön a Supercar oszátly, megegyezik-e a Supercar a Supercarral, igen akkor jó helyen járunk, létrejön az objektum, 
+                mivel létezik az osztály. Ezen hosszúnak tűnő folyamat közben a konstruktorok lefutnak, innen a három kiiratás, azaz minden oszályban létrejöttek objektumok, 
+                viszont ezek fölülíródtak.
+            </para>
+
+            <para>
+                A program futtatás után a következő kimenetet produkálja:
+            </para>
+
+        <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img2/Inherrit.png" format="PNG" scale="60" />
+                </imageobject>
+        </mediaobject>
+
+            <para>
+                A második példányosításnál a seconVechicle Car osztály típusú objektum megkapja a firstVehicle objektum típusát, viszont már castoljuk 
+                Car osztály tipusúvá és úgy adjuk át. A konstruktorok is lefutnak, itt már csak a Car osztályig. 
+                Végül az utolsó példányosítást ami kommentben van nem tudjuk végrehajtani, mivel a Supercar osztálynak nem adhatunk meg 
+                magasabb osztályból típust, mivel az öröklés folyamon visszafelé nem lehetséges a példányosítás, hiszen magasabb szintű osztályból
+                alacsonyabb osztályba objektumot nem lehet helyettesíteni.
+            </para>
+
+    </section>
+
+
+
+
+
+    <section>
+        <title>Liskov helyettesítési elv sértése</title>
+        <para>
+            A Liskov elvet fentebb megismerhettük.
+        </para>
+        <para>
+            Az elv megsértése azt jelenti hogy az örökített osztály tipusában hiba keletkezik az öröklődés miatt. 
+        </para>
+        <para>
+            Tehát ha egy osztály örökli egy ősosztály tipusát, akkor minden függvényt és válozót ugyanúgy bármelyik 
+            osztályra hivatkozva használhatunk, azokon kívül amelyeket az örököltetett osztályban definiáltunk, mert
+            ezeket csak arra az osztály hivatkozva használhatjuk amelyikben létrehoztunk őket.
+        </para>
+            <para>
+                Megoldás forrása: <link xlink:href="https://github.command/RubiMaistro/codes-prog2/tree/master/Liskov/LSP%20elv%20s%C3%A9rt%C3%A9s">
+                Liskov elv sértése</link>
+            </para>
+        
+        <programlisting language="java"><![CDATA[
+        class Madar {
+            public void repul() {
+                System.out.println("A " + super.getClass().getSimpleName() + " repül.");
+            };
+        }
+
+        class Golya extends Madar {};
+        class Strucc extends Madar {};
+            ]]></programlisting>
+        
+        <para>
+            Jelen esetben a Strucc osztályban a Madar osztály repul() függvénye logikai hiba lesz a programban, 
+            mivel a strucc nem tud repülni.
+        </para>
+        <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img2/LSPsertes.png" format="PNG" scale="60" />
+                </imageobject>
+        </mediaobject>
+        <para>
+            A repul() függvény kiiratja az osztály nevét aztán pedig, hogy repül. Ez a Strucc osztályban is le fog futni,
+            ha pedig komplexebb programot szeretnénk konstruálni jelen programból, akkor hibásan működhet. 
+        </para>
+        <para>
+            Általában a négyzet és téglalap örökítési példájában szokták a Liskov elv sértését bemutatni, de ez egy olyan 
+            példa amelyet bárki megérthet.
+        </para>
+            <para>
+                A program elérhető C++ nyelven is a következő linken: 
+                <link xlink:href="https://github.command/RubiMaistro/codes-prog2/blob/master/Liskov/LSP%20elv%20s%C3%A9rt%C3%A9s/LSP-sertes.cpp">
+                https://github.command/RubiMaistro/codes-prog2/blob/master/Liskov/LSP%20elv%20s%C3%A9rt%C3%A9s/LSP-sertes.cpp</link>
+            </para>
+        <programlisting language="java"><![CDATA[
+
+        class Madar {
+            public:
+                void fly(string nev) {
+                    nev = nev.erase(0, 6);
+                    cout << "A " << nev << " repül.\n";
+                } 
+
+                string nev = typeid(Madar).name();
+                
+            };
+
+        class Golya : public Madar{
+            public:
+                string nev = typeid(Golya).name();
+            };
+
+        class Struc : public Madar{
+            public:
+                string nev = typeid(Struc).name();
+            };
+
+        ]]></programlisting>
+        <para>
+            A Java és C++ program csipet szintaxisban tér el egymástól. Ezért például az osztály egyszerű nevét C++-ban
+            egy kicsit másképp kell lekérni a kódban.
+        </para>
+
+    </section>
+
+
+
+
+
+    <section>
+        <title>Szülő-gyerek osztály</title>
+        <para>
+            Az osztályok örökíthetőség által létrehozott gyerek osztályban bármilyen újabb megvalósított konstrukció már nem
+            használható a nála feljebb lévő, szülő osztályban.
+        </para>
+        <para>
+            Megoldás forrása: 
+                <link xlink:href="https://github.command/RubiMaistro/codes-prog2/tree/master/Liskov/ParentChild">Parent Child Classes</link>
+        </para>
+
+        <para>
+            A program rámutat arra, hogy a gyerek osztály (Child{}) rálát a teljes szülő osztályra (Parent{}), viszont ez
+            fordítva nem igaz mivel a gyerek osztályban létrehozott child() függvényt a szülő osztály képtelen használni,
+            hiszen elérhetetlen számára.
+        </para>
+        <programlisting language="java"><![CDATA[
+        class Parent {
+            public void parent() {
+                System.out.println("Parent class.");
+            }
+        }
+
+        class Child extends Parent {
+            public void child() {
+                System.out.println("Child class");
+            }
+        }
+
+        public class ParentChild {
+
+            public static void main(String[] args) {
+                    
+                Parent parent = new Parent();
+                Child child = new Child();
+                
+                parent.parent();
+                child.parent();
+                child.child();
+                // Nem látja a szülő osztály a gyerek osztály függvényeit.
+                // parent.child();
+            }
+        }
+            ]]></programlisting>
+        <para>
+            A programban létrehozunk egy Parent osztályt amit a Child osztály örökölni fog az extends kulcsszó révén.
+            Majd mindkét osztályban létrehoztunk egy-egy függvényt.
+        </para>
+        <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img2/szuloGyerek.png" format="PNG" scale="60" />
+                </imageobject>
+        </mediaobject>
+        <para>
+            A main() fő függvény osztályban pedig példányosítjuk a Parent és Child osztályt.
+            Majd meghívjuk a parent objektum függvényét, ami hiba nélkül lefut, aztán ugyan ezt a függvényt a child objektummal
+            hívjuk, ami szintén hiba nélkül fut le az örököltetés miatt.
+            Továbbá meghívjuk a child objektummal a saját függvényét, végül a Parent osztály példányával hívnánk meg a Child 
+            osztály függvényét, de ezt nem fogja látni a felnőtt osztály, így hiba keletkezik.
+        </para>
+        <para>
+            A programot C++ nyelven is megtekinthetjük:
+        </para>
+        <para>      
+            <link xlink:href="https://github.command/RubiMaistro/codes-prog2/blob/master/Liskov/ParentChild/Szulo-gyerek.cpp">
+            https://github.command/RubiMaistro/codes-prog2/blob/master/Liskov/ParentChild/Szulo-gyerek.cpp</link>
+        </para>
+        <programlisting language="java"><![CDATA[
+        #include <iostream>
+
+        using namespace std;
+
+        class Parent {
+            public:
+                void printParent() {
+                    cout << "Parent.\n";
+                }
+            };
+
+            class Child : public Parent{
+            public:
+                void printChild() {
+                    cout << "Child.\n";
+                }
+            };
+        
+        int main() {
+
+            Parent parent;
+            Child child;
+
+            parent.printParent();
+            child.printChild();
+            child.printParent();
+
+            //parent.printChild();
+            
+            return 0;
+        }
+        ]]></programlisting>
+        <para>
+            A Java és C++ kódok csak szintaxisban térnek el egymástól.
+        </para>
+
+    </section>
+
+</chapter>

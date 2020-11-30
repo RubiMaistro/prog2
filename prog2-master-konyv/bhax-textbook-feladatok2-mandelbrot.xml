@@ -1,0 +1,475 @@
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+    <info>
+        <title>Helló, Mandelbrot!</title>
+        <keywordset>
+            <keyword/>
+        </keywordset>
+    </info>
+
+    <section>
+        <title>EPAM: OO modellezés</title>
+            <para>
+                A szoftverfejlesztésben lényeges momentum a modellezés. Amikor egy programot kódban szinten szeretnénk 
+                megvalósítani, több esetben előnyösebb előre megtervezni és átgondolni a program negyobb részeit. Ehez 
+                a program modelljét érdemes előbb létrehozni, hogy az esetleges nagyobb hibákat már a kódolás előtt orvosolni 
+                tudjuk.
+            </para>
+            <para>
+                Viszont jól modellezni egy programot nem olyan egyszerű, legalábbis ha nem akarunk sok hibát véteni már 
+                a kód megírásakor. Vannak bizonyos alapelvek amelyeket ajánlatos figyelembe venni egy modellezés megkezdése előtt. 
+                Ezeket az elveket szoftverfejlesztési filozófiáknak nevezzük.
+            </para>
+            <para>
+                Egy pár elv amelyek kulcsfontosságúak:
+            </para>
+            <para>  
+                <command>DRY</command> ( Don't Repeat Yourself ) :
+            </para>
+                <para>
+                    Amit rövidít az a "ne ismételed önmagad", szó szerint ez az elva alapja. Ez az alapelv azt 
+                    a lehetőséget kínálja, hogy használjunk keretrendszert és csökkentsük a szoftverminták ismétlődését. 
+                    Tehát ha keretrendszert használunk akkor csak azokat a feladatokat végezzük kézzel amik a legfontosabbak. 
+                    A DRY elv alapja, hogy ugyanazokat a dolgokat ne írjuk le több helyre mert akkor egy változtatáskor 
+                    szinkornban kell tartanunk a programot és minden helyen át kell írnunk, hogy optimalizált legyen.
+                </para>
+                <para>  
+                    Mivel a <command>DRY</command> magyarra fordítva <command>"száraz"</command>, így az elv megsértésére úgy 
+                    hivatkoznak, hogy <command>"nedves"</command>, ami angolra fordíva <command>WET</command>. Ezt többféleképpen feloldják, 
+                    pl: 
+                    <command>"Write Everythong Twice"</command> azaz <command>"írj mindent kétszer"</command>, vagy 
+                    <command>"waste everyone's time"</command> azaz <command>"pazaroljuk mindenki idejét"</command>. 
+                </para>
+
+            <para>
+                <command>KISS</command> ( Keep It Simple, Stupid ) :
+            </para>
+                <para>
+                    Az elvet az Egyesült Államok Haditengerészete által 1960-ban megfogalmazott programtervezési minta. 
+                    Az alapelv szerint egy rendszer akkor működik a legjobban ha azt egyszerű megfogalmazásban és kódban hagyják, 
+                    tehát ami már jól működik azt nem kell feleseleges dolgokkal kibővíteni.
+                    A <command>KISS</command> kifejezést Kelly Johnson repülőgépmérnökhöz fűzik, ami lefordíva 
+                    <command>"Tartsa röviden és egyszerűen"</command>, vagy 
+                    <command>"Tartsa kicsinek és egyszerűnek"</command>, vagy 
+                    <command>"Tartsd ostobán egyszerűnek"</command>.
+                </para>
+
+            <para>
+                <command>YAGNI</command> ( You Aren't Gonna Need It ) :
+            </para>
+                <para>
+                    Az elv lényege hasonlít az előző, azaz a KISS elvhez, hogy válasszuk az egyszerűséget. Tehát ha van egy jól 
+                    működő prgoramunk akkor azt ne bonyolítsuk, hiszen nincs értelme, azaz válasszuk mindig az egyszerű de még 
+                    működő megoldást. 
+                </para>
+                <para>
+                    Ezt az elvet akkor szokták áthágni amikor egy bizonyos programban általánosítást szeretnének bevezetni, hiszen 
+                    akkor optimális lesz a programuk működése, viszont ezzel el is bonyolódhat.
+                </para>
+
+            <para>
+                <command>SOLID</command> ( betűszó, több elv együttese ) :
+            </para>
+            <itemizedlist>
+                <listitem>
+                <para>
+                    <command>S - SRP</command> ( Egyetlen felelősség ) :
+                </para>
+                    <para>
+                        Ezen elv alapja hogy minden metódus csak egyetlen dologért legyen felelős. Mivel ha van egy olyan metódusunk ami 
+                        több dologgal is foglalkozik akkor ha meg akarjuk hívni és szükségünk van az egyik információra akkor nem csak azt 
+                        hanem minden más dolgot is megkapunk ami számunkra haszontalan információ lehet. Ha pedig minden metódus csak egy 
+                        valamire öszpontosít akkor a programkód is átláthatóbb.
+                    </para>
+                </listitem>
+                <listitem>
+                <para>
+                     <command>O - OCP</command> ( Nyitva zárva ) :
+                </para>
+                    <para>      
+                        Az alapelv lényege, hogy ha egy régebben megírt programkódt bővíteni akarunk akkor a mindig meg kell néznünk 
+                        a régebbi részeket, hogy nem-e kell azokban is változtatásokat végrehajtani. Tehát az alapja hogy minden rész a 
+                        kódban szinkronizálva legyen az újabb kódrészekhez, ezért vissza kell menni és megváltoztani.
+                    </para>
+                </listitem>
+                <listitem>
+                <para>
+                    <command>L - LSP</command> ( Liskov helyettseítési elv ) :
+                </para>
+                    <para>
+                        A Liskov elv alapján az örököltetett osztályoknak cserélhetőknek kell lenniük az alaptípusukra, 
+                        azaz az alaposztályra való hivatkozásnak helyettesíthetőnek kell lennie egy örököltetett osztályra, 
+                        anélkül, hogy ez befolyásolná a viselkedést.
+                    </para>
+                    <para>
+                        Az elv lényege, hogy ha egy B tipusú osztály az A tipusúnak egy alosztálya akkor a B tipusú objektumok
+                        helyettesíthetőek A tipusú objektumokkal, így megtartva a program tulajdonságait. Ez az elv a Liskov 
+                        fejezetben bővebben kifejtve is megtalálható.
+                    </para>
+                </listitem>
+                <listitem>
+                <para>
+                    <command>I - ISP</command> ( Interfész elkülönítési elv ) :
+                </para>
+                    <para>
+                        Ez az elv egyszerű, a Liskov elv fordítottja. A klienst nem kell arra kényszeríteni, hogy számára haszontalan
+                        dolgoktól függjön. Ha van egy metódus ami több dolgot képes elvégezni de nekünk csak egyre van szükségünk akkor 
+                        csak azt az egyet tartalmazza, azaz az Interfészeket szét kell darabolni a lehetséges különböző kérésnek megfelelően. 
+                    </para>
+                </listitem>
+                <listitem>
+                <para>
+                    <command>D - DIP</command> ( Függőségi inverzió elve ) :
+                </para>
+                    <para>
+                        Ezen elv kimondja, hogy a magasabb szintű modulok nem függhetnek alacsonyabb szintű moduloktól. Az elv az Interfészek 
+                        használatára hívja fel a figyelmet. 
+                    </para>
+                    <para>
+                        Egy példán keresztül, hogy egy főnök független attól hogy az alkalmazottai mit 
+                        dolgoznak, tehát más szóval megbízható embereket vesz fel a munkahelyre és ha valakit pedig azért nem küldhet el mert 
+                        azt a dolgot csak az az alkalmazott tudja végrehajtani, akkor már baj van hiszen függés alakult ki a magas rangban lévő 
+                        cégvezető vagy főnök és az alacsonyabb rangú, alkalmazott között.
+                    </para>
+                </listitem>
+            </itemizedlist>
+        <para>
+            A jegyzethez használt segédanyagok:
+        </para>
+            <para>
+                <link xlink:href="https://siderite.dev/blog/solid-principles-plus-dry-yagni-kiss.html/">
+                    https://siderite.dev/blog/solid-principles-plus-dry-yagni-kiss.html/</link>
+            </para>
+            <para>
+                <link xlink:href="https://hu.wikipedia.org/wiki/Szoftverfejleszt%C3%A9si_filoz%C3%B3fi%C3%A1k_list%C3%A1ja#Szoftverfejleszt%C3%A9si_filoz%C3%B3fia">
+                https://hu.wikipedia.org/wiki/Szoftverfejleszt%C3%A9si_filoz%C3%B3fi%C3%A1k_list%C3%A1ja#Szoftverfejleszt%C3%A9si_filoz%C3%B3fia</link>
+            </para>
+
+    </section>
+
+
+    <section>
+        <title>Forward engineering UML osztálydiagram</title>
+
+        <para>
+            Egy egyszerű modellezés, amely tartalmaz osztályokat, azon belül értékeket és függvényeket. Van egy ős osztály és 
+            több származtatott osztály. Mindezt egy packagebe helyeztük el.
+        </para>
+        <para>
+            Megoldás forrása:
+                <link xlink:href="https://github.com/RubiMaistro/codes-prog2/tree/master/Mandelbrot/Animal">Animal UML</link>
+        </para>
+        <para>
+            A Diagaram:
+        </para>
+        <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img2/AnimalUML.jpg" format="JPG" scale="70" />
+                </imageobject>
+        </mediaobject>
+        <para>
+            Egy <command>Zoo</command> packageben létrehoztunk egy <command>Animal</command> osztályt amelyet örököltettünk 3 másik osztályra, 
+            a <command>Tiger</command>, a <command>Monkey</command> és a <command>Dolphin</command>osztályokra. 
+            Majd az osztályokban látunk részeket és elválasztókat, a legfelső részben az attributumok helyezkednek el, majd alattuk 
+            a függvények. Az attributumoknak és a függvényeknek adhatunk tipust és nevet. A függvényeknek visszatértési értéket is beállíthatunk 
+            amit nem kell majd a kódoláskor.
+        </para>
+        <para>
+            A következő képen azok az osztályok látszanak amelyeket UML-ben terveztünk majd java kódba konvertáltunk.
+        </para>
+        <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img2/AnimalUMLalap.png" format="PNG" scale="40" />
+                </imageobject>
+        </mediaobject>
+
+        <para>
+            Azt láthatjuk hogy teljesen üresek az osztályainkban a függvényeink. Modellezéskor érdemes a programunk osztályainak
+            és azok függvényeinek csak a vázát létrehozni, aztán majd a kódban eldönthetjük, hogy hogyan működjenek a függvényeink.
+        </para>
+        <para>
+            Ebben a feladatban csak egy egyszerű UML modellezést szerettem volna szemléltetni. Ezt a kódot egy main() osztályal kiegészítve 
+            abban egy main() metódussal kiegészítettem, ami megtalálható az alábbi linken.
+        </para>
+        <para>
+            Link: 
+                <link xlink:href="https://github.com/RubiMaistro/codes-prog2/tree/master/Mandelbrot/Animal">
+                https://github.com/RubiMaistro/codes-prog2/tree/master/Mandelbrot/Animal</link>
+        </para>
+        <para>
+            Az UML-ből egy JAVA kódba konvertált program tényleges kifejtése és használata a következő feladatban mutatkozik meg igazán.
+        </para>
+        
+    </section>
+
+
+
+    <section>
+        <title>EPAM: Neptun tantárgyfelvétel modellezése UML-ben</title>
+        <para>
+            A modellezés fontosságáról és lényegéről az első feladatban, az <command>OO modellezés</command>-ben tudhatunk meg többet. 
+            Az első program amit modellezni fogunk az a jól irmert Neptunos Tárgyfelvétel lesz. 
+        </para>
+        <para>
+            Modellezni már online is lehetőségünk van, de az <command>eclipse</command> applikáció ami a javat támogatja képes a modellezésre is, ha letöltünk 
+            modellező szoftvereket. 
+        </para>
+        <para>
+            A modellünket a <command>Gyár (Factory)</command> tervezési mintára fogjuk alapozni, erről az arroway fejezetben a Creation Design Patterns részben 
+            lehet több információt megtudni. 
+        </para>
+        <para>
+            A modellező szoftverben kiválaszthatunk bármit amit létre szeretnénk hozni, egy osztályt, egy függvényt, egy attributumot vagy akár packaget.
+        </para>
+        <para>
+            A modell amelyet létrehoztunk a következőképpen néz ki:
+        </para>
+        <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img2/TargyfelvetelUML.png" format="PNG" scale="80" />
+                </imageobject>
+        </mediaobject>
+        <para>
+            Modellezéskor számításba kell vennünk milyen osztályokat szerenénk létrehozni és hogyan. Jelen esetben a tárgyfelvételhez 
+            egy egyszerű ős osztályt modellezünk, ami a <command>Tárgy</command> osztály lesz, majd megadunk az osztályhoz több tulajdonságot. 
+            Egy tárgyhoz tartoznak csoportok és ezekben férőhelyek, majd egy függvény amely visszaadja a tárgyhoz tartozó hallgatói 
+            kapacitást, ez a getHely() függvény amit abstractnak definiálunk hiszen majd kifejtjük minden tárgyra a összlétszámra való tekintetben. 
+            Majd ezt az osztályt örökítjük további osztályoknak, ezek az osztályok már a bizonyos tárgyakat fogják 
+            definiálni, jelen esetben két tárgyat hoztunk létre, a <command>Prog2</command>-t és a <command>WebTech</command>-et. 
+            Mivel ez a program egy szimulációnak felel meg ezért a tárgyfelvételben egyenlőre csak két tárgyat hoztunk létre, 
+            és hogy egy kicsit interaktiv legyen a program, szimuláljuk majd a több hallgató jelenlétét a tárgyfelvételben, de erről később.
+        </para>
+        <para>
+            Tehát létrehoztuk a két tárgyat, ezután egy segédosztályt hozunk létre a <command>getTargyNev</command> osztályt, ez az osztály 
+            fog kommunikálni a "felhasználóval és a rendszerrel", vagyis ez az osztály a tárgyakért lesz felelős. Ez az osztály csak egy függvényt 
+            tartalmaz, tehát ezen keresztül kérjük le a bizonyos tárgy osztályokat.
+        </para>
+        <para>
+            A Tárgy ős osztályban létrehozunk további függvényeket, az egyik a <command>getRand()</command> függvény ami, egy véletlenszerű számot fog létrehzoni 
+            a bizonyos osztályok maximális létszámának függvényében. A másik függvény az <command>eredmény()</command> ami a tárgyfelvétel kimeneteléről fog 
+            információkat továbbítani a képernyőre.
+        </para>
+        <para>
+            A Prog2 és Webtech osztályokban kifejtjük a <command>getRand()</command> és <command>getHely()</command> függvényeket, a randomizálás fogja 
+            szimulálni a többi hallgató jelenlétét tárgyfelvételkor, nem bonyolítva túl a programot egy hálózatra kiterjedő verzióvá, egyenlőre ennyi elég. 
+            Viszont a hallgatóknak sem foglalunk helyet egyik tárgyban sem, de ez majd látszani fog a kiiratáskor.
+        </para>
+        <para>
+            Azon részeket amelyeket később a kódban ki kell fejteni az a következő feladatban lesz bemutatva.
+        </para>
+        
+    </section>
+
+
+
+    <section>
+        <title>EPAM: Neptun tantárgyfelvétel UML diagram implementálása</title>
+
+        <para>
+            Mivel létrehoztuk a modellünket, azaz a program vázát, már csak a programkódban kell kifejteni a működésüket.
+        </para>
+        <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img2/TargyfelvetelFuttatas.png" format="PNG" scale="45" />
+                </imageobject>
+        </mediaobject>
+        <para>
+            Egy tárgyfelvétel szimulálást láthatunk a fenti képen, bal oldalon a <command>main()</command> metódust láthatjuk, 
+            jobb oldalon pedig maga a tárgyfelvétel szimuláció egyik esetleges lefutási esetét lépésről lépésre. 
+            A <command>Console</command>-ban a kék színnel írt kéréseket, más szóval a felhasználótól kért válaszokat láthatjuk.
+        </para>
+        <para>
+            A prgoramkódot a pedig a következőkben nézhetjük végig.
+        </para>
+
+       <programlisting language="java"><![CDATA[
+            package EpamUML;
+
+            abstract class Targy {
+                protected int csoport;
+                protected int ferohely;
+                abstract void getHely();
+                abstract int getRand();  
+                    
+                public void eredmeny(String muvelet, String nev) {
+                    if( muvelet.equalsIgnoreCase("FELVESZ") ) {
+                        if( getRand() < (csoport*ferohely ))
+                            System.out.println("Sikeresen felvetted a " + nev + " tárgyat a " + (int) (Math.random() * (csoport - 1) + 1 ) + ". csoportba.");
+                        else 
+                            System.out.println("A kurzusok beteltek.");
+                        
+                        for(int i=1; i<=csoport; i++) {
+                            System.out.println(i+". csoport: " + ferohely + "/" + ferohely);
+                        }
+                    }
+                    else if(muvelet.equalsIgnoreCase("LEAD")) {
+                        System.out.println("Sikeresen leadtad a " + (int) (Math.random() * (csoport - 1) + 1 ) + ". " + nev + " csoport tárgyát.");
+                    }
+                    else 
+                        System.out.println("Nincs ilyen parancs. Próbáld újra.");	
+                }
+            }
+            ]]></programlisting>
+
+        <para>
+            Az absztrakt Tárgy osztály amelyről modellezéskor beszéltünk, ami az ős osztály és ebben lesz minden tárgynak az alapja kifejtve. 
+            Először is egy pár változó, a csoport és a ferohely amelyek a tárgyakhoz tartozó létszámot definiálják. 
+        </para>
+        <para>
+            Két absztrakt osztály is helyet foglal itt amit majd kifejtünk az örökített osztályokban, majd egy <command>eredmeny()</command> függvény amit itt fejtünk ki, 
+            hogy egységesen minden örököltetett osztályban optimális legyen a működése. Ez a függvény csak ki fogja iratni a tárgyfelvétel menetét, 
+            tahát if elágazásokon keresztül implementálva, egy tárgyat képesek vagyunk felvenni és leadni, valamint ha az előbbit szeretnénk akkor 
+            lehet hogy a tárgy felvétel nem lesz sikeres a férőhelyek betelése miatt.
+        </para>
+        <para>
+            Minden véletlenszerű, hiszen nem tároljuk el egyetlen hallagtó helyét sem, mert ez a program csak egy szimuláció, egyébként a randomizálást 
+            az egyes tárgyak osztályában láthatjuk majd a létszámal arányosan kiszámíva.
+        </para>
+
+        <programlisting language="java"><![CDATA[
+            package EpamUML;
+
+            class Prog2 extends Targy {
+                public int getRand() {
+                    return (int) ((Math.random() * (120-60)) + 60);
+                }
+                public void getHely() {
+                    ferohely = 18;
+                    csoport = 5;
+                }
+            }
+
+            class WebTech extends Targy {
+                public int getRand() {
+                    return (int) ((Math.random() * (100-70)) + 70);
+                }
+                public void getHely() {
+                    ferohely = 22;
+                    csoport = 4;
+                }
+            }
+            ]]></programlisting>
+
+        <para>
+            Itt a két tárgy osztályát látjuk amelyke örökölték az ős osztály a Tárgy osztály tulajdonságait.
+            A <command>getHely()</command> és <command>getRand()</command> függvények kifejtését kell megtenni ezekben az osztályokban. 
+            Először is <command>getHely()</command> metódusban definiáljuk a tárgyhoz tartozó csoportok számát és a csoportonkénti létszámot, 
+            a Prog2-ben 5 csoport lesz és mindegyikben 18 hely, a WebTech-ben 4 csoport 22 helyekkel. 
+        </para>
+        <para>
+            Majd a <command>getRand(</command> függvény amely szimulálni fogja a hallgatókat a tárgy felvételekor, 
+            ez abban nyilvánul meg, hogy létrehozunk egy véletlenszerű számot, ami arányos az összlétszámhoz azaz lesz olyan eset amikor 
+            betelt az össze kurzus amikor fel szeretnénk venni a tárgyat és nem sikerül és lesz olyan eset amikor fel tudjuk venni.
+        </para>
+
+        <programlisting language="java"><![CDATA[
+            package EpamUML;
+
+            class getTargyNev {
+                
+                public getTargyNev(){
+                    ArrayList<String> targyak = new ArrayList<String>();
+                    targyak.add("webtech");
+                    targyak.add("prog2");
+                }
+
+                public Targy getName( String name ) {
+                    
+                    String vantargy = null;
+                    for(String i : targyak) {
+                        if(name.equalsIgnoreCase(i))
+                            vantargy = name;
+                    }
+                    if(vantargy != null) {
+                        if(name.equalsIgnoreCase("PROG2")) {
+                            return new Prog2();
+                        }
+                        else if(name.equalsIgnoreCase("WEBTECH")) {
+                            return new WebTech();
+                        } 
+                    }
+                    else {
+                            System.out.println("Helytelen tárgynév vagy művelet.");
+                            
+                        }
+                    return null;
+                }
+            }
+            ]]></programlisting>
+
+        <para>
+            Először is egy listát létrehozva és ebbe elmentve a tárgyfelvételben szereplő lehetséges tárgyakat tárolja, 
+            ezt a konstruktor fogja mindig lefuttatni, majd ha a függvényt meghívjuk akkor egy <command>for()</command> ciklusban végig megy 
+            a listán amelyben megnézni hogy a kért tárgy benne van-e a tárgyfelvételben, és ha igen értékül adja a tárgy nevét 
+            egy változónak ami majd <command>if()</command> elágazásokon keresztül eldönti melyik tárgyal szeretnénk foglalkozni, majd visszaad egy 
+            új példányt abból a tárgy osztályból, így a program vezérlés egyből ahoz a bizonyos tárgyhoz lép és folytatódik a 
+            tárgyfelvétel.
+        </para>
+
+        <programlisting language="java"><![CDATA[
+            public class Targyfelvetel {
+	
+                public static void main(String[] args) throws IOException {
+                    
+                    getTargyNev targyMelyik = new getTargyNev();
+                    
+                    BufferedReader targyfelvetel = new BufferedReader(new InputStreamReader(System.in));
+                    
+                    System.out.println("Tárgyfelvétel\n");
+                    System.out.println("Ha végeztél ird be az 'exit' kulcsszót.");
+                    boolean fut;
+                    
+                    do {
+                        
+                        System.out.println("Ird be egy tárgy nevét ( prog2 vagy webtech ) : ");
+                        String targynev = targyfelvetel.readLine();
+                        
+                        System.out.println("Felvesz vagy Lead?: ");
+                        String muvelet = targyfelvetel.readLine();
+                        
+                        Targy t = targyMelyik.getName(targynev);
+                        
+                        if(t != null) {
+                        
+                            t.getRand();
+                            t.getHely();
+                            t.eredmeny(muvelet,targynev);
+                        }
+                        
+                        System.out.println("Ha nem akarsz további műveleteket végezni\nird be az 'exit' kulcsszót egyébként nyomj entert:");
+                        String exit = targyfelvetel.readLine();
+                        if(exit.equalsIgnoreCase("EXIT"))
+                            fut = false;
+                        else 
+                            fut = true;
+                        
+                    } while ( fut == true);
+                    
+                    System.out.println("A tárgyfelvétel megtörtént.");
+                }
+            }
+            ]]></programlisting>
+         <para>
+            A fő osztályban a Tárgyfelvéltel-ben kap helyet a <command>main()</command> függvény ahol példányokat hozunk létre és ahol öszpontosítjuk a programot. 
+            Az első objektum a <command>getTargyNev()</command> osztályhoz tartozik, ami majd vissza ad nekünk egy tárgyat amit fel szeretnénk venni, erre egy kiiratásban 
+            kérdezünk rá, majd értéket adva a függvénynek visszaad egy tárgy objektumot.
+        </para>
+        <para>
+            A felhasználótól a bemenetet egy BufferedReaderrel fogjuk kezelni. Egy hátultesztelő ciklust hozunk létre amely egy <command>"exit"</command> 
+            kulcsszó beírására lezárja a tárgyfelvétel, erről egy kiiratásban a felhasználót is informáljuk. Majd a ciklusban bekérjük egy tárgy 
+            nevét, aztán a műveletet, hogy mit szeretnénk a tárggyal, felvenni vagy leadni. A Tárgy ős osztálynak létrehozunk egy példányt aminek 
+            alapján a létrehozott getTargyNev osztály példánya alapján a <command>getName()</command> függvényben a bekért tárgy nevet megnézzi hogy van-e olyan tárgy, azaz 
+            van-e olyan osztály, ha nincs akkor <command>null</command> értéket ad a t objektumnak. 
+        </para>
+        <para>
+            Az <command>if()</command> feltétel null értékre nem teljesül, csak ha van olyan tárgy osztály létrehozva mint amit bekértünk. 
+            Az <command>if()</command>-ben lefuttatjuk az <command>getRand(), getHely() és eredmeny()</command> függvényeket arra 
+            az osztályra amelyet kapott a t objektum.
+        </para>
+        <para>
+            Majd informáljuk a felhasználót, hogy ha végzett a tárgyfelvétellel akkor irja be az <command>exit</command> kulcsszót, ami a logikai változó értékét
+            <command>hamis/false</command> logikai értékre állítja, ami a ciklus futásának végét eredményezi, aztán egy kiiratásban tájékoztatjuk, hogy végetért a tárgyfelvétel.
+        </para>
+        
+    </section>
+
+</chapter>

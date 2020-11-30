@@ -1,0 +1,312 @@
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+    <info>
+        <title>Helló, Lauda!</title>
+        <keywordset>
+            <keyword/>
+        </keywordset>
+    </info>
+
+    <section>
+        <title>EPAM: Kivételkezelés</title>
+
+        <para>
+            A programok futásakor több hiba lehetőség lehet, ezt egy IOException kulcsszóval vagy akár 
+            egy try-catch használatával kiszűrhetünk, hogy ne álljon le a program.
+            A hibákat a rendszer észreveszi és feldolgozza, ezt hibakezelésnek hívjuk, 
+            majd elmenti a hiba üzenetet és mi ezeket lekérhetjük.
+        </para>
+
+        <para>
+            A hibakezelés egy olyan módjára mutat rá ez a feladata amit a programozó hibaként, avagy kivételként 
+            írt a programba, ezt kivételkezelésnek hívjuk. Bármilyen kivételt írhatunk, amit a try ágban alapozunk meg 
+            és ezt dobjuk a throw kulcsszóval egy catch ágnak amivel elkapjuk, és megmondjuk mit csináljon ebben az esetben 
+            a programunk.
+        </para>
+
+        <programlisting language="java"><![CDATA[
+            public class ExceptionHandling {
+
+            public static void main(String[] args) {
+                System.out.println("Test case when input is null!");
+                test(null);
+
+                try {
+                    System.out.println("Test case when input is float!");
+                    test(1F);
+                } catch (Exception ignored) {
+                    // Ide miért kerül a vezérlés!?
+                }
+
+                System.out.println("Test case when input is String!");
+                test("string");
+            }
+
+            private static void test(Object input) {
+                try {
+                    System.out.println("Try!");
+                    if (input instanceof Float) {
+                        throw new ChildException();
+                    } else if (input instanceof String) {
+                        throw new ParentException();
+                    } else {
+                        throw new RuntimeException();
+                    }
+                } catch (ChildException e) {
+                    System.out.println("Child Exception is caught!");
+                    if (e instanceof ParentException) {
+                        throw new ParentException();
+                    }
+                } catch (ParentException e) {
+                    System.out.println("Parent Exception is caught!");
+                    System.exit(1);
+                } catch (Exception e) {
+                    System.out.println("Exception is caught!");
+                } finally {
+                    System.out.println("Finally!\n");
+                }
+            }
+
+        }
+    ]]></programlisting>
+
+        <para>
+            Azt vehetjük észre, hogy egy test() metódust hívunk meg, melynek először egy null, 
+            majd egy float és végül egy String tipustú értéket adtunk meg. 
+            Mindhárom esetben, máshogyan fog a kód lefutni. A kérdés, hogy a finally ág minden 
+            esetben le fog e futni?
+        </para>
+
+        <para>
+            A null értékre a test() függvényen belül a try-ban végig meg a feltételeken és 
+            mivel nem float vagy String tipusú az érték ezért, az egyszerű Exception kivételt 
+            kezelő catch ág kapja el, majd kiiratja, hogy elkapta és vegül a finally ág lefut, 
+            ezzel jelezve a tesztelés végét.
+        </para>
+
+        <para>
+            A float értékre a test() függvény felsimeri, hogy ez egy float ezért dob egy ChildException-t 
+            ami először egy új ParentException hoz létre, aztán a ChildExceptiont a konstrukorok eredményeképp, 
+            ezeket kiiratta a képernyőre. A catch ág elkapja a ChildException-t, majd kiirat és létrehozza 
+            az objektumot, végül a finally ág is lefut, ezennel vége a tesztelésnek.
+        </para>
+
+        <para>
+            A String értékre pedig a test() függvény felismeri, a Stringet és a floathoz hasonlóan dob egy kivételt, 
+            viszont itt egy ParentExceptiont, amit a megfelelő catch elkap és kiirat, viszont itt 
+            egy érdekes dolog törénik még. Egy System.exit(1) paranccsal megállítjuk a futást, ezért 
+            a finally ág már nem fog lefutni, mivel jelezte a program, hogy egy bizonyos pontnál álljon 
+            meg a kivételkezelés.
+        </para>
+
+        <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img2/exception.png" format="PNG" scale="60" />
+                </imageobject>
+        </mediaobject>
+
+    </section>
+
+
+    <section>
+        <title>Port scan</title>
+
+        <para>
+            A Port Scan azt mutatja meg, hogy egy hálózatnak melyik portjai nyitottak a kommunikációra. 
+            A kódrészlet Bátfai Norbert Tanár Úr egyik projektjéből származik, amelyben az előző 
+            feladatban tárgyalt kivételen van a hangsúly.
+        </para>
+
+        <programlisting language="java"><![CDATA[
+            public class portMain {
+
+                public static void main(String[] args) {
+                    
+                    for(int i=0; i<1024; ++i)
+                        try {
+                            java.net.Socket socket = new java.net.Socket( args[0], i);
+                            
+                            System.out.println(i + " figyeli");
+                            
+                            socket.close();
+                            
+                        } catch (Exception e) {
+                            
+                        System.out.println(i + " nem figyeli");
+                    }
+                }
+            }
+        ]]></programlisting>
+
+        <para>
+            A programunk azt nézi át, hogy melyik portunkat figyeli épp a számítógép. Láthatjuk hogy a program egy
+            for() ciklusbol, azon belül egy try-catch-ből áll. A program lényege a try blokkon belül van, mégpedig 
+            a "java.net.Socket socket = new java.net.Socket(args[0], i);" részben. A for ciklus 1024-ig fut, tehát 
+            az ez alatti portjainkat fogjuk vizsgálni. A vizsgálathoz az argumentumként megkapott IP-címmel 
+            próbálunk meg egy TCP kapcsolatot létrehozni. A try blokkban említett sor fogja ezt megpróbálni. 
+            Ha sikerült a kapcsolat létrehozása akkor kiíratjuk, hogy "figyeli". Ezek után az új socketet amit 
+            nyitottunk be is zárjuk, hogy feloldjuk a lefoglalt portot. Ha viszont a kapcsolat nem sikerült, 
+            akkor az Expection lép életbe, ami kiírja, hogy nem figyeli a portot a gép.
+        </para>
+
+        <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img2/portScan.png" format="PNG" scale="60" />
+                </imageobject>
+        </mediaobject>
+
+        <para>
+            A kivételeket a program futása közben használjuk, és a futás közbeni hiba hatására megszakíthatják a program futását. 
+            Ilyenkor egy objektum jön létre, ebbe lesz a hiba típusa, programunk állapota. 
+            Két féle kivételrol beszélhetünk. Egyik a program futása közben jön létre, erre példák az indexelési kivételek, 
+            hibás számítások okozta kivételek. A másik fajtája amik nem a futás alatt jöttek létre, ilyen például az I/O kivételek. 
+            A fenti programunk abban az esetben fog kivételt adni, ha a nem figyeli a portot. 
+        </para>
+        
+    </section>
+
+
+    <section>
+        <title>Junit teszt</title>
+
+        <para>
+            A JUnit a Java nyelnek egy egyszégteszt keresztrendszere, amellyel megvizsgálhatjuk, hogy egy program 
+            megfeleloen fog-e működni. A programot egyfajta teszt alá vetjük, amelyben a program minden lehetséges 
+            módon való felahsználását és a hibalehetőségeket teszteljük le.
+            Tanár úr által megadott ProgPateres eredmények alapján fogjuk elvégezni a Binfa javás verzióján. 
+            A BinFa Tesztelő a következő:
+        </para>
+
+        <programlisting language="java"><![CDATA[
+            import static org.junit.jupiter.api.Assertions.*;
+            import org.junit.jupiter.api.Test;
+
+            class BinfaTest {
+                LZWBinFa binfa = new LZWBinFa();
+
+                @Test
+                void test() {
+                    for (char c: "011110010010010000111".toCharArray())
+                        binfa.egyBitFeldolg(c);
+                
+                    assertEquals(4, binfa.getMelyseg(),0.0);
+                    assertEquals(2.75, binfa.getAtlag(),0.001);
+                    assertEquals(0.957427, binfa.getSzoras(), 0.0001);
+                }
+            }
+        ]]></programlisting>
+
+        <para>
+            Létrehoztunk egy BinfaTest osztályt amiben példányosítottuk az LZWBinFa osztályt, 
+            ezt a létrehozott objektumot fogjuk tesztelni. A teszteléshez egy test() metódust hoztunk létre, 
+            ahol egy for() ciklusban végig olvassuk a megadott karaktereket egy karaktereket tartalmazó tömbben 
+            és feldolgozzuk a binfa objektum egyBitFeldog() metódusával. Végül a tesztelés sikeres kell legyen, 
+            ha a mélység, az átlag és a szórás megegyezik a papíron előre kiszámolt eredményekkel. 
+            Az összehasonlítást assertEquals() metódussal végezzük és első paraméter a kiszámolt eredmény, 
+            amit a második paraméterrel hasonlít össze, ami a tesztelés alatt kiszámolt értékek a megadott 
+            bementi karakterek alapján, és végül a harmadik paraméter az egyezéstől való eltérések mértéke.
+        </para>
+
+        <para>
+            A teszt futtatása sikeres volt, ez azt jelenti, hogy megfelelően működik a BinFa program.
+        </para>
+
+        <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img2/binfaTestGood.png" format="PNG" scale="60" />
+                </imageobject>
+        </mediaobject>
+
+        <para>
+            Érdekességképpen a bemenet elejére írtunk pluszba egy 1-est, ekkor a következő 
+            eredményeket kaptuk a teszteléskor.
+        </para>
+
+        <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img2/binfaTestBad.png" format="PNG" scale="60" />
+                </imageobject>
+        </mediaobject>
+
+        <para>
+            Hibát talált hiszen egy plusz karakter megváltoztatja az egész Binfa értékeit.
+        </para>
+
+    </section>
+
+
+    <section>
+        <title>AOP</title>
+
+        <para>
+            Az AOP (Aspect Orientated Programming) egy programozási paradigma, ami az OOP paradigmával 
+            szemben nem csak objektumokkal foglalkozik, hanem vonatkozásokkal avagy feltételekkel. 
+            Az AOP bővebb kifejtése a következő fejezetben az EPAM: AOP feladatban megtekinthető, 
+            ahol bonyolultabb program kódokat is megtekinthetünk.
+        </para>
+
+        <para>
+            Ebben a feladatban csupán az AOP egy másik oldalát nézzük meg, amely a parancssorban való hivással 
+            és a kapcsolók helyes használatával foglakozik, valamit egy rövid és egyszerű kód is rendelkezésre áll. 
+            Az AOP-t akkor használjuk, amikor egy már meglévő programot úgy modosítunk, 
+            hogy a forrás kódot nem szeretnénk módosítani, ezt átszövésnek hívjuk. 
+            Az átszövéssel tudunk modosítani a program működésén. 
+            Mi most az LZWBinfa javas verziójának kiíratásán fogunk modosítani.
+        </para>
+
+        <programlisting language="java"><![CDATA[
+            privileged aspect BinfaAspect{
+                void around(LZWBinFa fa, LZWBinFa.Csomopont elem, java.io.PrintWriter os) 
+                :
+                target(fa) 
+                && call(public void 
+                        LZWBinFa.kiir(LZWBinFa.Csomopont, java.io.PrintWriter)) 
+                && args(elem, os){
+                    if (elem != null){
+                        ++fa.melyseg;
+
+                        for (int i = 0; i < fa.melyseg; ++i)
+                            os.write("---");
+
+                        os.write(elem.getBetu () + "(" + (fa.melyseg - 1) + ")\n");
+                        fa.kiir(elem.nullasGyermek (), os);
+                        fa.kiir(elem.egyesGyermek (), os);
+                        --fa.melyseg;
+                    }
+                }
+            }
+        ]]></programlisting>
+
+        <para>
+            A kódunk a privileged kulcsszóval indul, erre azért van szükség, hogy az Aspect hozzá férjen az LZWBinfa privát részeihez, 
+            ezután jön az aspect kulcsszó és a neve, egy átszövést így tudunk jelölni. Az aspect törzsébe megadjuk a következőképpen azt a bizonyos 
+            függvényt amit át akarunk majd szőni. Először adunk egy nevet, ez az around() függvény lesz, ez lesz az átszövés. 
+            Majd megadjuk melyik függvényt használjuk ehez, jelen esetben ez az LZWBinFa.kiir() metódus lesz. 
+            Ez a függvény kapja meg paraméterül a szükséges paramétereket a Binfábol. A függvénynek meg kell adnunk az összes paraméterét és 
+            az around paramétereit. Ezek után a kiir függvényt modosítjuk úgy, hogy postorder helyett preorder kiiratás legyen. 
+            A futtatásnál hozzá kell fűznünk a szövést a binfához. Ehez szükésg lesz az aspectjrt.jar mappára.
+        </para>
+
+        <para>
+            Parancssori futtatásnál megadjuk az elérési útvonalat, majd hozzá adjuk az aspectjrt-t, aztán az BinFa osztályt, 
+            amit a bemeneti fájlban követ, végül egy -o kapcsolóval megdunk egy kimeneti fájlt.
+        </para>
+
+        <programlisting language="java"><![CDATA[
+            java -classpath ./aspectjrt-1.6.7.jar: LZWBinFa teszt.txt -o eredmeny2.txt
+        ]]></programlisting>
+
+        <para>
+            Az átszövés sikeres volt, hiszen a fabejárás post order helyett inorder módon történt.
+            Az átszövésben és a linuxos környezet biztosításában Kiss Máté segédkezett.
+        </para>
+
+        <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img2/binfa.png" format="PNG" scale="60" />
+                </imageobject>
+        </mediaobject>
+        
+
+    </section>
+    
+</chapter>

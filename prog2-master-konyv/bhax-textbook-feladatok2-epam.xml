@@ -1,0 +1,644 @@
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+    <info>
+        <title>Helló, (Unknow)! Helló, EPAM!</title>
+        <keywordset>
+            <keyword/>
+        </keywordset>
+    </info>
+
+    <section>
+        <title>EPAM: Titkos üzenet, száll a gépben!</title>
+            
+        <para>
+            Ebben a feladatban egy olyan alkalmazást nézünk ami a parancssorból bejövő ascii karakterekből 
+            álló sorokat kódolja, a Caesar Cipher kódolási stílust használjuk a programban a kódoláshoz.
+        </para>
+
+        <para>
+            A Caesar Cipher egy olyan kódolási tipus ami egy karaktert egy másik karakterrel cserél ki. 
+            Egy szám érték függvényében fogja cserélni a karaktereket, egy karaktert úgy cserél, hogy 
+            egy előre megadott ascii karakterkészletben egy szám értékének megfelelően lép tovább a 
+            következő karakterre és új értéket ad.
+        </para>
+        
+        <para>
+            A program ami a kódolást végzi a következő. Először a main() metódust nézzük.
+        </para>
+
+        <programlisting language="java"><![CDATA[
+            public class Main {
+
+            public static void main(String[] args) {
+                
+                try {
+                    
+                    BufferedReader read = new BufferedReader(new InputStreamReader(System.in));
+                    EasyCaesarCipher code = new EasyCaesarCipher();
+                    
+                    System.out.print("Irja be a kódolandó szöveget: ");
+                    code.setText(read.readLine());
+                    
+                    System.out.print("A kódolt szöveg a következő: ");
+                    code.print(code.encoding(code.text));
+                        
+                    String codingText = code.encoding(code.text);
+                    
+                        System.out.print("Kódolt szöveg visszfejtése: ");
+                        code.print(code.decoding(codingText));
+                    
+                    String input, output;
+                    
+                        System.out.print("Irja be a kódolandó fájl nevét: ");
+                        input = read.readLine();
+                        System.out.print("Irja be a kimeneti fájl nevét: ");
+                        output = read.readLine();
+                        System.out.print("Irja be a kódolás módját ( encoding, decoding ): ");
+                        code.what = read.readLine();
+                    
+                    code.writeFromFileToFile(input, output);
+                    
+                } catch (IOException e) {
+                    
+                    e.printStackTrace();  
+                }
+            }
+        }
+        ]]></programlisting>
+
+        <para>
+            A main() metódusban egy try-catch hibakezelést láthatunk, amelyben definiálunk egy olvasót ami 
+            ami a felhasználó által a konzolba írt szöveget fogja olvasni. Majd láthatunk egy példányosítást, 
+            az EasyCaesarCipher osztály tulajdonképpen a kódolásért felelős. A felhasználótól bekérünk egy egyszerű 
+            szöveget amit kódolni szeretne, majd ezt a szöveget megadjuk a létrehozott objektumnak, amivel a program 
+            fog tovább foglalkozni. Majd egy újabb kiiratásban a felhasználó által megadott szöveg kódolva, a programban 
+            a Kódolást az encoding() metódus végzi el. 
+        </para>
+        <para>
+            A program képes Dekódolás is végrehajtani, ezt a decoding() metódus segítségével teszi. 
+            Létrehoztunk egy String tipusú codingText nevű változót ahova elmentjük az encoding() metódus 
+            eredményét, azaz a kódolt szöveget. Az osztálynak van saját szöveg kiirató metódusa, ez a print() metódus.
+        </para>
+        <para>
+            A program képes kódolni konzol bemenetről is és fájl bemenetről is. Most következik egy fájlban tárolt szöveg 
+            kódolása amely úgyan úgy működik mint a konzolból olvasás során való kódolás, viszont a kódolt szöveg egy másik 
+            fájlba fog íródni. A kódoláskoz két String tipusú változót hoztunk létre amelyek az input és az output. 
+            Az inputnak értékül bekéri a program a felhasználótól a kódolandó fájl nevét kiterjesztéssel együtt, 
+            majd az outputnak értékül azt a fájl nevet kiterjesztéssel együtt ahova a kódolt fájlt várjuk. 
+            Megkérdezi a program, hogy kódolásra vagy dekódolásra fogjuk használni. 
+            Majd az objektum meghívja a writeFromFileToFile() metódust ami végrehajtja az előbb ismertetett műveletet.
+        </para>
+
+        <mediaobject>
+            <imageobject>
+                    <imagedata fileref="img2/caesar_encoding.png" format="PNG" scale="100" />
+            </imageobject>
+        </mediaobject>
+
+        <para>
+            Mivel már tudjuk a program felhasználási lehetőségeit, nézzük meg, hogyan megy végbe mindez. 
+            A már említett EasyCaesarCipher osztály a következő: 
+        </para>
+
+        <programlisting language="java"><![CDATA[
+            import java.io.File;
+            import java.io.FileWriter;
+            import java.io.IOException;
+            import java.util.Scanner;
+
+            interface abc {
+                
+                char[] CharArrayAbc = {	'a', 'b', 'c', 'd', 'e', 
+                                        'f', 'g', 'h', 'i', 'j', 
+                                        'k', 'l', 'm', 'n', 'o', 
+                                        'p', 'q', 'r', 's', 't', 
+                                        'u', 'v', 'w', 'x', 'y', 
+                                        'z'	};
+            }
+
+            public class EasyCaesarCipher implements abc {
+                
+                private int offset;
+                public String text, coded, decoded, what;
+                
+                EasyCaesarCipher () {
+                    this.offset = 1;
+                }
+                
+                EasyCaesarCipher (int start) {
+                    this.offset = start;
+                }
+                
+                public void print (String str) {
+                    System.out.println(str);
+                }
+                
+                public void setText (String str) {
+                    this.text = str;
+                }
+                
+            ]]></programlisting>
+
+            <para>
+                A program által használt osztályok, a File, a FileWriter, az IOException és a Scanner, mivel fájlokkal is foglakozik a program. 
+                Egy interfészt láthatunk amely egy karakterekből álló tömböt tartalmaz, ez tárolja az ábécét amit a program használni fog. 
+                Aztán az EasyCaesarCipher osztály amibe implementáljuk az interfészt amiben először egy private változó van, 
+                ez lesz a kódolás kulcsa, hiszen ez tartalmazni fog egy egész szám értéket ami alapján a kódolást végezi a program. 
+                Majd további változók, a text ami tárolja a kódolandó szöveget, a coded változó majd a kódolt szöveget, 
+                a decoded változó pedig majd a dekódolt szöveget tartalmazza, végül a what változó tartalmazza, 
+                hogy mire használja a felhasználó a programot, azaz a program módját (kódolás vagy dekódolás).
+            </para>
+            <para>
+                Majd két kontruktor következik amelyek beállítják az offsetet azaz a kulcs értékét amelyet a felhasználó adhat meg az objektum 
+                létrehozásakor paraméterként, az első standard állapot 1 értéket ad meg amikor ezt a felhasználó nem adja meg, és a második 
+                pedig beállítja a kapott értéket. Az első függvény a print() amely egy egyszerű konzolra iratást eredményez. 
+                A második függvény pedig a setText() függvény amely eltárolja a kódolandó szöveget a text változóba.
+            </para>
+
+            <programlisting language="java"><![CDATA[
+            // Kódolás
+                public String encoding (String str) {
+                    
+                    coded = str;
+                    
+                    char ch[] = coded.toCharArray();
+                    
+                    for (int i = 0; i < coded.length(); i++) {
+                        
+                        int index = getIndex(ch[i]);
+                        char CHAR = ch[i];
+                        
+                        if (isInAbc (ch[i])) {
+                            
+                            if (index + this.offset < CharArrayAbc.length) 
+                                ch[i] = CharArrayAbc[ index + this.offset ];
+                            
+                            else if (index + this.offset >= CharArrayAbc.length)
+                                ch[i] = CharArrayAbc[ index + this.offset - CharArrayAbc.length ];
+                        }
+                        
+                        if ( Character.isUpperCase(CHAR) )
+                            ch[i] = Character.toUpperCase(ch[i]);	
+                    } 
+                    
+                    coded = new String(ch);
+                    
+                    return coded;
+                }
+            ]]></programlisting>
+
+            <para>
+                Most következik a kódolást végző encoding() metódus amely egy paraméterként megadott szöveget fog kódolni. 
+                Ezt a szöveget felbontja karakterekre és tárolja egy tömbben, amin egy for() ciklussal iterál végig. 
+                Egy index nevű változóba az adott karakternek az CharArrayAbc tömbben lévő indexét adjuk meg, amelyet a getIndex() 
+                függvény fog megadni. Minden egyes karaktert elmentünk a CHAR változóba. 
+                Egy if() feltételben megvizsgáljuk, hogy benne van-e a CharArrayAbc-ben az adott karakter, ezt azért tesszük, 
+                hogy ne szálljon el a program, ha olyan karaktert kellene kódoljon ami számára nem definiált a saját ábécéjében.
+                Most értünk el a kódolás részhez ami nagyon egyszerű. A CharArrayAbc-ben az offset értékének megfelelően fogja eltolni 
+                az adott karaker indexet így egy másik karaktert eredményezve, azaz melyik karaktert milyen karakterré kell kódolni. 
+                Az if elágazás tulajdonképpen, azt segíti elő hogy ezt a tologatás körkörös legyen, azaz ha egy karakter indexet eltolva 
+                az új index kimutat a tömbből, a program hibát jelezne. Az utolsó if() feltételben megvizsgáljuk, hogy ha nagy betűs karakterről 
+                van szó akkor a kódolt karakter is nagybetűs legyen. Miután végigfutott a program a tömbön, vissza írja a 
+                coded Stringbe a kódolt szöveget, majd visszaadja.
+                
+            </para>
+
+            <programlisting language="java"><![CDATA[
+                // Benne van-e a CharArrayAbc-ben?
+                public boolean isInAbc(char ch) {
+                    
+                    for (int i = 0; i < CharArrayAbc.length; i++) {
+                        if(  Character.toLowerCase(ch) == CharArrayAbc[i] )  
+                            return true;
+                    }
+                    return false;
+                }
+                
+            
+                // A paraméterben kapott karakternek megkeresi az indexét ha nem találja akkor -1 értékkel tér vissza
+                public int getIndex (char ch) {
+                
+                    for (int i = 0; i < CharArrayAbc.length; i++) {
+                        
+                        if( Character.toLowerCase(ch) == CharArrayAbc[i] ) {
+                            return i;
+                        }        
+                    }
+                    return -1;
+                }
+
+            ]]></programlisting>
+
+            <para>
+                Itt látjuk a két segéd függvényt amelyeket a kódoláskor már láthattunk. 
+                Az első eldönti egy paraméterként kapott karakterről, hogy benne van-e a 
+                CharArrayAbc-ben és egy logikai értékkel tér vissza. 
+                A második pedig egy paraméterként kapott karakternek a CharArrayAbc-ben 
+                lévő indexével tér vissza.
+            </para>
+
+            <programlisting language="java"><![CDATA[
+                // Dekódolás
+                public String decoding (String str) {
+                    
+                    decoded = str;
+                    char ch[] = decoded.toCharArray();
+                    
+                    for (int i = 0; i < decoded.length(); i++) {
+                        
+                        int index = getIndex(ch[i]);
+                        char CHAR = ch[i];
+                        
+                        if (isInAbc (ch[i]) & index != -1) {
+                            
+                            if (index - this.offset >= 0) 
+                                ch[i] = CharArrayAbc[ index - this.offset ];
+                            
+                            else if (index - this.offset < 0)
+                                ch[i] = CharArrayAbc[ index - this.offset + CharArrayAbc.length ];
+                        }
+                        
+                        if ( Character.isUpperCase(CHAR) )
+                            ch[i] = Character.toUpperCase(ch[i]);		          		
+                    } 
+                    
+                    decoded = new String(ch);
+                    
+                    return decoded;
+                }
+            ]]></programlisting>
+
+            <para>
+                A dekódolást a decoding() metódus végzi. Ez nagyrész megegyezik a coding() a kódoló metódussal, 
+                viszont ha a kódoló és dekódoló függvények két külön osztályban lennének, ez nem számítana hiszen 
+                a dekódolásra nagy szükség van az offset kulcs értékére és az ábécére. Hiszen ez alapján tudjuk, hogy kódolásnál 
+                mennyi volt az index különbség. Tulajdonképpen ez a metódus az indexeket csökkenteni fogja, másszóval 
+                az ábécében ellenkező irányba fogja elvégezni a tologatást.
+            </para>
+
+            <programlisting language="java"><![CDATA[
+                public void writeFromFileToFile(String input, String output) throws IOException {
+                    
+                    File myobj = new File(input);
+                    FileWriter fwriter = new FileWriter(output);
+                    Scanner myReader = new Scanner(myobj);
+                    
+                    while(myReader.hasNextLine()) {
+                        String data = myReader.nextLine();
+                
+                        if ( this.what.equalsIgnoreCase("encoding") )
+                            fwriter.write(encoding(data) + "\n");
+                        else if ( this.what.equalsIgnoreCase("decoding") )
+                            fwriter.write(decoding(data) + "\n");
+                    }
+                    
+                    if ( this.what.equalsIgnoreCase("encoding"))
+                        System.out.println("A titkositandó " + input + " fájl titkositása a(z) " 
+                                + output + " fájlba iródott."); 
+                    if ( this.what.equalsIgnoreCase("decoding"))
+                        System.out.println("A(z) " + input + " titkositott fájl visszafejtése a(z) " 
+                                + output + " fájlba iródott."); 
+                    
+                    fwriter.close();
+                    myReader.close();
+                    
+                }
+
+        ]]></programlisting>
+
+        <para>
+            Végül az utolsó függvény amely a fájlkezelésért felelős. Paraméterben kap egy input és egy output fájlt. 
+            Az input tartalmazza a kódolandó szöveget, az output fájl pedig tartalmazni fogja a kódolt szöveget. 
+            Először megnyitjuk az input fájlt, majd egy writerrel fogjuk majd írni és egy scannerrel pedig olvasni. 
+            Egy while() ciklussal addig olvassuk a fájlt amíg végig nem olvasstuk. Soronként olvassuk, ezeket mindig 
+            elmentjük a string tipusú data nevű változóba. Majd egy if() elágazásnál megállapítja a program, 
+            hogy kódoljuk vagy dekódoljuk, azaz hogy milyen módban van a fájl amit felhsználó adott meg. 
+            A fájl writer a write() metódussal fog a fájlba írni, a metódusnak megadjuk az encoding() vagy decoding() 
+            függvényt, majd ennek a függvénynek paraméterként a fájlból olvasott eltárolt sort, így a függvény vissza fogja 
+            adni a szüveget kódolva és ki fogja írni egy fájlba a writer. Végül a felhaszálónak információként 
+            kiirjuk hogy az általa kért művelet végrehajtódott és bezárjuk a fájl írót és olvasót.
+        </para>
+
+        <para>
+            Végül egy dekódolás. A fent megadott futási kép alapján láttuk, hogy kódolta a felhasználó által 
+            megadott fájlban lévő szöveget. Most ezt a kódolt szöveget adjuk a programnak, hogy dekódolja és 
+            tulajdonképpen az eredeti szöveget kell visszakapnunk.
+        </para>
+
+        <mediaobject>
+            <imageobject>
+                    <imagedata fileref="img2/caesar_decoding.png" format="PNG" scale="100" />
+            </imageobject>
+        </mediaobject>
+
+            <programlisting language="java"><![CDATA[
+
+                @Override
+                public int hashCode() {
+                    final int prime = 31;
+                    int result = 1;
+                    result = prime * result + ((coded == null) ? 0 : coded.hashCode());
+                    result = prime * result + ((decoded == null) ? 0 : decoded.hashCode());
+                    result = prime * result + offset;
+                    result = prime * result + ((text == null) ? 0 : text.hashCode());
+                    result = prime * result + ((what == null) ? 0 : what.hashCode());
+                    return result;
+                }
+
+                @Override
+                public boolean equals(Object obj) {
+                    if (this == obj)
+                        return true;
+                    if (obj == null)
+                        return false;
+                    if (getClass() != obj.getClass())
+                        return false;
+                    EasyCaesarCipher other = (EasyCaesarCipher) obj;
+                    if (coded == null) {
+                        if (other.coded != null)
+                            return false;
+                    } else if (!coded.equals(other.coded))
+                        return false;
+                    if (decoded == null) {
+                        if (other.decoded != null)
+                            return false;
+                    } else if (!decoded.equals(other.decoded))
+                        return false;
+                    if (offset != other.offset)
+                        return false;
+                    if (text == null) {
+                        if (other.text != null)
+                            return false;
+                    } else if (!text.equals(other.text))
+                        return false;
+                    if (what == null) {
+                        if (other.what != null)
+                            return false;
+                    } else if (!what.equals(other.what))
+                        return false;
+                    return true;
+                }
+            }
+            ]]></programlisting>
+
+        <para>
+            Beépített metódusok felüldefiniálásait itt láthatjuk, 
+            amelyekre szükség volt a program optimális működése érdekében.
+        </para>
+
+    </section>
+
+
+
+    <section>
+        <title>EPAM: ASCII Art</title>
+
+        <para>
+            Ebben a feladatban az ascii karakterekkel foglalkozunk, lényegében egy tetszőleges képet olvasunk be,
+            amit ascii karakterekkel rajzolunk a konzolra. Ez azt jelenti, hogy a kép képpontjai ascii karakterekből 
+            állnak, ezért habár a képet nem eredeti állapotában látjuk, de a karakterek szimmetriájának köszönhetően 
+            jól felismerhető lesz a kép implementációja.
+        </para>
+        
+        <para>
+            A programkód a következő
+        </para>
+
+        <programlisting language="java"><![CDATA[
+            import java.awt.image.BufferedImage;
+            import java.io.IOException;
+            import java.io.OutputStream;
+
+            public class AsciiPrinter {
+
+                private static final char[] ASCII_PIXELS = { 'O', '_', '-', '*', '+', 'p', 'b'};
+                private static final byte[] NEW_LINE = "\n".getBytes();
+
+                private OutputStream outputStream;
+                private BufferedImage image;
+
+                public AsciiPrinter(OutputStream outputStream, BufferedImage image) {
+                    this.outputStream = outputStream;
+                    this.image = image;
+                }
+
+        ]]></programlisting>
+
+        <para>
+            Egyetlen osztályban meg lehet oldani az egészet. Az AsciiPrinter osztály lesz felelős azért, 
+            hogy végbemenjen a képfeldolgozás. Mivel ASCII karakterekkel helyettesítjük a képpontokat, 
+            ezért ehez létrehoztunk változókat, egy char tipusú tömböt amiben a karaktereket tároljuk 
+            és egy byte tipus tömböt ami tárolni fog egy sortörést. Két private változót is létrehozunk, 
+            ezek kezelik a I/O részt, melyik képet olvassunk be és hol jelenítjük meg.
+        </para>
+
+        <para>
+            Az első függvény az AsciiPrinter() függvény amit a felhasználó hív meg, a kép beolvasásához. 
+            Ez eltárolja a kép elérési útját és azt a fájlt ahová elmenti e képet.
+        </para>
+
+        <programlisting language="java"><![CDATA[
+            public void print() throws IOException {
+                    for (int i = 0; i < image.getHeight(); i++) {
+                        for (int j = 0; j < image.getWidth(); j++) {
+                            outputStream.write(getAsciiChar(image.getRGB(j, i)));
+                        }
+                        outputStream.write(NEW_LINE);
+                    }
+                }
+
+                public static char getAsciiChar(int pixel) {
+                    return getAsciiCharFromGrayScale(getGreyScale(pixel));
+                }
+
+                public static int getGreyScale(int argb) {
+                    int red = (argb >> 15) & 0xff;
+                    int green = (argb >> 8) & 0xff;
+                    int blue = (argb) & 0xff;
+                    return (red + green + blue) / 3;
+                }
+
+                public static char getAsciiCharFromGrayScale(int greyScale) {
+                    return ASCII_PIXELS[greyScale / 51];
+                }
+
+            }
+        ]]></programlisting>
+
+        <para>
+            A következő a print() metódus, ez fogja végrehajtani lényegében a kiiratást. 
+            A kép pixeljein egy XY koordináta rendszer alapján iterál végig a program, amit két for() ciklus 
+            segítségével visz véghez. A második ciklusban az outputStreambe iratjuk a pixeleket karakterek formájában, 
+            ezt a write() metódus teszi lehetővé, amely paraméterként kapja a getAsciiChar() metódust. Ez a metódus visszatérési 
+            értékként a getAsciiCharFromGrayScale() metódus ami paraméterben a kép egy bizonyos pixeljét kapja, 
+            amit a getRGB() metódussal adunk át. Majd a getAsciiCharFromGrayScale() metódus paraméterként kapja a 
+            getGreyScale() metódust ami azt az egy pixel alapján tér vissza egy színkódból számított számmal, 
+            és ezt a számot egy tetszőleges prímszámmal osztva kapunk egy indexet amely ez egyik karakter indexe lesz a tömbben.
+        </para>
+
+        <para>
+            A getAsciiCharFromGrayScale() metódus kap egy egész változót, majd ezt a változót 
+            osztja egy bizonyos számmal és az ASCII_PIXELS tömbből visszaadja az egyik karaktert 
+            az új számot indexkét felhasználva.
+        </para>
+
+        <para>
+            A getGreyScale() metódus paraméterként kapja az egyik pixelt és ezt lebontja piros, zöld és kék 
+            színcsatornákra majd végül visszatér az átlagukkal.
+        </para>
+
+        <para>
+            A getAsciiChar() metódus paraméterként kapja a pixelt és átadja a getGreyScale() metódusnak, 
+            majd ez a függvény adja vissza az előbb említett két metódus eggyüttesét.
+        </para>
+
+        <programlisting language="java"><![CDATA[
+
+        ]]></programlisting>
+
+        <programlisting language="java"><![CDATA[
+            import java.awt.image.BufferedImage;
+            import java.io.File;
+            import java.io.FileOutputStream;
+            import java.io.IOException;
+            import java.io.OutputStream;
+
+            import javax.imageio.ImageIO;
+
+            public class Main {
+
+                public static void main(String[] args) throws IOException {
+                    String imageName = "D:\\University\\3.felev\\prog2-master-konyv\\img2\\smiley.png";
+                    String textFileName = args.length != 2 ? null : args[1];
+                    OutputStream outputStream = textFileName == null ? System.out : new FileOutputStream(textFileName);
+                    BufferedImage image = ImageIO.read(new File(imageName));
+
+                    new AsciiPrinter(outputStream, image).print();
+                }
+            }
+        ]]></programlisting>
+
+        <para>
+            Eredeti kép
+        </para>
+
+        <mediaobject>
+            <imageobject>
+                    <imagedata fileref="img2/smiley.png" format="PNG" scale="200" />
+            </imageobject>
+        </mediaobject>     
+
+        <para>
+            Feldolgozás utáni kép ASCII karakterekkel megjelenítve
+        </para>
+
+        <mediaobject>
+            <imageobject>
+                    <imagedata fileref="img2/ascii_art.png" format="PNG" scale="50" />
+            </imageobject>
+        </mediaobject>
+
+    </section>
+
+
+
+    <section>
+        <title>OOCWC Boost ASIO hálózatkezelése</title>
+
+        <para>
+            Feladatunk hogy mutassunk rá a scanf szerepére és használatára, a megadott forráskódban. 
+            A scanf() egy függvény, amely az std bemenetről olvas be a függvényben megadott paraméterek szerint. 
+            Paraméterezése ugyan olyan, mint a már ismert printf függvénynek, viszont ez az ellentétes irányú függvénye. 
+            Bemenetet vár, majd ezt olvassa be a programnak.
+        </para>
+
+        <para>
+            Forrás link: 
+            <link xlink:href="https://github.com/nbatfai/robocar-emulator/blob/master/justine/rcemu/src/carlexer.ll">
+                https://github.com/nbatfai/robocar-emulator/blob/master/justine/rcemu/src/carlexer.ll</link>
+        </para>
+
+        <para>
+            Nem szükséges ez egész programkódot megjelenítani, hiszen egy-két példán keresztül 
+            meg lehet érteni a függvény működését.
+        </para>
+
+        <programlisting language="java"><![CDATA[
+            {STAT}{WS}{INT} {
+                std::sscanf(yytext, "<stat %d", &m_id);
+                m_cmd = 1003;
+            }
+
+            {POS}{WS}{INT}{WS}{INT}{WS}{INT} {
+				std::sscanf(yytext, "<pos %d %u %u", &m_id, &from, &to);
+				m_cmd = 10001;
+			}
+        ]]></programlisting>
+
+        <para>
+            Minden paramétert {}-ek között definiálunk, amit a sscanf() függvény kérni fog.
+        </para>
+
+        <para>
+            A kódban nem a scanf hanem a sscanf szerepel, amiről formázott Stringeket olvas be. 
+            A függvénynek először a szöveget kell megadni amit vizsgálni akarunk. Ez a példában a yytext, 
+            aztán a " %d", ez a formátum ami alapján kiolvassa a megadott karaktersorozatot, jelen esetben 
+            decimális. Utánna az m_id argumentum, amibe elhelyezzük a konvertált értékeket. 
+            Tehát álltalánosan az scanf és a sscnaf így néznek ki.
+        </para>
+
+        <para>
+            A scanf konzerviós karakterei melyeknek az argumentum típusa az int*, 
+            a "d" a decimális egész, az "i" az egész szám, "o" az oktális
+            szám, "u" az előjel nélküli egész, "x" a hexadecimális szám.
+            A char* típúsuak pedig a a "c" ami a karakter, az "s" ami karaktersorozat.
+        </para>
+
+        <para>
+            Szűrni is tudjuk a bemenetet, ezt [ ] belül tudjuk megadni, például [abc] azt jelenti, 
+            hogy az inputból mindent beoolvas kivéve az a,b,c karaktereket. 
+            A [a-z0-9] pedig a kisbetűket és a számokat nem olvassa be.
+        </para>
+
+    </section>
+
+
+
+    <section>
+        <title>BrainB</title>
+
+        <para>
+            A BrainB már ismerős program számunkra, ugyanis az előző fejezetben már találkoztunk vele. Azt tudjuk 
+            hogy a BrainB egy benchmark, ami egy teljesítmény vizsgáló pogram. Az alábbi program minket játékosokat 
+            vizsgál és hasonlít össze. Minden játékost a megszerzett pontjai alapján hasinlít össze. 
+            A játék menetét, és hogy miként zajlik azt az eloző fejezet 7 ik csomagjában az erről szóló fejezetben elolvashatjuk. 
+        </para>
+
+        <para>
+            Most a Qt slot-signal mechanizmust fogjuk vizsgálni. A slotok és a signalok az objektumok közötti kommunikációra szolgálnak. 
+            A QT-nek ez a mehanizmus egy központi eleme amit a QT meta-object system tesz lehetové. 
+            Egy signalt egy objektum bocsát ki, ha valamilyen változás történik. A Slot-ot pedig akkor hívják meg, 
+            ha egy hozzá kapcsolt jel kerül kiírásra. A Slot egy tagfüggvény, és a Signalhoz való kapcsolást pedig a 
+            connect függvény teszi lehetové és a szignatúrájuknak meg kell egyezni.
+        </para>
+
+        <para>
+            A BrainB-ben két ilyennel van:
+        </para>
+
+        <programlisting language="java"><![CDATA[
+            connect ( brainBThread, SIGNAL ( heroesChanged ( QImage, int, int ) ),
+                        this, SLOT ( updateHeroes ( QImage, int, int ) ) );
+
+            connect ( brainBThread, SIGNAL ( endAndStats ( int ) ),
+                        this, SLOT ( endAndStats ( int ) ) );
+        ]]></programlisting>
+
+        <para>
+            Ebben a példában a jelentése az, hogy ha a brainBThread-n belül bekövetkezik heroesChanged signal, 
+            akkor az updateHeroes függvényt lefuttatja. A második connect ugyan ez, itt viszont ha a endAndStats signal
+            következik be, ami azt jelenti, hogy lejárt a játék idő, akkor megkapjuk a játék eredményét egy debug üzenetben. 
+        </para>
+
+    </section>
+
+</chapter>

@@ -1,0 +1,728 @@
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+    <info>
+        <title>Helló, Chomsky!</title>
+        <keywordset>
+            <keyword/>
+        </keywordset>
+    </info>
+
+    <section>
+        <title>EPAM: Bináris keresés és Buborék rendezés implementálása</title>
+        
+        <para>
+            Egy java osztály implementálása, amely képes előre definált n darab egész szám tárolására. Ez az osztály 
+            az alábbi funkcionalitásokkal rendelkezik:
+        </para>
+
+        <itemizedlist>
+            <listitem>
+                <para>Elem hozzáadása a tárolt elemekhez.</para>
+            </listitem>
+
+            <listitem>
+                <para>Egy tetszőleges egész számról megállapíja, hogy el van-e tárolva.</para>
+            </listitem>
+            
+            <listitem>
+                <para>Az eltárolt elemeket rendezni tudja és visszatérni a rendezett elemekkel.</para>
+            </listitem>
+        </itemizedlist>
+
+        <para>
+            A porgram kód pedig a következő:
+        </para>
+
+        <programlisting language="java"><![CDATA[
+            import java.util.Arrays;
+
+            public class IntTarolo {
+                
+                int array[];
+                int index;
+                int size = 0;
+                boolean sorted = true;
+                
+                public IntTarolo(int size){
+                    
+                    this.size = size;
+                    this.array = new int[size];
+                }
+                
+                public IntTarolo(int array[]){
+                    
+                    this.size = array.length;
+                    this.array = array;
+                    this.index = this.size;
+                    this.sorted = false;
+                }
+            ]]></programlisting>
+        <para>
+            Az IntTarolo osztályban létrehozunk egy egész tipusú tömböt az értékek tárolásához, 
+            egy egész tipusú index nevű változtót majd a tömb méretének a vizsálatához, egy egész tipusú size nevű változót a tömb méretének 
+            a tárolásához, végül egy boolean, azaz logikai változót ami a tömb rendezettségét fogja definiálni.
+        </para>
+        <para>
+            Valamint létrehoztunk még két tipusú konstuktort, az első egy értéket kap amit értékül ad a size változónak, 
+            ez a tömb mérete. A második konstruktor egy tömböt kap paraméterül ami alapján leszűri a tömb információit és 
+            elmenti a létrehozott változókba, a tömb mértetét, magát a tömböt, az indexet, és a sorted változót hamisra állítja, 
+            azaz rendezelten a tömb.
+        </para>
+
+        <programlisting language="java"><![CDATA[
+                public void add(int ertek) {
+                    if( size <= index ) {
+                        throw new IllegalArgumentException("Tele van.");
+                    }
+                    sorted = false;
+                    array[index++] = ertek;
+                }
+            ]]></programlisting>
+
+        <para>
+            A függvény amely segitségével új elemeket tárolunk el. A metódus paraméterként egy egész számot kap, 
+            majd ezt a számot egy if feltételben megvizsgálja, hogy ha a feltétel telesül akkor megtelt a tömb és egy 
+            illegális argumentum tipusú hibát fog vissza adni, ami kiirja, hogy "Tele van". Ha hamis, tehát van még hely a tömbben 
+            akkor a rendezettséget, a sorted változót hamisra állítjuk és a tömb következő indexéhez ez értéket rendeljük.
+        </para>
+
+        <programlisting language="java"><![CDATA[
+                public String taroltE(int ertek) {
+                    if(!sorted) {
+                        sort();
+                    }
+                    
+                    int left = 0, right = size - 1;
+                    
+                    while(left <= right) {
+                        int mid = left + ( right - left ) / 2;
+                        
+                        if(array[mid] == ertek) {
+                            return "A(z) " + ertek + " benne van.";
+                        }
+                        
+                        if(array[mid] < ertek) {
+                            left = mid + 1;
+                        } else {
+                            right = mid - 1;
+                        }
+                    }
+                    
+                    return "A(z) " + ertek + " nincs benne.";
+                }
+                
+                public int[] sort() {
+                    for(int i=0; i < size - 1; ++i) {
+                        for(int j=0; j < size - i - 1; ++j) {
+                            if(array[j] > array[j + 1]) {
+                                int temporary = array[j];
+                                array[j] = array[j + 1];
+                                array[j + 1] = temporary;
+                            }
+                        }
+                    }
+                    
+                    sorted = true;
+                    return array;
+                }
+                ]]></programlisting>
+            <para>
+                A bináris kereső függvény amely Stringben lévő kifejezésnek megfelelően adja vissza, hogy egy elem tárolt-e vagy sem. 
+                A függény paraméterként egy egész tpisú értéket vár, majd a függvényben egy if feltétel megvizsgálja, hogy rendezett-e 
+                a tömb, ha nem rendezett akkor rendezi. Két változó segitségével keressük meg az értéket a tömbben, a tömb kezdő és 
+                végpontját tároljuk el. Majd egy while() ciklusban addig keresünk amíg az egyik változó át nem lépi a tömb középindexét, 
+                azaz túlép a tömb felén, hiszen a left nőni míg a right csökkenni fog. A mid változó megkapja a left és right változó 
+                értékei közé eső középindexet, ha ez megegyezik az értékkel akkor benne van a tömbben, ha pedig nem akkor a következő 
+                if feltétel megvizságlja ez érték nagyságát és eldönti, a leftet vagy a rightot kell tologatni, azaz ha kisebb a szám akkor 
+                a right fog csökkenni, hiszen a lenti tartományban kell keresni, ellenkező esetben ha nagyobb akkor a left nőni fog, 
+                hiszen itt pedig a fenti tartományban kell tovább keresni.
+            </para>
+            <para>
+                A buborékrendezés alapján rendezést végző <command>sort()</command> fűggvényt is definiáltuk, amely növekvő sorrendbe 
+                állítja a tömb elemeit. A rendezést az egymás mellett lévő elemek összehasonlításával és cseréjével 
+                hajtja végre a függvény.
+            </para>
+
+            <mediaobject>
+                <imageobject condition="printf">
+                    <imagedata fileref="img2/intTaroloFutasiKep.png" format="PNG" scale="60" />
+                </imageobject>
+            </mediaobject>
+
+            <para>
+                A main() metódusban az IntTarolo osztályt használjuk egy tömb értékekkel való feltöltéséhez. 
+                Először létrehozunk egy tömböt, majd feltöltjük tetszőleges értékekkel, aztán rendezzük a tömböt, 
+                végül kiiratjuk rendezés előtt és után is. Majd rákérdezhetünk értékekre, hogy benne vannak-e a tömbben. 
+                Például a 44-et és a 12-őt felvettük értékül a tömbbe de a 13-mat már nem.
+            </para>
+
+    </section>
+
+
+    <section>
+        <title>EPAM: Order of everything</title>
+
+        <para>
+            Létezik egy érdekes és egyben nagyon hasznos dolog a Javaban, ez nem más mint a Comparable. 
+            Ezt függvények általánosítására használhatunk, ez egyébként C++-ban a Template osztályok és 
+            függvények mutatják be nagyon jól. Mivel ez Javaban is létezik, ezért egy példa feladaton 
+            keresztül vizsgáljuk meg a használatát.
+        </para>
+
+        <para>  
+            A feladatban egy olyan program működését fogjuk nézi amelyik képes bármilyen Collectionokat, 
+            azaz bármilyen struktúrát rendezni, például String vagy Integer tipusokat egyanazon metódussal.
+        </para>
+
+        <programlisting language="java"><![CDATA[
+            import java.util.Collection;
+            import java.util.Collections;
+            import java.util.List;
+            import java.util.Set;
+            import java.util.stream.Collectors;
+            import java.util.stream.Stream;
+
+            import org.junit.jupiter.params.ParameterizedTest;
+            import org.junit.jupiter.params.provider.Arguments;
+            import org.junit.jupiter.params.provider.MethodSource;
+
+
+            public class OrderOfEverythingTest {
+
+                @ParameterizedTest
+                @MethodSource("collectionsToSortDataProvider")
+                public <T extends Comparable<T>>
+                List<T> testOrder
+                (List<T> input, List<T> expectedOutput) {
+                    
+                    //List<Integer> actualOutput = createOrderedList(input);
+                    List<T> actualOutput = createOrderedList(input);
+
+                    // Then
+                    //assertThat(actualOutput, equalTo(expectedOutput));
+                    return actualOutput;
+                }
+
+                private static Stream<Arguments> collectionsToSortDataProvider() {
+                    return Stream.of(
+                        Arguments.of(Collections.emptySet(), Collections.emptyList()),
+                        Arguments.of(Set.of(1), List.of(1)),
+                        Arguments.of(Set.of(2,1), List.of(1,2))
+                    );
+                }
+
+                private <T extends Comparable<T>> List<T> createOrderedList(Collection<T> input) {
+                    return input.stream()
+                        .sorted()
+                        .collect(Collectors.toList());
+                }
+            }
+        ]]></programlisting>
+
+        <para>
+            Az osztály elején importálunk sok szükséges osztályt, ezek a struktúrák kezeléséhez 
+            szükségesek, mint példáult a Collection, a Set vagy a legfontosabb a List, hiszen listában fogjuk 
+            elmenteni a rendezett elemeket. Egy függvényben elkérjük a felhasználótól a bementetet, azaz 
+            a rendezetlen Collectiont és azt a listát amibe rendezni szeretnénk, ez a testOrder() metódus. 
+            Ennek a metódusnak örököltetjük a Comparable-t ami elősegíti, hogy a metódus bármilyen tipusú 
+            adatokat képes legyen feldolgozni. A metódusban létrehozunk egy listát ami megegyezik a paraméterben 
+            kapott lista típusával, ezt T tipusként értelmezünk, ennek a listának értékül adjuk a rendező függvényt 
+            ami az input, avagy bemenet alapján fogja létrehozni a rendezett listát amennyiben lehet rendezni. 
+        </para>
+
+        <para>
+            Majd a rendezett listát létrehozott függvény a createOrderedList() lesz, ami Stream API-val egyszerűen 
+            rendezi és visszaadja a listát. A Streamelést elősegítő metódus a collectionsToSortDataProvider(), 
+            azt adjuk meg a legelső metódusnak alapként, azaz a MethodSource-nek a metódus előtt, 
+            valamint kulcsszóként a ParameterizedTest kulcsszót is megadjuk.
+        </para>
+
+        <programlisting language="java"><![CDATA[
+            @SuppressWarnings("serial")
+            public class ParentException extends RuntimeException {
+
+                ParentException() {
+                    System.out.println("New Parent Class Constructor.");
+                }
+            }
+
+            @SuppressWarnings("serial")
+            public class ChildException extends ParentException {
+
+                ChildException(){
+                    System.out.println("New Child Class Constructor.");
+                }
+            }
+        ]]></programlisting>
+
+        <para>
+            Ha egy függvény számára a Comparable definiálva van az azt jelenti, hogy illeszkedik rá 
+            bármilyen típus. Ez megegyezik a C++-ban lévő Template kulcsszóval.
+        </para>
+
+        <programlisting language="java"><![CDATA[ 
+            import java.util.Arrays;
+            import java.util.List;
+
+            public class Main {
+
+                public static void main(String[] args) {
+                    
+                    OrderOfEverythingTest obj = new OrderOfEverythingTest();
+                    
+                    // Integer
+                    List<Integer> array = Arrays.asList(420,34,1,-69,72,115,276);
+                    List<Integer> list = array;
+                    
+                    System.out.println("Unordered:\n\t" + array);
+                    
+                    System.out.println("Ordered:\n\t" + obj.testOrder(array, list));
+                    
+                    //String
+                    List<String> str = Arrays.asList("Luke", "Sophie", "John", "Jack");
+                    List<String> list2 = str;
+                    
+                    System.out.println("Unordered:\n\t" + str);
+                    
+                    System.out.println("Ordered:\n\t" + obj.testOrder(str, list2));                
+                }
+            }
+            ]]></programlisting>
+
+        <para>
+            A main osztályban egyszerűen létrehozunk az osztálynak egy objektumot amit használunk 
+            a rendezéshez, majd az objektummal meghívjuk az osztály rendező függvényét, aminek adunk 
+            egy I/O paramétert, azaz egy bemenetet, a rendezendő Collectiont, és egy kimenetet, ahova meg szeretnénk 
+            kapni a rendezett elemeket egy listában. Ez azért érdekes mert több tipusra definiálódott a rendező 
+            függvény ezért kipróbálhatjuk Integer és String tipusokra, de akár más tipusokra is.
+        </para>
+
+        <mediaobject>
+                <imageobject condition="printf">
+                    <imagedata fileref="img2/orderOfEverything.png" format="PNG" scale="80" />
+                </imageobject>
+        </mediaobject>
+
+    </section>
+
+
+    <section>
+        <title>EPAM: HashMap implementáció</title>
+
+        <para>
+            Egy java.util.Map implementáció, mely nem használja a Java Collection API-t.
+            Az implementáció megfelel az összes megadott unit tesztnek, nem tud kezelni null
+            értékű kulcsokat és a “keySet”, “values”, “entrySet” metódusok nem kell támogatják az elem törlést.
+        </para>
+
+        <para>
+            A Hash Map kulcs-érték párokat tárol, az első a kulcs a második pedig maga az érték. 
+            A feladat egy olyan HashMap implementáció ami képes különböző tipusú értékek tárolása 
+            egyetlen HashMapben.
+        </para> 
+
+        <para>
+            Hogy a program képes legyen egymástól függetelenül különböző tipusok tárolására, 
+            általános típusokat kell használnunk, azaz a tipust is várva a felhasználótól, 
+            majd azzal dolgozva tovább.
+        </para>
+
+        <programlisting language="java"><![CDATA[
+            package EPAM_HashMap;
+
+            import java.util.*;
+            import java.util.function.BiPredicate;
+
+            class ArrayMap<K, V> implements Map<K, V> {
+
+            private static final int INITIAL_SIZE = 16;
+            private static final String NULL_KEY_NOT_SUPPORTED = "This Map implementation does not support null keys!";
+
+            private int size = 0;
+            @SuppressWarnings("unchecked")
+            private K[] keys = (K[]) new Object[INITIAL_SIZE];
+            @SuppressWarnings("unchecked")
+            private V[] values = (V[]) new Object[INITIAL_SIZE];
+
+            @Override
+            public int size() {
+                return size;
+            }
+
+            @Override
+            public boolean isEmpty() {
+                return size <= 0;
+            }
+
+            @Override
+            public boolean containsKey(Object key) {
+                Objects.requireNonNull(key, NULL_KEY_NOT_SUPPORTED);
+
+                return searchItemInArray(key, keys, Object::equals) != -1;
+            }
+
+            @Override
+            public boolean containsValue(Object value) {
+                int valueIndex = searchItemInArray(value, values, Object::equals);
+                return valueIndex > -1 && keys[valueIndex] != null;
+            }
+
+            @Override
+            public V get(Object key) {
+                Objects.requireNonNull(key, NULL_KEY_NOT_SUPPORTED);
+                if(size <= 0) {
+                return null;
+                }
+
+                int keyIndex = searchItemInArray(key, keys, Object::equals);
+                if (keyIndex > -1) {
+                return values[keyIndex];
+                }
+
+                return null;
+            }
+
+            @Override
+            public V put(K key, V value) {
+                Objects.requireNonNull(key, NULL_KEY_NOT_SUPPORTED);
+
+                int keyIndex = searchItemInArray(key, keys, Objects::equals);
+                if (keyIndex < 0) {
+                keyIndex = findFirstEmptyPlace();
+                if (keyIndex < 0) {
+                    expandArrays();
+                }
+                keyIndex = size;
+                }
+
+                V prevValue = values[keyIndex];
+
+                keys[keyIndex] = key;
+                values[keyIndex] = value;
+                size++;
+
+                return prevValue;
+            }
+
+            @Override
+            public V remove(Object key) {
+                Objects.requireNonNull(key, NULL_KEY_NOT_SUPPORTED);
+
+                int keyIndex = searchItemInArray(key, keys, Object::equals);
+                if (keyIndex > -1) {
+                V prevValue = values[keyIndex];
+
+                keys[keyIndex] = null;
+                values[keyIndex] = null;
+                size--;
+
+                return prevValue;
+                }
+
+                return null;
+            }
+
+            @Override
+            public void putAll(Map<? extends K, ? extends V> m) {
+                m.forEach(this::put);
+            }
+
+            @Override
+            public void clear() {
+                Arrays.fill(keys, null);
+                Arrays.fill(values, null);
+                size = 0;
+            }
+
+            @Override
+            public Set<K> keySet() {
+                Set<K> result = new HashSet<>();
+                for(K i : keys) {
+                if (i != null) {
+                    result.add(i);
+                }
+                }
+
+                return result;
+            }
+
+            @Override
+            public Collection<V> values() {
+                Collection<V> result = new ArrayList<>();
+                for(V i : values) {
+                if (i != null) {
+                    result.add(i);
+                }
+                }
+
+                return result;
+            }
+
+            @Override
+            public Set<Entry<K, V>> entrySet() {
+                Set<Entry<K, V>> result = new HashSet<>();
+                for(int i = 0; i < keys.length; ++i) {
+                K key = keys[i];
+                if (key != null) {
+                    V value = values[i];
+                    result.add(new AbstractMap.SimpleEntry<>(key, value));
+                }
+                }
+
+                return result;
+            }
+
+
+            private <I> int searchItemInArray(I item, I[] array, BiPredicate<I, I> equalFunction) {
+                for (int index = 0; index < array.length; index++) {
+                if (equalFunction.test(item, array[index]))
+                    return index;
+                }
+
+                return -1;
+            }
+
+            private int findFirstEmptyPlace() {
+                return searchItemInArray(null, keys, Objects::equals);
+            }
+
+            private void expandArrays() {
+                int expandedSize = size * 2;
+
+                keys = Arrays.copyOf(keys, expandedSize);
+                values = Arrays.copyOf(values, expandedSize);
+            }
+
+            }
+        ]]></programlisting>
+
+        <para>
+            Egy alapértéket állít be minden új HashMapnek, ez az érték a 16, de azt később meg lehet változtatni.
+            A containsKey() metódus egy key objektumot vár majd vissza ad egy logiaki értéket, hogy van-e benne olyan.
+            A containsValue() matódus pedig egy értéket vár és vissza ad egy logiaki értéket, hogy van-e benne olyan. 
+            A null értékeket nem kezeli, ezt minden metódusban jelezni kell a <command>NULL_KEY_NOT_SUPPORTED</command> feltételle.
+        </para>
+
+        <para>
+            Több metódust szükséges volt felüldefiniálni, hogy ne támogasson null kulcsokat. 
+            Valamint több olyan metódus van a HashMap osztályban amit az Eclipse automatikusan 
+            tud generálni a meglévő kód alapján, ezek a következők: a get(), put(), set(), stb.
+        </para>
+
+        <para>
+            A put() metódus eltárol egy értéket úgy, hogy megadunk egy tetszóleges kulcsot, ami hivatkozik, 
+            majd az értékre. A get() parancs egy kulcsot vár paraméterként, ami alapján megkeresi a kulcshoz 
+            tartozó értéket és ezt adja vissza.
+        </para>
+
+        <para>
+            A remove() metódus egy kulcs alapján tud egy értéket törölni. Mivel null kulcsokat, 
+            nem tud tárolni ezért nem is tudja őket kitörölni. A values() metódus kilistázza az 
+            értékeket egy Collectionban megjelenítve. Az entrySet() metódus az kulcs-érték 
+            párokat listázza ki egy Collectionban. A clear() matódus az egész HashMapet kiüríti. 
+        </para>
+
+        <para>
+            A searchItemInArray() metódus vissza adja egy keresett item indexét, ha az benne van.
+            Az isEmpty() metódus logikai értéket ad vissza HashMap ürességének a vizsgálatából. 
+            A size() metódus pedig egyértelműen a HashMap méretét adja vissza.
+        </para>
+
+        <programlisting language="java"><![CDATA[
+            package EPAM_HashMap;
+
+            public class Main {
+
+                @SuppressWarnings("rawtypes")
+                public static void main(String[] args) {
+                    
+                    ArrayMap<Integer, Comparable> map = new ArrayMap<Integer, Comparable>();
+                    
+                    map.put(17, "§§§");
+                    map.put(22, "Különböző Collectionok nélkül használható.");
+                    map.put(35, "Ez egy Hash Map implemetáció.");
+                    map.put(52, "Alkalmazkodik az elsőként kapott tipushoz."); 
+                    
+                    System.out.println(map.get(35));
+                    System.out.println(map.get(22));
+                    System.out.println(map.get(52));
+                    
+                    System.out.println(map.values());
+                    
+                    ArrayMap<Comparable, Comparable> map2 = new ArrayMap<Comparable, Comparable>();
+                    
+                    map2.put("first", "first");
+                    map2.put("2", 3.14);
+                    map2.put(2, 54321);
+                    map2.put(3.14, "Kiskacsa");
+                    
+                    System.out.println("\nTetszőleges Hash Map:");
+                    System.out.println(map2.get("first"));
+                    System.out.println(map2.get("2"));
+                    
+                    System.out.println("Egy HashMap kulcs-érték párjai: " + map.entrySet());
+                    System.out.println("Egy HashMap értékei: " + map2.values());
+
+                }
+            }
+        ]]></programlisting>
+
+        <para>
+            Egy main osztályban használjuk a HashMap implementációt, ahol két hash mapet hozunk létre. 
+            A elsőben a kulcsok Integer, az értékek pedig Comparable, azaz tetszőlegesek lehetnek. 
+            Majd a put() metódussal adunk a hashMaphez kulcsokat és értékeket, a get() metódussal pedig a kulcsaikra 
+            hivatkozva lekérhetjük őket. A values() metódus pedig vissza is adta. A következő képen a main() metódus 
+            futatás eredményét látjuk egy másik hashMapel együtt.
+        </para>
+
+        <mediaobject>
+                <imageobject condition="printf">
+                    <imagedata fileref="img2/hashMap.png" format="PNG" scale="50" />
+                </imageobject>
+        </mediaobject>
+
+        <para>
+            Majd egy olya HashMapet is létrehozunk aminek a kulcsai és az értékei is Comparable 
+            tipusúak, ez azt jelenti, hogy képesek bármilyen értéket felvenni kulcsnak és képesek 
+            bármilyen értéket eltárolni. Négy kulcs-érték párt vettünk fel, string-string, string-int, 
+            int-int és int-String tipusokat vettünk fel ugyanabban a hashMapben. 
+            Majd a get() metódusba egy értékre a kulcsával hivatkozhatunk. 
+            kipróbálhatjuk az entrySet() metódust, ami kiiratja együtt a kulcs-érték párokat 
+            egy listában. Majd vegül kiirathatjuk csak az értékeke e values() metódussal.
+        </para>
+
+        <mediaobject>
+                <imageobject condition="printf">
+                    <imagedata fileref="img2/hashMapNullException.png" format="PNG" scale="50" />
+                </imageobject>
+        </mediaobject>
+
+        <para>
+            Ezen a futási képen java.lang.NullPointerException errort generáltunk egy null kulcs 
+            érték megadásával, ez is bizonyítja hogy null kulcsok tárolására nem lehet alkalmazni ezt a HashMapet.
+        </para>
+
+    </section>
+
+
+    <section>
+        <title>Full Screen</title>
+
+        <para>
+            Ez a feladat egy kicsit érdekesebb, mivel egy teljes képernyős java program felépítéséről lesz szó. 
+            A hangsúly a teljes képernyőn van, vagyis inkább az ablak megjelenítésen.
+            A java lehetőséget ad erre a JFrame segitségével. 
+            A program létrehoz egy kezdetleges Bejelentkező ablak prototipust.
+        </para>
+
+        <para>
+            A forráskód a következő.
+        </para>
+
+        <programlisting language="java"><![CDATA[
+            import javax.swing.JFrame;
+            import javax.swing.JTextField;
+            import javax.swing.JPasswordField;
+            import javax.swing.JLabel;
+            import java.awt.FlowLayout;
+
+            @SuppressWarnings("serial")
+            public class SimpleFullScreen extends JFrame{
+                
+                public static void main(String[] args) {
+                    SimpleFullScreen screen = new SimpleFullScreen();
+                    
+                    screen.Screen();
+                }
+        ]]></programlisting>
+
+        <para>
+            Egy osztályt létrehozva benne a main() metódusban példányosítás után az objektum 
+            meghívja azt a függvényt amelyik megjeleníti a teljes képernyős ablakot. 
+            Minden importra szükségünk van. A JFrame osztály tulajdonságait örököli meg az osztály, 
+            amely egy ablak megjelenítés és elrendezést elősegítő osztály. A FlowLayout egy fajta elrendezést 
+            jelent majd. A JLabel segitségével egyszerű szövegdobozt lehet létrehozni. 
+            A JTextField segitségével, olyan szövegdobozt lehet létrehozni, amibe bármilyen felhasználó egyszerű 
+            szöveget gépelhet, a JPasswordField segitségével, pedig olyan szövegdobozt lehet létrehozni, 
+            ami password tipusú, azaz a bele írt karakterek rejtettek lesznek, ahogyan egy egyszerű Bejelentkező 
+            oldalon is használják.
+        </para>
+
+        <programlisting language="java"><![CDATA[
+
+                SimpleFullScreen() { 
+                    super("Bejelentkező felülelt");
+                }
+
+                public void Screen() {
+                
+                    JLabel felhLabel;
+                    JLabel jelszoLabel;
+                    JTextField felhField;
+                    JPasswordField jelszoField;
+                    
+                    setLayout(new FlowLayout());
+                    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                    setSize(1280,720);
+                    setVisible(true);
+                    setResizable(true);
+                    
+                    felhLabel = new JLabel("Felhasználónév: ");
+                    felhLabel.setToolTipText(" Az a név amellyel bejelentkezel. ");
+                        add(felhLabel);
+                    felhField = new JTextField("  Ird be a felhasználó neved  ");
+                        add(felhField);
+                    
+                    jelszoLabel = new JLabel("Jelszó: ");
+                    jelszoLabel.setToolTipText(" Az a jelszó amellyel bejelentkezel. ");
+                        add(jelszoLabel);
+                    jelszoField = new JPasswordField("  Jelszó  ");
+                        add(jelszoField);	
+                }
+                
+            }
+        ]]></programlisting>
+
+        <para>
+            Maga a megjelenítés a Screen() függvényben történik, a konstruktorban megadjuk az ablaknak 
+            a cím szavát amit megjelenít mint ablak nevet. A metódusban elsősorban létrehozunk négy változót. 
+            Az első két változó két egyszerű ablak, a harmadik egy szöveg mező és a negyedik egy jelszó mező. 
+        </para>
+
+        <para>
+            A set tipusú metódusok végzik az alap beállításokat.
+            Az elrendezést a setLayout() függvény FlowLayout-ra állítja, ami előre definiált, egy egyszerű középre állítás. 
+            A setDefaultCloseOperation() metódus a bezárhatóságot segíti elő. 
+            A setSize() metódus a feladat lényege, hiszen itt állíhatjuk az ablak méretét.
+            A setVisible() metódus az ablak láthatóságát állítja be true értékre.
+            A setResizable() metódus segitségével tudjuk kézzel is átméretezni az ablakot.
+        </para>
+
+        <para>
+            Az ablakba létrehozunk két Labelt, amik a felhasználónév és jelszó nevet kapták. 
+            Mindkét cimkéhez tudunk rendelni Fieldet, amibe írhatunk kezdeteleges segítő szövegeket, 
+            ezekbe a felhasználó tud gépelni. Majd létrehoztunk ToolTipeket is amik rejtett magyarázatok, 
+            ezek is segítenek a felhasználónak, ezek akkor jelennek meg amikor a kurzort a cimkére viszi 
+            a felhasználó. A Filedet és a ToolTippet mindig hozzá kell adni a cimkéhez, hogy kezelni tudja őket.
+        </para>
+
+        <mediaobject>
+                <imageobject condition="printf">
+                    <imagedata fileref="img2/FullScreen.png" format="PNG" scale="30" />
+                </imageobject>
+        </mediaobject>
+
+        <para>
+            Egy érdekesség: A setResizable() metódus igazra állításával lehetőség van arra, 
+            hogy átméretezzük a képet, de ugyanakkor full screen-re állítani a jobb felső sarokban 
+            lévő Full Screen gomb segítségével.
+        </para>
+
+        <mediaobject>
+                <imageobject condition="printf">
+                    <imagedata fileref="img2/FullScreen2.png" format="PNG" scale="50" />
+                </imageobject>
+        </mediaobject>
+
+    </section>
+
+</chapter>
